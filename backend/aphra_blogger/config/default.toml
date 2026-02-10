@@ -1,0 +1,37 @@
+# Blogger Agent Configuration
+
+[models]
+# Default LLM model for content generation
+default_model = "gpt-4-turbo-preview"
+
+# Model for style analysis (can use cheaper model)
+style_analysis_model = "gpt-3.5-turbo"
+
+# Model for critique
+critic_model = "gpt-4-turbo-preview"
+
+[models.openai]
+# OpenAI API configuration
+api_key_env = "OPENAI_API_KEY"
+organization = ""
+temperature = 0.7
+max_tokens = 2000
+
+[models.anthropic]
+# Anthropic Claude configuration (optional)
+api_key_env = "ANTHROPIC_API_KEY"
+temperature = 0.7
+max_tokens = 2000
+
+[workflow]
+# Workflow configuration
+max_iterations = 3
+enable_critic = true
+verbose = true
+
+[content]
+# Content generation settings
+min_word_count = 800
+max_word_count = 2000
+target_tone = "professional_casual"
+include_images = true
