@@ -1,2 +1,270 @@
-# blogger-agent-tfg
-Multi-agent AI system for mimicking blogger writing style. TFG project using Aphra workflows, Next.js, and Modal deployment.
+# Blogger Agent TFG
+
+> Multi-agent AI system for mimicking blogger writing style using Aphra workflows, Next.js, and Modal deployment
+
+## 📋 Descripción del Proyecto
+
+Sistema multi-agente de IA que analiza el estilo de escritura de un blogger y genera artículos nuevos que mimetizan su tono, estructura, y forma de escribir. El proyecto utiliza múltiples agentes especializados que colaboran para:
+
+- Analizar el estilo narrativo del blogger
+- Extraer palabras clave y patrones lingüísticos
+- Generar contenido base
+- Criticar y refinar el texto
+- Construir HTML/JSX optimizado para Next.js
+- Seleccionar y ubicar imágenes apropiadas
+
+## 🏗️ Arquitectura
+
+```
+blogger-agent-tfg/
+├── backend/                    # Python + Aphra Workflows
+│   ├── aphra_blogger/
+│   │   ├── workflows/
+│   │   │   ├── blogger_style.py
+│   │   │   ├── agents/
+│   │   │   │   ├── style_analyzer.py
+│   │   │   │   ├── keyword_extractor.py
+│   │   │   │   ├── content_generator.py
+│   │   │   │   ├── critic.py
+│   │   │   │   ├── html_builder.py
+│   │   │   │   └── image_selector.py
+│   │   │   └── prompts/
+│   │   ├── config/
+│   │   └── context.py
+│   ├── runner.py
+│   ├── requirements.txt
+│   └── tests/
+├── frontend/                   # Next.js
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── generate-post/
+│   │   ├── posts/[slug]/
+│   │   └── components/
+│   ├── package.json
+│   └── next.config.js
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── API.md
+│   ├── SETUP.md
+│   └── MODAL_DEPLOYMENT.md
+├── docker-compose.yml
+└── CONTRIBUTING.md
+```
+
+## 👥 División de Tareas (3 Personas)
+
+### 👤 Persona 1: Backend Lead + Workflows Core
+**Responsabilidades:**
+- Estructura base del `BloggerStyleWorkflow`
+- Agentes principales:
+  - `style_analyzer.py` - Análisis del estilo del blogger
+  - `content_generator.py` - Redacción base + refinada  
+  - `critic.py` - Crítica y feedback
+- Configuración de `config/default.toml`
+- Tests unitarios backend
+- Docker setup para backend
+
+**Branches:**
+- `feature/workflow-base`
+- `feature/style-analyzer`
+- `feature/content-generator`
+- `feature/critic-agent`
+
+### 👤 Persona 2: Backend Specialization + Integration  
+**Responsabilidades:**
+- Agentes especializados:
+  - `keyword_extractor.py` - Palabras clave y términos
+  - `html_builder.py` - Construcción JSON/HTML
+  - `image_selector.py` - Descripciones de imágenes
+- Prompts tuneados en `prompts/`
+- `runner.py` - CLI para ejecutar workflows
+- Tests de integración
+- Documentación técnica (`ARCHITECTURE.md`, `API.md`)
+- **Integración con Modal** para deployment
+
+**Branches:**
+- `feature/keyword-extractor`
+- `feature/html-builder`  
+- `feature/image-selector`
+- `feature/runner-cli`
+- `feature/modal-deployment`
+- `docs/architecture`
+
+### 👤 Persona 3: Frontend Full Stack + DevOps
+**Responsabilidades:**
+- Frontend completo Next.js:
+  - Componentes React (`<BlogLayout>`, `<PostHeader>`, `<PostBody>`, etc.)
+  - Página dinámica `app/posts/[slug]/page.tsx`
+  - API route `app/api/generate-post/route.ts`
+  - Estilos y UX (Tailwind CSS)
+- DevOps:
+  - `docker-compose.yml` completo
+  - GitHub Actions CI/CD
+  - `SETUP.md` y `DEPLOYMENT.md`
+- Testing frontend
+
+**Branches:**
+- `feature/blog-components`
+- `feature/post-page`
+- `feature/api-endpoint`
+- `feature/docker-setup`
+- `feature/ci-cd`
+- `docs/setup`
+
+## 🚀 Integración con Modal
+
+**Modal** se usará para deployment serverless del backend Python:
+
+### ¿Por qué Modal?
+- Ejecución serverless de código Python
+- Escalado automático según demanda
+- Gestión de dependencias integrada
+- GPU/CPU bajo demanda para LLMs
+- Costos eficientes (pay-per-use)
+
+### Implementación
+
+```python
+# backend/modal_app.py
+import modal
+
+stub = modal.Stub("blogger-agent")
+
+image = modal.Image.debian_slim().pip_install_from_requirements("requirements.txt")
+
+@stub.function(image=image, secrets=[modal.Secret.from_name("openai-secret")])
+def generate_blog_post(blogger_urls: list[str], topic: str) -> dict:
+    from aphra_blogger.workflows.blogger_style import BloggerStyleWorkflow
+    
+    workflow = BloggerStyleWorkflow()
+    result = workflow.run(blogger_urls=blogger_urls, topic=topic)
+    
+    return result
+
+@stub.webhook(method="POST")
+def webhook(data: dict):
+    result = generate_blog_post.call(
+        blogger_urls=data["blogger_urls"],
+        topic=data["topic"]
+    )
+    return result
+```
+
+### Conexión Next.js → Modal
+
+```typescript
+// frontend/app/api/generate-post/route.ts
+export async function POST(request: Request) {
+  const { bloggerUrls, topic } = await request.json();
+  
+  const response = await fetch(process.env.MODAL_WEBHOOK_URL!, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ blogger_urls: bloggerUrls, topic })
+  });
+  
+  const post = await response.json();
+  return Response.json(post);
+}
+```
+
+## 🔧 Setup Rápido
+
+### Backend
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python runner.py --blogger-urls https://example.com/blog --topic "AI en educación"
+```
+
+### Frontend  
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Docker (Todo junto)
+```bash
+docker-compose up
+```
+
+### Modal Deployment
+```bash
+modal deploy backend/modal_app.py
+```
+
+## 📊 Flujo de Trabajo (Workflow)
+
+1. **Análisis de Estilo** (`style_analyzer`) → Analiza posts del blogger
+2. **Extracción de Keywords** (`keyword_extractor`) → Palabras clave recurrentes
+3. **Generación Base** (`content_generator`) → Primer borrador
+4. **Aplicación de Estilo** (`content_generator`) → Reescribe con estilo del blogger
+5. **Crítica** (`critic`) → Feedback sobre coherencia y estilo  
+6. **Refinamiento** (`content_generator`) → Versión final
+7. **HTML Builder** (`html_builder`) → Estructura JSON/HTML
+8. **Selección de Imágenes** (`image_selector`) → Prompts y ubicaciones
+
+## 🤝 Contribuir
+
+Lee [CONTRIBUTING.md](CONTRIBUTING.md) para entender el flujo de trabajo con Git y GitHub.
+
+### Flujo Git
+1. Crear issue desde GitHub Projects
+2. Asignarte la issue
+3. Crear rama: `git checkout -b feature/nombre`
+4. Commits: `git commit -m "feat(scope): description"`
+5. Push y PR contra `develop`
+6. Esperar 1 approval
+7. Merge
+
+## 📚 Documentación
+
+- [Arquitectura](docs/ARCHITECTURE.md) - Diseño del sistema
+- [API](docs/API.md) - Especificación de agentes y workflows
+- [Setup](docs/SETUP.md) - Configuración detallada
+- [Modal Deployment](docs/MODAL_DEPLOYMENT.md) - Guía de deployment
+
+## 🧪 Testing
+
+```bash
+# Backend
+cd backend
+pytest tests/
+
+# Frontend
+cd frontend  
+npm test
+```
+
+## 📦 Tech Stack
+
+### Backend
+- Python 3.11+
+- Aphra (workflow framework)
+- OpenAI API / OpenRouter
+- Modal (serverless deployment)
+- pytest
+
+### Frontend
+- Next.js 14 (App Router)
+- React 18
+- TypeScript
+- Tailwind CSS
+- Jest + Testing Library
+
+### DevOps
+- Docker + Docker Compose
+- GitHub Actions
+- Modal
+
+## 📝 Licencia
+
+MIT License - Ver [LICENSE](LICENSE) para detalles.
+
+## 👨‍🎓 Proyecto Académico
+
+Trabajo Final de Grado (TFG) - Especialización en IA y Big Data  
+IES Rafael Alberti - 2026
