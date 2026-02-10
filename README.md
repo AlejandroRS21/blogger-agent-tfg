@@ -80,6 +80,131 @@ blogger-agent-tfg/
 - `runner.py` - CLI para ejecutar workflows
 - Tests de integración
 - Documentación técnica (`ARCHITECTURE.md`, `API.md`)
+## 🏛️ Next.js como Motor del Blog
+
+**IMPORTANTE**: Este proyecto **NO usa WordPress**. El blog completo está construido con **Next.js 14** usando App Router.
+
+### Arquitectura del Blog
+
+```
+Backend (Modal)          Frontend (Next.js Blog)
+┌──────────────────┐       ┌────────────────────────┐
+│ Workflow Agentes │       │ Next.js App           │
+│ + Modal Deploy   │  -->  │ + Markdown Rendering  │
+│                  │       │ + SEO Optimizado      │
+│ Genera JSON      │       │ + Componentes React   │
+└──────────────────┘       └────────────────────────┘
+```
+
+### Flujo de Generación y Publicación
+
+1. **Usuario solicita generar post** (UI de Next.js)
+2. **API Route** (`/api/generate-post`) llama al webhook de Modal
+3. **Modal ejecuta workflow** con agentes (style_analyzer, content_generator, etc.)
+4. **Modal devuelve JSON** estructurado:
+   ```json
+   {
+     "slug": "mi-experiencia-con-claude-opus",
+     "title": "Claude Opus me tiene un poco alucinado",
+     "description": "Mis primeras impresiones tras...",
+     "content_markdown": "## Intro\n\nTotal, que...",
+     "meta": {
+       "author": "Sistema Blogger Agent",
+       "date": "2026-02-10",
+       "tags": ["ia", "claude", "anthropic"],
+       "read_time": "8 min"
+     },
+     "images": [
+       {
+         "id": "hero",
+         "alt": "Claude Opus interface",
+         "position": "hero"
+       }
+     ]
+   }
+   ```
+5. **Next.js guarda el post** en el filesystem o base de datos
+6. **Next.js renderiza el post** en `/posts/[slug]` usando:
+   - Server Components para SEO
+   - Markdown → HTML con `remark`/`rehype`
+   - Metadata dinámica para `<head>`
+
+### Estructura Frontend Next.js
+
+```typescript
+// app/posts/[slug]/page.tsx
+import { getPost } from '@/lib/posts';
+import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import { BlogLayout } from '@/components/BlogLayout';
+
+export async function generateMetadata({ params }) {
+  const post = await getPost(params.slug);
+  return {
+    title: post.title,
+    description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: 'article'
+    }
+  };
+}
+
+export default async function PostPage({ params }) {
+  const post = await getPost(params.slug);
+  
+  return (
+    <BlogLayout>
+      <article>
+        <h1>{post.title}</h1>
+        <div className="meta">
+          <time>{post.meta.date}</time>
+          <span>{post.meta.read_time}</span>
+        </div>
+        <MarkdownRenderer content={post.content_markdown} />
+      </article>
+    </BlogLayout>
+  );
+}
+```
+
+### Almacenamiento de Posts
+
+**Opción 1: Filesystem (más simple para el TFG)**
+```
+frontend/
+└── content/
+    └── posts/
+        ├── mi-experiencia-con-claude.json
+        ├── anthropic-es-la-nueva-apple.json
+        └── ...
+```
+
+**Opción 2: Base de datos (más escalable)**
+- Vercel Postgres / Supabase
+- Tabla `posts` con columnas: `slug`, `title`, `content`, `meta`, etc.
+
+### Ventajas de Next.js vs WordPress
+
+✅ **Performance**: Server Components, Static Generation  
+✅ **TypeScript**: Type-safe en todo el stack  
+✅ **Control total**: Sin limitaciones de plugins  
+✅ **SEO moderno**: Metadata API, sitemap automático  
+✅ **Deploy fácil**: Vercel, Netlify, Railway  
+✅ **Sin base de datos MySQL**: Opcional, no obligatorio  
+✅ **Markdown nativo**: Renderizado con remark/rehype  
+✅ **Componentes reutilizables**: React ecosystem
+
+### Componentes Principales
+
+- **`<BlogLayout>`**: Layout general con header, footer, sidebar
+- **`<PostHeader>`**: Hero image, título, meta (autor, fecha, lectura)
+- **`<PostBody>`**: Renderizado de markdown con estilos
+- **`<RelatedPosts>`**: Algoritmo simple de posts relacionados
+- **`<ImageCarousel>`**: Galería de imágenes del post
+- **`<CommentSection>`**: Sistema de comentarios (Giscus/Disqus/custom)
+
+
 - **Integración con Modal** para deployment
 
 **Branches:**
