@@ -46,7 +46,7 @@ blogger-agent-tfg/
 │   ├── ARCHITECTURE.md
 │   ├── API.md
 │   ├── SETUP.md
-│   └── MODAL_DEPLOYMENT.md
+│   └── _DEPLOYMENT.md
 ├── docker-compose.yml
 └── CONTRIBUTING.md
 ```
@@ -206,6 +206,7 @@ frontend/
 
 
 - **Integración con Modal** para deployment
+- **Integración con Vercel** para deployment del frontend Next.js
 
 **Branches:**
 - `feature/keyword-extractor`
