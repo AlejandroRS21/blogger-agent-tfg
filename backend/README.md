@@ -1,6 +1,6 @@
 # Backend - Blogger Agent
 
-Backend Python del sistema multi-agente para mimificar el estilo de escritura de bloggers.
+Backend Python del sistema multi-agente para mimetizar el estilo de escritura de bloggers.
 
 ## 🏗️ Estructura
 
@@ -189,10 +189,11 @@ Para deployment serverless, ver `modal_app.py` (próximamente).
 
 ## 📚 Dependencias Principales
 
-- **aphra** - Framework de workflows
 - **openai** - Cliente OpenAI API
+- **anthropic** - Cliente Anthropic API (opcional)
 - **toml** - Parsing de configuración
 - **pydantic** - Validación de datos
+- **pytest** - Framework de testing
 
 ## 🤝 Contribuir
 
