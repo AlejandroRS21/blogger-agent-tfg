@@ -2,6 +2,12 @@
 
 > Guía de implementación por fases con tareas pendientes
 
+> :information_source: **NOTA SOBRE EL FRONTEND**  
+> Algunas referencias en este documento mencionan deployment en Vercel con Next.js.  
+> El proyecto ahora usa **GitHub Pages** con HTML estático. Ver: [https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)
+
+---
+
 ## ✅ Completado
 
 ### Fase 0: Setup Inicial ✅
