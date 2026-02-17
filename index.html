@@ -54,8 +54,11 @@
     <script>
         async function loadPosts() {
             try {
-                const response = await fetch('posts.json');
+                // Añadimos un pequeño log para depuración
+                console.log('Intentando cargar listado de posts...');
+                const response = await fetch('posts.json?v=' + Date.now());
                 const posts = await response.json();
+                console.log('Posts cargados:', posts.length);
                 
                 const container = document.getElementById('posts-container');
                 const noPosts = document.getElementById('no-posts');
