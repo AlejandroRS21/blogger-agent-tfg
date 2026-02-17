@@ -80,3 +80,24 @@ class LLMProvider(ABC):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ]
+
+    def generate(
+        self,
+        prompt: str,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+    ) -> str:
+        """
+        Simple text generation from a single prompt.
+        
+        Args:
+            prompt: Text prompt
+            temperature: Override default temperature
+            max_tokens: Override default max tokens
+            
+        Returns:
+            Generated text string
+        """
+        messages = [{"role": "user", "content": prompt}]
+        response = self.chat_completion(messages, temperature, max_tokens)
+        return response.content

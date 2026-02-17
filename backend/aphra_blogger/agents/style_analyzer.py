@@ -51,7 +51,7 @@ class StyleAnalyzer:
                 self.llm = create_llm_provider(
                     provider=provider,
                     api_key=api_key,
-                    model=model or "mistralai/Mistral-7B-Instruct-v0.2",
+                    model=model, # Dejar que el factory decida si no se provee
                     temperature=0.3,
                     max_tokens=1000
                 )
@@ -76,8 +76,12 @@ class StyleAnalyzer:
             # Fallback to rule-based analysis
             return self._fallback_analysis(sample_text or "")
         
+        # Safe extraction of sample_text
+        safe_sample = (sample_text or "")[:500]
+        url_context = f"URLs: {', '.join(blogger_urls)}" if blogger_urls else f"Sample Text: {safe_sample}"
+        
         # For now, use a comprehensive prompt with known info about Javi Pas style
-        prompt = f"""Analyze the writing style of the blogger from these URLs: {', '.join(blogger_urls)}.
+        prompt = f"""Analyze the writing style of the blogger from this context: {url_context}.
 
 Based on research, this blogger (Javi Pas from javipas.com "Incognitosis") has the following characteristics:
 

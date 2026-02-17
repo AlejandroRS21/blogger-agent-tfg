@@ -76,7 +76,7 @@ class HTMLBuilder:
                 self.llm = create_llm_provider(
                     provider=provider,
                     api_key=api_key,
-                    model=model or "mistralai/Mistral-7B-Instruct-v0.2",
+                    model=model,
                     temperature=0.7,
                     max_tokens=200
                 )

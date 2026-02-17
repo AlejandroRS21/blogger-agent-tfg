@@ -38,12 +38,13 @@ def create_llm_provider(
         ValueError: If provider is invalid or not available
     """
     # Default model based on provider
-    if model is None:
+    if model is None or "/" not in model:
         if provider == "openai":
             model = "gpt-4-turbo-preview"
         elif provider == "huggingface":
             model = "meta-llama/Meta-Llama-3.1-8B-Instruct"
         elif provider == "modal":
+            # Default Modal function name
             model = "blogger-agent-models/LlamaModel.generate"
         else:  # auto
             model = "gpt-4-turbo-preview"  # Will be overridden per provider

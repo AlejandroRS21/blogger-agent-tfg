@@ -69,9 +69,19 @@ class ModalProvider(LLMProvider):
         tokens = max_tokens if max_tokens is not None else self.config.max_tokens
         
         try:
-            # Lookup the remote function
-            # Note: This is a blocking call in this implementation
-            f = modal.Function.lookup(self.function_name)
+            # Try to lookup the remote function
+            # Use appropriate method based on modal version
+            if hasattr(modal.Function, "lookup"):
+                f = modal.Function.lookup(self.function_name)
+            elif hasattr(modal.Function, "from_name"):
+                # Split app name and function name if necessary
+                if "/" in self.function_name:
+                    app_name, func_name = self.function_name.split("/", 1)
+                    f = modal.Function.from_name(app_name, func_name)
+                else:
+                    f = modal.Function.from_name("blogger-agent-models", self.function_name)
+            else:
+                raise AttributeError("Modal library is incompatible: neither 'lookup' nor 'from_name' found on modal.Function")
             
             # Format payload
             payload = {

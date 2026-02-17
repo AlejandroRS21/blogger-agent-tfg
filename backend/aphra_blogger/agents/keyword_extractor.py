@@ -52,7 +52,7 @@ class KeywordExtractor:
                 self.llm = create_llm_provider(
                     provider=provider,
                     api_key=api_key,
-                    model=model or "mistralai/Mistral-7B-Instruct-v0.2",
+                    model=model, # Factory will handle defaults
                     temperature=0.3,
                     max_tokens=800
                 )
@@ -76,7 +76,9 @@ class KeywordExtractor:
         if not self.llm or not self.llm.is_available():
             return self._fallback_extraction()
         
-        prompt = f"""Extract keywords and characteristic expressions from the blog: {blogger_urls[0]}
+        url_text = blogger_urls[0] if blogger_urls else (sample_text or "General Tech Blog")
+        
+        prompt = f"""Extract keywords and characteristic expressions from the blog context: {url_text}
 
 This is Javi Pas's tech blog "Incognitosis". Known recurring topics and expressions:
 

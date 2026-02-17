@@ -47,12 +47,11 @@ class CriticAgent:
         
         if LLM_AVAILABLE:
             try:
-                # Use strong model for critique
-                default_model = model or "meta-llama/Meta-Llama-3.1-70B-Instruct"
+                # Factory will handle defaults
                 self.llm = create_llm_provider(
                     provider=provider,
                     api_key=api_key,
-                    model=default_model,
+                    model=model,
                     temperature=0.3,
                     max_tokens=1000
                 )

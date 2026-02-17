@@ -2,7 +2,19 @@
 name = "blogger-agent-tfg"
 version = "0.1.0"
 description = "Multi-agent AI system for mimicking blogger writing style"
-readme = "README.md"
+dependencies = [
+    "daggr>=0.7.0",
+    "gradio>=6.5.1",
+    "httpx>=0.28.1",
+    "python-dotenv>=1.2.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["aphra_blogger", "src"]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [

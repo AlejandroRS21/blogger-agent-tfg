@@ -50,7 +50,7 @@ class ImageSelectorAgent:
                 self.llm = create_llm_provider(
                     provider=provider,
                     api_key=api_key,
-                    model=model or "mistralai/Mistral-7B-Instruct-v0.2",
+                    model=model,
                     temperature=0.5,
                     max_tokens=1000
                 )

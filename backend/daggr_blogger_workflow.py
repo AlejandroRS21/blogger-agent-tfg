@@ -42,6 +42,7 @@ from aphra_blogger.agents.content_generator import ContentGenerator
 from aphra_blogger.agents.critic import CriticAgent
 from aphra_blogger.agents.image_selector import ImageSelectorAgent
 from aphra_blogger.agents.html_builder import HTMLBuilder
+from aphra_blogger.agents.research_agent import ResearchAgent
 
 # ============================================================================
 # CONFIGURACIÓN GLOBAL
@@ -87,6 +88,7 @@ def initialize_agents(provider: str, api_key: str):
         state.agents = {
             "style": StyleAnalyzer(provider=state.config.provider, api_key=actual_key),
             "keywords": KeywordExtractor(provider=state.config.provider, api_key=actual_key),
+            "research": ResearchAgent(provider=state.config.provider, api_key=actual_key),
             "generator": ContentGenerator(provider=state.config.provider, api_key=actual_key),
             "critic": CriticAgent(provider=state.config.provider, api_key=actual_key),
             "images": ImageSelectorAgent(provider=state.config.provider, api_key=actual_key),
@@ -97,18 +99,40 @@ def initialize_agents(provider: str, api_key: str):
         return f"❌ Error al inicializar: {str(e)}"
 
 # ============================================================================
+# COMPONENTES COMPARTIDOS
+# ============================================================================
+
+# Entradas
+provider_input = gr.Dropdown(choices=["modal", "huggingface", "openai"], value="modal", label="Proveedor LLM")
+api_key_input = gr.Textbox(label="API Key / Token", placeholder="Opcional si está en .env", type="password")
+blogger_name_input = gr.Textbox(label="Nombre del Blogger", value="TechGuru")
+sample_posts_input = gr.Textbox(label="Muestras de Estilo", lines=5, value="Hoy aprendí sobre React Hooks.\nLa IA está cambiando el mundo.")
+topic_input = gr.Textbox(label="Tema del Post", value="El futuro de Next.js")
+
+# Salidas (compartidas entre nodos individuales y el botón "Run All")
+style_output = gr.Textbox(label="Análisis de Estilo", lines=10)
+keywords_output = gr.Textbox(label="Keywords Extraídas")
+topic_out_output = gr.Textbox(label="Tema Original", visible=False)
+research_output = gr.Textbox(label="Investigación en tiempo real", lines=5)
+draft_output = gr.Textbox(label="Borrador", lines=20)
+critique_output = gr.Textbox(label="Crítica", lines=10)
+refined_output = gr.Textbox(label="Contenido Refinado", lines=20)
+images_output = gr.Textbox(label="Imágenes")
+html_output = gr.Textbox(label="Código HTML Final", lines=10)
+
+# ============================================================================
 # NODOS DEL GRAFO
 # ============================================================================
 
-def setup_workflow(provider: str, api_key: str) -> str:
-    return initialize_agents(provider, api_key)
+def setup_workflow(provider: str, api_key: str) -> Dict[str, str]:
+    return {"status": initialize_agents(provider, api_key)}
 
 config_node = FnNode(
     fn=setup_workflow,
     name="⚙️ Configuración",
     inputs={
-        "provider": gr.Dropdown(choices=["modal", "huggingface", "openai"], value="modal", label="Proveedor LLM"),
-        "api_key": gr.Textbox(label="API Key / Token (Opcional si está en .env)", type="password")
+        "provider": provider_input,
+        "api_key": api_key_input
     },
     outputs={"status": gr.Textbox(label="Estado")}
 )
@@ -119,137 +143,304 @@ def ensure_agents():
         if "❌" in res:
             raise Exception(res)
 
-def analyze_style(status: str, blogger_name: str, sample_posts: str) -> str:
+def safe_json_load(data: Any) -> Any:
+    """Helper to handle both JSON strings and already parsed objects (dict/list)."""
+    if isinstance(data, (dict, list)):
+        return data
+    if isinstance(data, str) and data.strip():
+        try:
+            # Clean up potential markdown code blocks if the LLM included them
+            clean_data = data.strip()
+            if clean_data.startswith("```json"):
+                clean_data = clean_data[7:].strip()
+            if clean_data.endswith("```"):
+                clean_data = clean_data[:-3].strip()
+            return json.loads(clean_data)
+        except Exception as e:
+            print(f"⚠️ Warning: Could not parse JSON, returning raw string: {e}")
+            return data
+    return {}
+
+def ensure_dict(data: Any) -> Dict[str, Any]:
+    """Ensures we have a dictionary."""
+    parsed = safe_json_load(data)
+    if isinstance(parsed, dict):
+        return parsed
+    return {}
+
+def ensure_string(data: Any, key: str = None) -> str:
+    """Ensures we have a string, extracting from dict if necessary."""
+    if data is None:
+        return ""
+    
+    # Si ya es un diccionario
+    if isinstance(data, dict):
+        if key and key in data:
+            return str(data[key])
+        for k in ["topic_out", "topic", "content", "text", "refined_content"]:
+            if k in data:
+                return str(data[k])
+        return str(next(iter(data.values()))) if data else ""
+    
+    # Si es un string, podría ser un diccionario serializado (típico en Gradio/Daggr)
+    if isinstance(data, str):
+        data_stripped = data.strip()
+        if data_stripped.startswith("{") and data_stripped.endswith("}"):
+            try:
+                # Intentar parsear como JSON
+                import json
+                parsed = json.loads(data_stripped.replace("'", "\"")) # Manejar comillas simples
+                if isinstance(parsed, dict):
+                    if key and key in parsed:
+                        return str(parsed[key])
+                    for k in ["topic_out", "topic", "content", "text", "refined_content"]:
+                        if k in parsed:
+                            return str(parsed[k])
+            except:
+                # Fallback regex para diccionarios representados como string
+                import re
+                if key:
+                    match = re.search(f"['\"]{key}['\"]\\s*:\\s*['\"](.*?)['\"]", data_stripped)
+                    if match:
+                        return match.group(1)
+        return data_stripped
+    
+    return str(data)
+
+def analyze_style(status: str, blogger_name: str, sample_posts: str) -> Dict[str, str]:
     ensure_agents()
+    print(f"🔍 Analyzing style for: {blogger_name}")
     analysis = state.agents["style"].analyze(blogger_urls=[], sample_text=sample_posts)
-    return json.dumps(analysis, indent=2, ensure_ascii=False)
+    return {"style_json": json.dumps(analysis, indent=2, ensure_ascii=False)}
 
 style_analyzer = FnNode(
     fn=analyze_style,
     name="1️⃣ Style Analyzer",
     inputs={
         "status": config_node.status,
-        "blogger_name": gr.Textbox(label="Blogger", value="TechGuru"),
-        "sample_posts": gr.Textbox(label="Muestras de estilo", lines=5, value="Hoy aprendí sobre React Hooks.\nLa IA está cambiando el mundo.")
+        "blogger_name": blogger_name_input,
+        "sample_posts": sample_posts_input
     },
-    outputs={"style_json": gr.Textbox(label="Análisis de Estilo", lines=10)}
+    outputs={"style_json": style_output}
 )
 
-def extract_keywords(topic: str, style_json: str) -> Dict[str, str]:
+def extract_keywords(topic: Any, style_json: Any) -> Dict[str, Any]:
     ensure_agents()
-    style = json.loads(style_json)
-    res = state.agents["keywords"].extract(blogger_urls=[], sample_text=topic)
+    actual_topic = ensure_string(topic, "topic")
+    print(f"🔍 Extracting keywords for: {actual_topic} (Style type: {type(style_json)})")
+    style = ensure_dict(style_json)
+    res = state.agents["keywords"].extract(blogger_urls=[], sample_text=actual_topic)
     keywords = res.get("keywords", [])
-    return {"keywords": ", ".join(keywords), "topic": topic}
+    if isinstance(keywords, list):
+        kw_str = ", ".join(keywords)
+    else:
+        kw_str = str(keywords)
+    return {"keywords": kw_str, "topic_out": actual_topic}
 
 keyword_extractor = FnNode(
     fn=extract_keywords,
     name="2️⃣ Keyword Extractor",
     inputs={
-        "topic": gr.Textbox(label="Tema del Post", value="El futuro de Next.js"),
+        "topic": topic_input,
         "style_json": style_analyzer.style_json
     },
     outputs={
-        "keywords": gr.Textbox(label="Keywords Extraídas"),
-        "topic": gr.State()
+        "keywords": keywords_output,
+        "topic_out": topic_out_output
     }
 )
 
-def generate_content(topic: str, keywords: str, style_json: str) -> str:
+def perform_research(topic_out: Any) -> Dict[str, str]:
     ensure_agents()
-    style = json.loads(style_json)
-    kw_list = [k.strip() for k in keywords.split(",")]
-    content = state.agents["generator"].generate_draft(topic=topic, style_profile=style, keywords=kw_list)
-    return content
+    actual_topic = ensure_string(topic_out, "topic_out")
+    print(f"🔍 Performing research for: {actual_topic}")
+    res = state.agents["research"].search(query=actual_topic)
+    summary = res.get("summary", "No se encontró información relevante.")
+    return {"research_summary": str(summary)}
+
+research_node = FnNode(
+    fn=perform_research,
+    name="2.5️⃣ Research Agent (Brave Search)",
+    inputs={
+        "topic_out": keyword_extractor.topic_out
+    },
+    outputs={"research_summary": research_output}
+)
+
+def generate_content(topic_out: Any, keywords: Any, style_json: Any, research_summary: Any) -> Dict[str, str]:
+    ensure_agents()
+    actual_topic = ensure_string(topic_out, "topic_out")
+    actual_keywords = ensure_string(keywords, "keywords")
+    actual_research = ensure_string(research_summary, "research_summary")
+    
+    style = ensure_dict(style_json)
+    kw_list = [k.strip() for k in actual_keywords.split(",") if k.strip()]
+    
+    # ... existing logic ...
+    related_links = ""
+    try:
+        index_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs", "posts.json")
+        if os.path.exists(index_path):
+            with open(index_path, "r", encoding="utf-8") as f:
+                posts = json.load(f)
+                # Filtramos posts que tengan palabras similares en el título o descripción
+                topic_words = set(actual_topic.lower().split())
+                matches = []
+                for p in posts:
+                    p_title_words = set(p["title"].lower().split())
+                    if topic_words.intersection(p_title_words):
+                        matches.append(f"- [{p['title']}](post.html?id={p['id']})")
+                
+                if matches:
+                    related_links = "\n\n### Artículos relacionados que ya hemos escrito:\n" + "\n".join(matches[:3])
+    except Exception as e:
+        print(f"⚠️ Error buscando memoria: {e}")
+
+    # Enriquecemos el tema con la investigación real
+    topic_with_context = f"{actual_topic}\n\nDATOS DE INVESTIGACIÓN RECIENTE:\n{actual_research}"
+    content = state.agents["generator"].generate_draft(topic=topic_with_context, style_profile=style, keywords=kw_list)
+    
+    if related_links:
+        content += related_links
+        
+    return {"draft_content": content}
 
 content_generator = FnNode(
     fn=generate_content,
     name="3️⃣ Content Generator",
     inputs={
-        "topic": keyword_extractor.topic,
+        "topic_out": keyword_extractor.topic_out,
         "keywords": keyword_extractor.keywords,
-        "style_json": style_analyzer.style_json
+        "style_json": style_analyzer.style_json,
+        "research_summary": research_node.research_summary
     },
-    outputs={"draft_content": gr.Markdown(label="Borrador")}
+    outputs={"draft_content": draft_output}
 )
 
-def critique_content(topic: str, content: str, style_json: str) -> str:
+def critique_content(topic_out: Any, content: Any, style_json: Any) -> Dict[str, str]:
     ensure_agents()
-    style = json.loads(style_json)
-    critique = state.agents["critic"].critique(content=content, style_profile=style, topic=topic)
-    return json.dumps(critique, indent=2, ensure_ascii=False)
+    actual_topic = ensure_string(topic_out, "topic_out")
+    actual_content = ensure_string(content, "draft_content")
+    style = ensure_dict(style_json)
+    critique = state.agents["critic"].critique(content=actual_content, style_profile=style, topic=actual_topic)
+    return {"critique_json": json.dumps(critique, indent=2, ensure_ascii=False)}
 
 critic_agent = FnNode(
     fn=critique_content,
     name="4️⃣ Critic Agent",
     inputs={
-        "topic": keyword_extractor.topic,
+        "topic_out": keyword_extractor.topic_out,
         "content": content_generator.draft_content,
         "style_json": style_analyzer.style_json
     },
-    outputs={"critique_json": gr.Textbox(label="Crítica", lines=10)}
+    outputs={"critique_json": critique_output}
 )
 
-def select_images(topic: str, content: str) -> str:
+def refine_content(draft: Any, critique_json: Any, style_json: Any) -> Dict[str, str]:
     ensure_agents()
-    images = state.agents["images"].select_images(content=content, topic=topic)
-    return json.dumps(images, indent=2)
+    actual_draft = ensure_string(draft, "draft_content")
+    critique = ensure_dict(critique_json)
+    style = ensure_dict(style_json)
+    
+    print("🔍 Refining content based on critique...")
+    refined = state.agents["generator"].refine_content(
+        draft=actual_draft, 
+        critique_feedback=critique, 
+        style_profile=style
+    )
+    return {"refined_content": refined}
+
+content_refiner = FnNode(
+    fn=refine_content,
+    name="4.5️⃣ Content Refiner",
+    inputs={
+        "draft": content_generator.draft_content,
+        "critique_json": critic_agent.critique_json,
+        "style_json": style_analyzer.style_json
+    },
+    outputs={"refined_content": refined_output}
+)
+
+def select_images(topic_out: Any, content: Any) -> Dict[str, str]:
+    ensure_agents()
+    actual_topic = ensure_string(topic_out, "topic_out")
+    actual_content = ensure_string(content, "refined_content")
+    images = state.agents["images"].select_images(content=actual_content, topic=actual_topic)
+    return {"image_urls": json.dumps(images, indent=2)}
 
 image_selector = FnNode(
     fn=select_images,
     name="5️⃣ Image Selector",
     inputs={
-        "topic": keyword_extractor.topic,
-        "content": content_generator.draft_content
+        "topic_out": keyword_extractor.topic_out,
+        "content": content_refiner.refined_content
     },
-    outputs={"image_urls": gr.Textbox(label="Imágenes")}
+    outputs={"image_urls": images_output}
 )
 
-def build_html(topic: str, content: str, images_json: str, style_json: str) -> str:
+def build_html(topic_out: Any, content: Any, images_json: Any, style_json: Any) -> Dict[str, str]:
     ensure_agents()
-    style = json.loads(style_json)
-    images = json.loads(images_json)
-    output = state.agents["html"].build(content=content, topic=topic, images=images, style_profile=style)
+    actual_topic = ensure_string(topic_out, "topic_out")
+    actual_content = ensure_string(content, "refined_content")
+    style = ensure_dict(style_json)
+    images = safe_json_load(images_json)
+    if not isinstance(images, list):
+        if isinstance(images, dict) and "images" in images:
+            images = images["images"]
+        else:
+            images = []
+            
+    output = state.agents["html"].build(content=actual_content, topic=actual_topic, images=images, style_profile=style)
     
-    # NUEVO: Guardar el post para el frontend
+    # Guardar el post para el frontend
     try:
-        slug = topic.lower().replace(" ", "-").replace("?", "").replace("!", "")
-        # Aseguramos que existe el directorio
-        output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs", "posts")
+        # Generar slug y asegurar que no esté vacío
+        slug = actual_topic.lower().replace(" ", "-")
+        slug = "".join([c for c in slug if c.isalnum() or c == '-'])
+        if not slug:
+            slug = f"post-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            
+        # Rutas absolutas para evitar confusiones
+        workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        output_dir = os.path.join(workspace_root, "docs", "posts")
         os.makedirs(output_dir, exist_ok=True)
         
         post_data = {
             "id": slug,
-            "title": topic,
-            "description": content[:150] + "...",
+            "title": actual_topic,
+            "description": actual_content[:150] + "...",
             "html_code": output.html,
             "metadata": {
-                "word_count": len(content.split()),
-                "reading_time": max(1, len(content.split()) // 200),
+                "word_count": len(actual_content.split()),
+                "reading_time": max(1, len(actual_content.split()) // 200),
                 "date": datetime.now().strftime("%Y-%m-%d"),
                 "author": "Blogger Agent",
-                "tags": style.get("personality_traits", ["AI"])
+                "tags": style.get("personality_traits", ["AI"]) if isinstance(style, dict) else ["AI"]
             }
         }
         
         # Guardar archivo individual
-        with open(os.path.join(output_dir, f"{slug}.json"), "w", encoding="utf-8") as f:
+        post_file_path = os.path.join(output_dir, f"{slug}.json")
+        with open(post_file_path, "w", encoding="utf-8") as f:
             json.dump(post_data, f, indent=2, ensure_ascii=False)
             
-        print(f"✅ Post guardado en: {output_dir}/{slug}.json")
+        print(f"✅ Post individual guardado en: {post_file_path}")
         
         # Actualizar el índice posts.json
-        index_path = os.path.join(os.path.dirname(output_dir), "posts.json")
+        index_path = os.path.join(workspace_root, "docs", "posts.json")
         posts_index = []
         if os.path.exists(index_path):
             try:
                 with open(index_path, "r", encoding="utf-8") as f:
-                    posts_index = json.load(f)
-            except:
+                    content_json = f.read().strip()
+                    if content_json and content_json != "[]":
+                        posts_index = json.loads(content_json)
+            except Exception as e:
+                print(f"⚠️ Error leyendo índice actual: {e}")
                 posts_index = []
         
         # Evitar duplicados
-        posts_index = [p for p in posts_index if p["id"] != slug]
+        posts_index = [p for p in posts_index if p.get("id") != slug]
         
         # Añadir resumen del post al principio
         posts_index.insert(0, {
@@ -264,22 +455,112 @@ def build_html(topic: str, content: str, images_json: str, style_json: str) -> s
         with open(index_path, "w", encoding="utf-8") as f:
             json.dump(posts_index, f, indent=2, ensure_ascii=False)
             
-        print(f"✅ Índice de posts actualizado: {index_path}")
+        print(f"✅ Índice de posts actualizado: {index_path} (Total: {len(posts_index)})")
     except Exception as e:
-        print(f"⚠️ Error al guardar el post: {e}")
+        print(f"❌ Error crítico al guardar el post: {e}")
+        import traceback
+        traceback.print_exc()
 
-    return output.html
+    return {"final_html": output.html}
 
 html_builder = FnNode(
     fn=build_html,
     name="6️⃣ HTML Builder",
     inputs={
-        "topic": keyword_extractor.topic,
-        "content": content_generator.draft_content,
+        "topic_out": keyword_extractor.topic_out,
+        "content": content_refiner.refined_content,
         "images_json": image_selector.image_urls,
         "style_json": style_analyzer.style_json
     },
-    outputs={"final_html": gr.HTML(label="🎉 Post Final")}
+    outputs={"final_html": html_output}
+)
+
+def run_full_pipeline(provider: str, api_key: str, blogger_name: str, sample_posts: str, topic: str) -> Dict[str, Any]:
+    """Ejecuta todos los nodos en secuencia y actualiza todos los cuadros de texto del tirón."""
+    print("🚀 Iniciando ejecución completa del workflow...")
+    
+    # Asegurar que los agentes se inicializan con la config actual
+    initialize_agents(provider, api_key)
+    
+    try:
+        # 1. Estilo
+        print("-> Analizando estilo...")
+        style_out = analyze_style("Ready", blogger_name, sample_posts)
+        style_json = style_out["style_json"]
+        
+        # 2. Keywords
+        print("-> Extrayendo keywords...")
+        kw_out = extract_keywords(topic, style_json)
+        keywords = kw_out["keywords"]
+        actual_topic = kw_out["topic_out"]
+        
+        # 3. Research
+        print("-> Investigando...")
+        res_out = perform_research(actual_topic)
+        research_summary = res_out["research_summary"]
+        
+        # 4. Generator
+        print("-> Generando contenido...")
+        gen_out = generate_content(actual_topic, keywords, style_json, research_summary)
+        draft = gen_out["draft_content"]
+        
+        # 5. Critic
+        print("-> Criticando...")
+        crit_out = critique_content(actual_topic, draft, style_json)
+        critique = crit_out["critique_json"]
+        
+        # 6. Refiner
+        print("-> Refinando...")
+        ref_out = refine_content(draft, critique, style_json)
+        refined = ref_out["refined_content"]
+        
+        # 7. Images
+        print("-> Seleccionando imágenes...")
+        img_out = select_images(actual_topic, refined)
+        images_json = img_out["image_urls"]
+        
+        # 8. HTML
+        print("-> Construyendo HTML final...")
+        html_out = build_html(actual_topic, refined, images_json, style_json)
+        final_html = html_out["final_html"]
+        
+        print("✅ ¡Pipeline completado con éxito!")
+        return {
+            "style_json": style_json,
+            "keywords": keywords,
+            "research": research_summary,
+            "draft": draft,
+            "critique": critique,
+            "refined": refined,
+            "images": images_json,
+            "final_html": final_html
+        }
+    except Exception as e:
+        print(f"❌ Error en pipeline: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"final_html": f"Error: {str(e)}"}
+
+full_pipeline_node = FnNode(
+    fn=run_full_pipeline,
+    name="🚀 GENERACIÓN AUTOMÁTICA",
+    inputs={
+        "provider": provider_input,
+        "api_key": api_key_input,
+        "blogger_name": blogger_name_input,
+        "sample_posts": sample_posts_input,
+        "topic": topic_input
+    },
+    outputs={
+        "style_json": style_output,
+        "keywords": keywords_output,
+        "research": research_output,
+        "draft": draft_output,
+        "critique": critique_output,
+        "refined": refined_output,
+        "images": images_output,
+        "final_html": html_output
+    }
 )
 
 # ============================================================================
@@ -288,7 +569,18 @@ html_builder = FnNode(
 
 graph = Graph(
     name="🚀 Blogger Agent TFG - LIVE Workflow",
-    nodes=[config_node, style_analyzer, keyword_extractor, content_generator, critic_agent, image_selector, html_builder],
+    nodes=[
+        config_node, 
+        full_pipeline_node, # ✅ Nodo maestro añadido
+        style_analyzer, 
+        keyword_extractor, 
+        research_node, 
+        content_generator, 
+        critic_agent, 
+        content_refiner,
+        image_selector, 
+        html_builder
+    ],
 )
 
 if __name__ == "__main__":
