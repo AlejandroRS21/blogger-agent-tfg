@@ -1,17 +1,25 @@
-# LLM providers
-openai>=1.0.0
-anthropic>=0.25.0
+# LLM providers (at least one required)
+huggingface-hub>=0.20.0  # Primary provider (free/cheaper)
+openai>=1.0.0  # Optional fallback provider
+anthropic>=0.25.0  # Optional alternative provider
 
 # HTTP and API clients
 httpx>=0.24.0
 requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0  # Parser for BeautifulSoup
 
 # Configuration management
 toml>=0.10.2
+Markdown>=3.5.0
+Pygments>=2.17.0  # For code highlighting in markdown
 
 # Utilities
 python-dotenv>=1.0.0
 pydantic>=2.0.0
+modal>=0.62.0
+daggr>=0.1.0
+gradio>=4.0.0
 
 # Testing
 pytest>=7.4.0
@@ -20,3 +28,9 @@ pytest-asyncio>=0.21.0
 # Development
 black>=23.0.0
 ruff>=0.1.0
+
+# Daggr for visual workflow management and testing
+# (incluye Gradio como dependencia)
+daggr>=0.7.0
+
+fastapi[standard]
