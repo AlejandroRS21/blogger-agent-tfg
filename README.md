@@ -55,17 +55,35 @@ blogger-agent-tfg/
 │   │   ├── test_scraper.py
 │   │   └── test_html_builder.py  # ✅ NUEVO: 20+ tests HTMLBuilder
 │   ├── examples_scraper.py
-│   ├── test_full_pipeline.py   # ✅ NUEVO: Test completo end-to-end
-│   ├── requirements.txt
+│   ├── test_full_pipeline.py   # ✅ Test completo end-to-end
+│   ├── daggr_blogger_workflow.py  # ✅ Workflow visual con Daggr
+│   ├── outputs/                # ✅ Posts generados (JSON)
+│   ├── requirements.txt        # daggr>=0.7.0 (incluye Gradio)
+│   ├── DAGGR_WORKFLOW.md       # ✅ NUEVO: Documentación Daggr
 │   └── Dockerfile
-├── frontend/                   # ⏳ Pendiente Next.js
+├── frontend/                   # ✅ Next.js + TypeScript + Tailwind
 │   ├── app/
 │   │   ├── api/
 │   │   │   └── generate-post/
+│   │   │       └── route.ts    # ✅ API endpoint con modo mock
+│   │   ├── components/
+│   │   │   ├── BlogLayout.tsx  # ✅ Layout principal
+│   │   │   ├── PostHeader.tsx  # ✅ Metadata de posts
+│   │   │   ├── PostBody.tsx    # ✅ Renderizado HTML
+│   │   │   └── GenerateForm.tsx # ✅ Formulario de generación
+│   │   ├── generate/
+│   │   │   └── page.tsx        # ✅ Página del formulario
 │   │   ├── posts/[slug]/
-│   │   └── components/
+│   │   │   └── page.tsx        # ✅ Post dinámico
+│   │   ├── types/
+│   │   │   └── post.ts         # ✅ TypeScript types
+│   │   ├── layout.tsx          # ✅ Root layout
+│   │   ├── page.tsx            # ✅ Homepage con hero y features
+│   │   └── globals.css
+│   ├── .env.local              # ✅ Variables de entorno
 │   ├── package.json
-│   └── next.config.js
+│   ├── README.md               # ✅ Documentación frontend
+│   └── tailwind.config.ts
 ├── docs/                       # ✅ Documentación completa
 │   ├── ORCHESTRATION_PLAN.md   # Plan maestro
 │   ├── NEXT_STEPS.md           # Roadmap detallado
@@ -74,6 +92,8 @@ blogger-agent-tfg/
 │   ├── HTMLBUILDER_INTEGRATION.md  # ✅ NUEVO: Integración HTMLBuilder
 │   ├── SCRAPER_IMPLEMENTATION.md   # ✅ NUEVO: Guía del scraper
 │   ├── HUGGINGFACE_MIGRATION.md    # ✅ NUEVO: Migración completa a HF
+│   ├── FRONTEND_IMPLEMENTATION.md  # ✅ NUEVO: Implementación frontend Next.js
+│   ├── GRADIO_INTERFACE.md         # ✅ NUEVO: Interfaz Gradio para testing
 │   └── ENVIRONMENT_VARIABLES.md
 ├── vercel.json                 # ✅ Config Vercel
 └── README.md
@@ -182,6 +202,69 @@ cat post.json
 - 🚀 **Rápido**: Modelos Llama 3.1 y Mistral optimizados
 - 🔄 **Fallback**: OpenAI como respaldo si HF no disponible
 - 📖 [Guía completa de migración](docs/HUGGINGFACE_MIGRATION.md)
+
+### Frontend - Next.js con Modo Mock ✅
+
+```bash
+# 1. Ir al directorio frontend
+cd frontend
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Configurar variables de entorno (opcional)
+# .env.local ya está configurado con modo mock por defecto
+# USE_MOCK=true (no requiere backend corriendo)
+
+# 4. Iniciar servidor de desarrollo
+npm run dev
+
+# 5. Abrir en navegador
+# http://localhost:3000
+```
+
+**✨ Frontend Completo:**
+- 🎨 **4 Componentes**: BlogLayout, PostHeader, PostBody, GenerateForm
+- 📄 **3 Páginas**: Homepage, Generate, Posts dinámicos
+- 🔌 **API Route**: /api/generate-post con modo mock
+- 🎯 **Modo Mock**: Testing sin backend (USE_MOCK=true)
+- 📱 **Responsive**: Tailwind CSS 4 + diseño mobile-first
+- 📖 [Documentación frontend](frontend/README.md)
+
+### Generación y Testing con Daggr (Recomendado) 🎨
+
+```bash
+# Interfaz visual para generar y debuggear posts
+cd backend
+python daggr_blogger_workflow.py
+
+# Abrir http://localhost:7860
+```
+
+**✨ Features Daggr:**
+- 📊 **Visualización de Workflow**: Canvas interactivo con 6 agentes conectados
+- 🔍 **Inspección por Nodo**: Ver input/output de cada agente
+- 🔄 **Re-ejecución Selectiva**: Ejecutar solo el nodo que necesites
+- ⏱️ **Debugging Visual**: Identifica problemas en cada paso
+- 💾 **Persistencia**: Estado guardado entre sesiones
+- 🧪 **Testing Manual**: Prueba diferentes estilos y temas
+- 📖 [Guía completa Daggr](backend/DAGGR_WORKFLOW.md)
+
+### Testing End-to-End (Backend + Frontend)
+
+```bash
+# Terminal 1: Backend
+cd backend
+uv run uvicorn aphra_blogger.api:app --reload
+
+# Terminal 2: Frontend (modo real)
+cd frontend
+# Editar .env.local: USE_MOCK=false
+npm run dev
+
+# Abrir http://localhost:3000 y generar posts
+```
+
 
 **Resultado:** JSON completo con:
 - ✅ Análisis de estilo del blogger
@@ -348,6 +431,31 @@ O conecta tu repositorio de GitHub con Vercel para deployment automático.
    - Crea componente Next.js completo listo para usar
 7. **Selección de Imágenes** (`image_selector`) → Prompts y ubicaciones para imágenes
 
+## 📊 Estado del Proyecto
+
+### ✅ Completado (Backend - 100%)
+- **LLM Abstraction**: Multi-provider con HuggingFace (gratis) y OpenAI (fallback)
+- **6 Agentes**: StyleAnalyzer, KeywordExtractor, ContentGenerator, Critic, ImageSelector, HTMLBuilder
+- **Orquestador**: 7 fases completas con integración de todos los agentes
+- **Scraper**: WordPress-optimizado para blogs (javipas.com compatible)
+- **Tests**: 76 tests (75 passing, 1 skipped)
+- **Documentación**: 5 guías completas (ORCHESTRATION, HUGGINGFACE_MIGRATION, HTMLBUILDER, etc.)
+
+### ✅ Completado (Frontend - 100%)
+- **Next.js 16**: React 19 + TypeScript 5 + Tailwind CSS 4
+- **4 Componentes**: BlogLayout, PostHeader, PostBody, GenerateForm
+- **3 Páginas**: Homepage (hero + features), Generate (formulario), Posts dinámicos
+- **API Route**: `/api/generate-post` con modo mock para desarrollo
+- **Configuración**: .env.local con variables de entorno
+- **Servidor**: Dev server corriendo en puerto 3000/3001
+
+### ⏳ Pendiente
+- **Tests Frontend**: Jest + Testing Library
+- **Integración E2E**: Backend Python + Frontend Next.js
+- **Deploy Modal**: Backend serverless con HuggingFace
+- **Deploy Vercel**: Frontend en producción
+- **CI/CD**: GitHub Actions para testing y deployment
+
 ## 🤝 Contribuir
 
 Lee [CONTRIBUTING.md](CONTRIBUTING.md) para entender el flujo de trabajo con Git y GitHub.
@@ -367,10 +475,13 @@ Lee [CONTRIBUTING.md](CONTRIBUTING.md) para entender el flujo de trabajo con Git
 - [Plan de Orquestación](docs/ORCHESTRATION_PLAN.md) - Plan completo de desarrollo ⭐
 - [Próximos Pasos](docs/NEXT_STEPS.md) - Roadmap y tareas pendientes 📋
 - [Orchestrator README](backend/src/orchestrator/README.md) - Documentación del orquestador
+- [**Daggr Workflow**](backend/DAGGR_WORKFLOW.md) - Guía completa de Daggr ✅ **NUEVO**
 - [API](docs/API.md) - Especificación de agentes y workflows
 - [Setup](docs/SETUP.md) - Configuración detallada
 - [Modal Deployment](docs/MODAL_DEPLOYMENT.md) - Guía de deployment backend
 - [Vercel Deployment](docs/VERCEL_DEPLOYMENT.md) - Guía de deployment frontend ✅
+- [HuggingFace Migration](docs/HUGGINGFACE_MIGRATION.md) - Migración a HF ✅
+- [Frontend Implementation](docs/FRONTEND_IMPLEMENTATION.md) - Guía frontend Next.js ✅
 
 ## 🧪 Testing
 
@@ -389,20 +500,27 @@ npm test
 ### Backend
 - Python 3.11+
 - Aphra (workflow framework)
-- OpenAI API / OpenRouter
-- **python-markdown** - Conversión Markdown→HTML (nuevo)
-- **Pygments** - Syntax highlighting para código (nuevo)
-- **beautifulsoup4** - Web scraping (nuevo)
-- **lxml** - Parser HTML rápido (nuevo)
+- **HuggingFace Inference API** - LLM primario (gratis) ✅
+- OpenAI API - Fallback opcional
+- **Daggr 0.7.0** - Workflow visual y debugging ✅
+- **python-markdown** - Conversión Markdown→HTML
+- **Pygments** - Syntax highlighting para código
+- **beautifulsoup4** - Web scraping
+- **lxml** - Parser HTML rápido
 - Modal (serverless deployment) - Pendiente
 - pytest (40+ tests)
 
 ### Frontend
-- Next.js 14 (App Router)
-- React 18
-- TypeScript
-- Tailwind CSS
-- Jest + Testing Library
+- Next.js 16.1.6 (App Router) ✅
+- React 19.2.3 ✅
+- TypeScript 5 ✅
+- Tailwind CSS 4 ✅
+- Jest + Testing Library (pendiente)
+
+### Testing & Debugging
+- **Daggr** - Visualización workflow, inspección nodos, re-ejecución ✅
+- pytest - Tests unitarios e integración
+- Mock mode - Testing frontend sin backend ✅
 
 ### DevOps
 - Docker + Docker Compose

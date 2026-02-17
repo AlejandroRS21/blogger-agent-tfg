@@ -8,6 +8,7 @@ import os
 from .base import LLMProvider, LLMConfig
 from .openai_provider import OpenAIProvider
 from .huggingface_provider import HuggingFaceProvider
+from .modal_provider import ModalProvider
 
 
 def create_llm_provider(
@@ -42,6 +43,8 @@ def create_llm_provider(
             model = "gpt-4-turbo-preview"
         elif provider == "huggingface":
             model = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+        elif provider == "modal":
+            model = "blogger-agent-models/LlamaModel.generate"
         else:  # auto
             model = "gpt-4-turbo-preview"  # Will be overridden per provider
     
@@ -53,8 +56,25 @@ def create_llm_provider(
         **kwargs
     )
     
-    # Auto mode: try HuggingFace first (free/cheaper), then OpenAI
+    # Auto mode: try Modal first if configured, then HuggingFace, then OpenAI
     if provider == "auto":
+        # Check for Modal config
+        modal_ready = (os.getenv("MODAL_TOKEN_ID") and os.getenv("MODAL_TOKEN_SECRET")) or os.getenv("MODAL_API_KEY")
+        if modal_ready:
+            try:
+                modal_config = LLMConfig(
+                    api_key=api_key or os.getenv("MODAL_API_KEY"),
+                    model="blogger-agent-models/LlamaModel.generate",
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    **kwargs
+                )
+                llm = ModalProvider(modal_config)
+                if llm.is_available():
+                    return llm
+            except Exception:
+                pass
+
         # Check for HF token
         hf_token = api_key or os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_TOKEN")
         if hf_token:
@@ -70,24 +90,11 @@ def create_llm_provider(
                 if llm.is_available():
                     return llm
             except Exception:
-                pass  # Fall through to OpenAI
-        
-        # Fall back to OpenAI
-        openai_key = api_key or os.getenv("OPENAI_API_KEY")
-        if openai_key:
-            openai_config = LLMConfig(
-                api_key=openai_key,
-                model="gpt-4-turbo-preview",
-                temperature=temperature,
-                max_tokens=max_tokens,
-                **kwargs
-            )
-            llm = OpenAIProvider(openai_config)
-            if llm.is_available():
-                return llm
+                pass
         
         raise ValueError(
-            "No LLM provider available. Set HF_TOKEN or OPENAI_API_KEY environment variable."
+            "No LLM provider available (Modal or HuggingFace). OpenAI is disabled. "
+            "Set MODAL_TOKEN_ID/SECRET or HF_TOKEN environment variable."
         )
     
     # Specific provider requested
@@ -97,6 +104,15 @@ def create_llm_provider(
             raise ValueError(
                 "HuggingFace provider not available. "
                 "Set HF_TOKEN or HUGGINGFACE_TOKEN environment variable."
+            )
+        return llm
+        
+    elif provider == "modal":
+        llm = ModalProvider(config)
+        if not llm.is_available():
+            raise ValueError(
+                "Modal provider not available. "
+                "Set MODAL_TOKEN_ID and MODAL_TOKEN_SECRET environment variables."
             )
         return llm
     

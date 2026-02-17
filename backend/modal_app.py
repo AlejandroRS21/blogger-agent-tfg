@@ -31,11 +31,15 @@ image = (
 
 # Define secrets (will need to be configured in Modal dashboard)
 # modal secret create openai-secret OPENAI_API_KEY=sk-...
+# modal secret create hf-secret HF_TOKEN=hf_...
 
 
 @app.function(
     image=image,
-    secrets=[modal.Secret.from_name("openai-secret")],
+    secrets=[
+        modal.Secret.from_name("openai-secret"),
+        modal.Secret.from_name("hf-secret"),
+    ],
     timeout=600,  # 10 minutes max
     memory=2048,  # 2GB RAM
 )
@@ -45,6 +49,7 @@ def generate_blog_post(
     enable_critique: bool = True,
     min_word_count: int = 800,
     max_word_count: int = 2500,
+    provider: str = "huggingface",
 ) -> Dict[str, Any]:
     """
     Generate a blog post that mimics the style of the given blogger.
@@ -63,29 +68,10 @@ def generate_blog_post(
         enable_critique: Whether to enable critique phase (default: True)
         min_word_count: Minimum words for generated content (default: 800)
         max_word_count: Maximum words for generated content (default: 2500)
+        provider: LLM provider to use ("huggingface", "openai", "auto")
         
     Returns:
-        Dict with complete blog post data:
-        {
-            "workflow_id": "abc123",
-            "topic": "...",
-            "blogger_urls": [...],
-            "style_profile": {...},
-            "keywords": [...],
-            "content": "...",
-            "html_structure": {
-                "html": "...",
-                "jsx": "...",
-                "metadata": {...},
-                "headings": [...],
-                "nextjs_component": "..."
-            },
-            "image_prompts": [...],
-            "metadata": {
-                "duration": 1.5,
-                "phases": {...}
-            }
-        }
+        Dict with complete blog post data
     """
     # Import here to avoid loading during image build
     from src.orchestrator.main import BloggerOrchestrator
@@ -94,6 +80,8 @@ def generate_blog_post(
     # Configure orchestrator
     config = OrchestratorConfig(
         openai_api_key=os.environ.get("OPENAI_API_KEY"),
+        huggingface_token=os.environ.get("HF_TOKEN"),
+        provider=provider,
         enable_critique=enable_critique,
         min_word_count=min_word_count,
         max_word_count=max_word_count,
@@ -115,7 +103,10 @@ def generate_blog_post(
 
 @app.function(
     image=image,
-    secrets=[modal.Secret.from_name("openai-secret")],
+    secrets=[
+        modal.Secret.from_name("openai-secret"),
+        modal.Secret.from_name("hf-secret"),
+    ],
 )
 @modal.web_endpoint(method="POST")
 def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
@@ -130,7 +121,8 @@ def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
         "topic": "Topic to write about",
         "enable_critique": true,  // optional
         "min_word_count": 800,    // optional
-        "max_word_count": 2500    // optional
+        "max_word_count": 2500,   // optional
+        "provider": "huggingface" // optional
     }
     
     Response:
@@ -171,6 +163,7 @@ def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
         enable_critique = data.get("enable_critique", True)
         min_word_count = data.get("min_word_count", 800)
         max_word_count = data.get("max_word_count", 2500)
+        provider = data.get("provider", "huggingface")
         
         # Validate types
         if not isinstance(blogger_urls, list):
@@ -194,6 +187,7 @@ def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
             enable_critique=enable_critique,
             min_word_count=min_word_count,
             max_word_count=max_word_count,
+            provider=provider,
         )
         
         return {

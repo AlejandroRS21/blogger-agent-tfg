@@ -38,6 +38,11 @@ class OrchestratorConfig:
     # API Keys (from environment)
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
+    huggingface_token: Optional[str] = None
+    modal_api_key: Optional[str] = None
+    
+    # Provider Settings
+    provider: str = "auto"  # "auto", "huggingface", "openai", "modal"
     
     # Timeouts
     agent_timeout: int = 60  # seconds per agent
@@ -67,6 +72,9 @@ class OrchestratorConfig:
             max_word_count=content.get('max_word_count', 2500),
             openai_api_key=os.getenv('OPENAI_API_KEY'),
             anthropic_api_key=os.getenv('ANTHROPIC_API_KEY'),
+            huggingface_token=os.getenv('HF_TOKEN') or os.getenv('HUGGINGFACE_TOKEN'),
+            modal_api_key=os.getenv('MODAL_API_KEY'),
+            provider=models.get('provider', 'auto'),
         )
     
     @classmethod
@@ -75,13 +83,23 @@ class OrchestratorConfig:
         return cls(
             openai_api_key=os.getenv('OPENAI_API_KEY'),
             anthropic_api_key=os.getenv('ANTHROPIC_API_KEY'),
+            huggingface_token=os.getenv('HF_TOKEN') or os.getenv('HUGGINGFACE_TOKEN'),
+            modal_api_key=os.getenv('MODAL_API_KEY'),
         )
     
     def validate(self) -> None:
         """Validate configuration."""
-        if not self.openai_api_key and not self.anthropic_api_key:
+        has_key = any([
+            self.openai_api_key, 
+            self.anthropic_api_key, 
+            self.huggingface_token, 
+            self.modal_api_key,
+            os.getenv('MODAL_TOKEN_ID') and os.getenv('MODAL_TOKEN_SECRET')
+        ])
+        
+        if not has_key:
             raise ValueError(
-                "At least one API key must be set: OPENAI_API_KEY or ANTHROPIC_API_KEY"
+                "At least one API key must be set: OPENAI_API_KEY, HF_TOKEN, or MODAL_TOKEN_ID/SECRET"
             )
         
         if self.max_retries < 0:

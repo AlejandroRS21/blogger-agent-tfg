@@ -17,6 +17,7 @@ Pygments>=2.17.0  # For code highlighting in markdown
 # Utilities
 python-dotenv>=1.0.0
 pydantic>=2.0.0
+modal>=0.62.0
 
 # Testing
 pytest>=7.4.0
@@ -25,3 +26,9 @@ pytest-asyncio>=0.21.0
 # Development
 black>=23.0.0
 ruff>=0.1.0
+
+# Daggr for visual workflow management and testing
+# (incluye Gradio como dependencia)
+daggr>=0.7.0
+
+fastapi[standard]
