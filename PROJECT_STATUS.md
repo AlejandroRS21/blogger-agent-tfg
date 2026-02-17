@@ -1,49 +1,49 @@
-# 🚀 Blogger Agent TFG - Estado del Proyecto
+# :rocket: Blogger Agent TFG - Estado del Proyecto
 
-## ✅ Proyecto Completamente Limpiado y Reorganizado
+## :white_check_mark: Proyecto Completamente Limpiado y Reorganizado
 
 Fecha: 11 de febrero de 2026
 
 ---
 
-## 📋 Resumen de Cambios
+## :clipboard: Resumen de Cambios
 
-### 🗑️ Archivos Eliminados (Interfaz Gradio redundantes)
+### :wastebasket: Archivos Eliminados (Interfaz Gradio redundantes)
 
 Se eliminaron **6 archivos** de interfaces Gradio que eran redundantes:
 
-1. ❌ `gradio_app.py` - Interfaz básica con Mermaid
-2. ❌ `gradio_app_advanced.py` - Interfaz avanzada con progress tracking
-3. ❌ `gradio_diagrams.py` - Solo visualización de diagramas
-4. ❌ `gradio_dag.py` - Intento fallido de usar `from gradio import daggr`
-5. ❌ `gradio_dag_interactive.py` - DAG interactivo con vis.js
-6. ❌ `test_gradio.py` - Tests de las interfaces Gradio
+1. :x: `gradio_app.py` - Interfaz básica con Mermaid
+2. :x: `gradio_app_advanced.py` - Interfaz avanzada con progress tracking
+3. :x: `gradio_diagrams.py` - Solo visualización de diagramas
+4. :x: `gradio_dag.py` - Intento fallido de usar `from gradio import daggr`
+5. :x: `gradio_dag_interactive.py` - DAG interactivo con vis.js
+6. :x: `test_gradio.py` - Tests de las interfaces Gradio
 
 **Razón:** Daggr proporciona todas estas funcionalidades de forma nativa y oficial.
 
-### ✅ Archivo Mantenido (Solución Oficial)
+### :white_check_mark: Archivo Mantenido (Solución Oficial)
 
 **`daggr_blogger_workflow.py`** - Workflow visual completo con Daggr 0.7.0
 
 Este archivo proporciona:
-- 📊 Visualización automática del flujo de 6 agentes
-- 🔍 Inspección de inputs/outputs de cada nodo
-- 🔄 Re-ejecución selectiva de nodos
-- 💾 Persistencia automática de estado
-- 🧪 Testing manual interactivo
-- 🐛 Debugging visual del pipeline
+- Visualización automática del flujo de 6 agentes
+- Inspección de inputs/outputs de cada nodo
+- Re-ejecución selectiva de nodos
+- Persistencia automática de estado
+- Testing manual interactivo
+- Debugging visual del pipeline
 
 ---
 
-## 🏗️ Nueva Arquitectura
+## :building_construction: Nueva Arquitectura
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    BLOGGER AGENT TFG                             │
 │                                                                   │
 │  ┌───────────────────────┐         ┌──────────────────────┐    │
-│  │   FRONTEND (Next.js)  │         │  BACKEND (Python)    │    │
-│  │   Puerto: 3000        │         │  Puerto: 7860        │    │
+│  │  FRONTEND (GitHub     │         │  BACKEND (Python)    │    │
+│  │  Pages - Static HTML) │         │  Puerto: 7860        │    │
 │  ├───────────────────────┤         ├──────────────────────┤    │
 │  │                       │         │                      │    │
 │  │  VISUALIZACIÓN        │         │  GENERACIÓN          │    │
@@ -51,20 +51,20 @@ Este archivo proporciona:
 │  │  • Homepage           │         │  • Daggr Workflow    │    │
 │  │  • Listar posts       │         │  • 6 Agentes IA      │    │
 │  │  • Ver post           │         │  • HuggingFace LLM   │    │
-│  │  • Formulario gen.    │         │  • Testing visual    │    │
+│  │  • HTML estático      │         │  • Testing visual    │    │
 │  │                       │◄───────►│  • Debugging         │    │
-│  │  GESTIÓN              │  JSON   │                      │    │
-│  │  ────────             │  Posts  │  DEBUGGING           │    │
-│  │  • Crear              │         │  ─────────           │    │
-│  │  • Editar             │         │  • Inspeccionar      │    │
-│  │  • Eliminar           │         │  • Re-ejecutar       │    │
-│  │  • Buscar             │         │  • Modificar         │    │
+│  │  DEPLOYMENT           │  JSON   │                      │    │
+│  │  ──────────           │  Posts  │  DEBUGGING           │    │
+│  │  • GitHub Pages       │         │  ─────────           │    │
+│  │  • Sin servidor       │         │  • Inspeccionar      │    │
+│  │  • HTML/CSS/JS puro   │         │  • Re-ejecutar       │    │
+│  │  • Automático en push │         │  • Modificar         │    │
 │  │                       │         │  • Validar           │    │
 │  └───────────────────────┘         └──────────────────────┘    │
 │           │                                   │                  │
 │           │         ┌─────────────────┐      │                  │
-│           └────────►│  outputs/       │◄─────┘                  │
-│                     │  (Posts JSON)   │                          │
+│           └────────►│  docs/          │◄─────┘                  │
+│                     │  (Posts HTML)   │                          │
 │                     └─────────────────┘                          │
 │                                                                   │
 └─────────────────────────────────────────────────────────────────┘
@@ -72,18 +72,18 @@ Este archivo proporciona:
 
 ### Separación de Responsabilidades
 
-| Aspecto | Frontend (Next.js) | Backend (Daggr) |
-|---------|-------------------|-----------------|
-| **Propósito** | Visualización y UX | Generación y Testing |
-| **Puerto** | 3000 | 7860 |
-| **Usuario Final** | Lectores/Administradores | Desarrolladores/QA |
-| **Funciones** | Listar, Ver, Gestionar | Generar, Debuggear, Validar |
-| **Tecnología** | React, TypeScript, Tailwind | Python, Daggr, HuggingFace |
-| **Deploy** | Vercel | Hugging Face Spaces |
+| Aspecto | Frontend (GitHub Pages) | Backend (Daggr) |
+|---------|-------------------------|-----------------|
+| **Propósito** | Visualización estática | Generación y Testing |
+| **Puerto** | - (estático) | 7860 |
+| **Usuario Final** | Lectores | Desarrolladores/QA |
+| **Funciones** | Listar, Ver posts | Generar, Debuggear, Validar |
+| **Tecnología** | HTML, CSS, JavaScript | Python, Daggr, HuggingFace |
+| **Deploy** | GitHub Pages | Local / Hugging Face Spaces |
 
 ---
 
-## 📦 Estructura de Archivos Actual
+## :package: Estructura de Archivos Actual
 
 ```
 backend/
@@ -124,33 +124,17 @@ backend/
 ├── CLEANUP.md                  # Este resumen de limpieza
 └── README.md
 
-frontend/
-├── app/
-│   ├── components/             # Componentes React
-│   │   ├── BlogLayout.tsx
-│   │   ├── PostHeader.tsx
-│   │   ├── PostBody.tsx
-│   │   └── GenerateForm.tsx
-│   ├── posts/[slug]/           # Posts dinámicos
-│   │   └── page.tsx
-│   ├── generate/               # Formulario de generación
-│   │   └── page.tsx
-│   ├── api/
-│   │   └── generate-post/
-│   │       └── route.ts        # API endpoint
-│   ├── types/
-│   │   └── post.ts             # TypeScript types
-│   ├── page.tsx                # Homepage
-│   └── layout.tsx              # Root layout
-├── .env.local                  # Variables de entorno
-├── package.json
-└── README.md
+docs/                           # GitHub Pages (Frontend estático)
+├── index.html                  # Homepage del blog
+├── post.html                   # Template para posts individuales
+├── posts.json                  # Índice de posts generados
+└── posts/                      # Directorio de posts HTML
+    └── [post-slug].html
 
-docs/                           # Documentación
+project_docs/                   # Documentación técnica
 ├── ORCHESTRATION_PLAN.md
 ├── NEXT_STEPS.md
 ├── MODAL_DEPLOYMENT.md
-├── VERCEL_DEPLOYMENT.md
 ├── HUGGINGFACE_MIGRATION.md
 ├── FRONTEND_IMPLEMENTATION.md
 └── HTMLBUILDER_INTEGRATION.md
@@ -158,7 +142,7 @@ docs/                           # Documentación
 
 ---
 
-## 🔧 Dependencias Actualizadas
+## :wrench: Dependencias Actualizadas
 
 ### Backend - `requirements.txt`
 
@@ -195,23 +179,16 @@ ruff>=0.1.0
 daggr>=0.7.0
 ```
 
-### Frontend - `package.json`
+### Frontend - GitHub Pages (HTML estático)
 
-```json
-{
-  "dependencies": {
-    "next": "16.1.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "tailwindcss": "4.0.0",
-    "typescript": "5.x"
-  }
-}
-```
+No se requieren dependencias de Node.js. El sitio utiliza:
+- HTML5 puro
+- CSS con Tailwind CDN
+- JavaScript vanilla
 
 ---
 
-## 🚀 Cómo Usar el Proyecto
+## :rocket: Cómo Usar el Proyecto
 
 ### 1. Generación de Posts (Backend con Daggr)
 
@@ -227,45 +204,31 @@ python daggr_blogger_workflow.py
 2. Ejecuta el workflow completo o nodo por nodo
 3. Inspecciona outputs de cada agente
 4. Modifica inputs y re-ejecuta si es necesario
-5. Los posts se guardan en `outputs/`
+5. Los posts se guardan en `docs/` para GitHub Pages
 
-### 2. Visualización de Posts (Frontend con Next.js)
+### 2. Visualización de Posts (GitHub Pages)
 
-```bash
-# Terminal 2: Iniciar Next.js
-cd frontend
-npm run dev
-# → http://localhost:3000
-```
+Los posts se publican automáticamente en:
+**[https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)**
 
-**Uso:**
-1. Homepage: Ver características del sistema
-2. `/generate`: Formulario para generar posts
-3. `/posts/[slug]`: Ver posts individuales
-4. Gestión completa de contenido
+**Funcionamiento:**
+1. Los agentes generan posts en formato JSON
+2. El HTML Builder crea archivos HTML estáticos en `docs/`
+3. GitHub Pages sirve automáticamente el contenido del directorio `docs/`
+4. No se requiere servidor ni compilación
 
-### 3. Testing End-to-End
+### 3. Desarrollo Local del Frontend
 
 ```bash
-# Opción 1: Modo Mock (sin backend)
-cd frontend
-# .env.local → USE_MOCK=true (por defecto)
-npm run dev
-
-# Opción 2: Integración real
-# Terminal 1: Backend
-cd backend
-python -m src.orchestrator.runner --topic "IA en educación"
-
-# Terminal 2: Frontend
-cd frontend
-# .env.local → USE_MOCK=false
-npm run dev
+# Servir archivos estáticos localmente
+cd docs
+python -m http.server 8000
+# → http://localhost:8000
 ```
 
 ---
 
-## 📊 Métricas del Proyecto
+## :bar_chart: Métricas del Proyecto
 
 ### Backend
 - **Agentes**: 6 (100% migrados a HuggingFace)
@@ -274,90 +237,89 @@ npm run dev
 - **Documentación**: 9 archivos (5,000+ líneas)
 
 ### Frontend
-- **Componentes**: 4
-- **Páginas**: 3
-- **API Routes**: 1
-- **Tests**: Pendiente
+- **Tecnología**: HTML5, CSS3, JavaScript (vanilla)
+- **Páginas**: 2 (index.html, post.html)
+- **Deployment**: GitHub Pages
+- **Performance**: Carga instantánea (sin bundling)
 
 ### Total
-- **Progreso**: ~85% completo
-- **Pendiente**: Deploy (Modal + Vercel), CI/CD
+- **Progreso**: ~90% completo
+- **Pendiente**: Mejoras de contenido y estilo
 
 ---
 
-## 🎯 Próximos Pasos
+## :dart: Próximos Pasos
 
 ### Alta Prioridad
-- [ ] **Testing Frontend**: Jest + Testing Library
-- [ ] **Integración E2E**: Backend → Frontend automática
+- [ ] **Contenido de ejemplo**: Generar posts de demostración
+- [ ] **Estilos mejorados**: Refinar diseño visual del blog
 - [ ] **Deploy Backend**: Hugging Face Spaces con Daggr
-- [ ] **Deploy Frontend**: Vercel con dominio personalizado
+- [ ] **Documentación**: Guía de usuario final
 
 ### Media Prioridad
-- [ ] **CI/CD**: GitHub Actions para tests automáticos
-- [ ] **Sistema de Colas**: Para generaciones múltiples
-- [ ] **Autenticación**: Login para gestión de posts
-- [ ] **Base de Datos**: Persistencia de posts (PostgreSQL)
+- [ ] **CI/CD**: GitHub Actions para validación automática
+- [ ] **Sistema de búsqueda**: Filtrado de posts por tags
+- [ ] **RSS Feed**: Generación automática de feed
+- [ ] **Analytics**: Tracking de visitas
 
 ### Baja Prioridad
-- [ ] **Traducción**: Multi-idioma con i18n
-- [ ] **SEO Avanzado**: Meta tags optimizados
-- [ ] **Analytics**: Tracking de uso y métricas
-- [ ] **API Pública**: REST API para terceros
+- [ ] **Comentarios**: Sistema de comentarios estático (utterances)
+- [ ] **SEO Avanzado**: Meta tags y social sharing
+- [ ] **Dark Mode**: Tema oscuro para el blog
+- [ ] **PWA**: Progressive Web App capabilities
 
 ---
 
-## 📖 Documentación Actualizada
+## :books: Documentación Actualizada
 
 ### Guías Principales
-1. [README.md](../README.md) - Visión general del proyecto ✅ **ACTUALIZADO**
-2. [DAGGR_WORKFLOW.md](DAGGR_WORKFLOW.md) - Guía completa de Daggr ✅ **NUEVO**
-3. [CLEANUP.md](CLEANUP.md) - Este resumen de limpieza ✅ **NUEVO**
+1. [README.md](../README.md) - Visión general del proyecto :white_check_mark: **ACTUALIZADO**
+2. [DAGGR_WORKFLOW.md](DAGGR_WORKFLOW.md) - Guía completa de Daggr :white_check_mark: **NUEVO**
+3. [CLEANUP.md](CLEANUP.md) - Este resumen de limpieza :white_check_mark: **NUEVO**
 
 ### Documentación Técnica
 4. [ORCHESTRATION_PLAN.md](../docs/ORCHESTRATION_PLAN.md) - Plan maestro
 5. [HUGGINGFACE_MIGRATION.md](../docs/HUGGINGFACE_MIGRATION.md) - Migración a HF
-6. [FRONTEND_IMPLEMENTATION.md](../docs/FRONTEND_IMPLEMENTATION.md) - Frontend Next.js
-7. [HTMLBUILDER_INTEGRATION.md](../docs/HTMLBUILDER_INTEGRATION.md) - HTMLBuilder
+6. [HTMLBUILDER_INTEGRATION.md](../docs/HTMLBUILDER_INTEGRATION.md) - HTMLBuilder
 
 ### Deployment
-8. [MODAL_DEPLOYMENT.md](../docs/MODAL_DEPLOYMENT.md) - Deploy backend
-9. [VERCEL_DEPLOYMENT.md](../docs/VERCEL_DEPLOYMENT.md) - Deploy frontend
+7. [MODAL_DEPLOYMENT.md](../docs/MODAL_DEPLOYMENT.md) - Deploy backend
+8. ~~[VERCEL_DEPLOYMENT.md](../docs/VERCEL_DEPLOYMENT.md)~~ - **Obsoleto** (se usa GitHub Pages)
 
 ---
 
-## 🎓 Proyecto Académico
+## :mortar_board: Proyecto Académico
 
 **Trabajo Final de Grado (TFG)**  
 Especialización en IA y Big Data  
 IES Rafael Alberti - 2026
 
 ### Tecnologías Destacadas
-- 🤖 **IA Multi-Agente**: 6 agentes especializados colaborando
-- 🆓 **HuggingFace**: LLM gratuito (Llama 3.1, Mistral)
-- 📊 **Daggr**: Workflow visual oficial de Gradio
-- ⚛️ **Next.js 16**: Framework moderno de React
-- 🎨 **Tailwind CSS**: Diseño responsive y elegante
+- **IA Multi-Agente**: 6 agentes especializados colaborando
+- **HuggingFace**: LLM gratuito (Llama 3.1, Mistral)
+- **Daggr**: Workflow visual oficial de Gradio
+- **GitHub Pages**: Hosting gratuito y automático
+- **HTML/CSS/JS**: Frontend ligero y rápido
 
 ---
 
-## ✅ Checklist Final
+## :white_check_mark: Checklist Final
 
 - [x] Backend: 6 agentes con HuggingFace
 - [x] Backend: Orquestador completo (7 fases)
 - [x] Backend: Tests (75/76 passing)
 - [x] Backend: Daggr workflow visual
-- [x] Frontend: Next.js 16 completo
-- [x] Frontend: 4 componentes + 3 páginas
-- [x] Frontend: API route con modo mock
+- [x] Frontend: HTML estático con GitHub Pages
+- [x] Frontend: Diseño responsive con Tailwind
+- [x] Frontend: Sistema de posts dinámico
 - [x] Documentación: 11 guías completas
-- [x] Limpieza: Archivos Gradio redundantes eliminados
-- [ ] Deploy: Modal (backend)
-- [ ] Deploy: Vercel (frontend)
+- [x] Limpieza: Archivos redundantes eliminados
+- [x] Deploy: GitHub Pages configurado
+- [ ] Deploy: Hugging Face Spaces (backend)
 - [ ] CI/CD: GitHub Actions
-- [ ] Tests: Frontend con Jest
+- [ ] Contenido: Posts de ejemplo
 
-**Estado Global:** 🟢 85% Completo y Funcional
+**Estado Global:** :green_circle: 90% Completo y Funcional
 
 ---
 
