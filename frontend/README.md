@@ -1,6 +1,50 @@
 # Frontend - Blogger Agent TFG
 
-Frontend de Next.js para el sistema multi-agente de generación de contenido de blog.
+:warning: **IMPORTANTE: Este directorio contiene un frontend Next.js que YA NO SE UTILIZA**
+
+## :information_source: Estado Actual
+
+El proyecto ahora utiliza **GitHub Pages con HTML estático** en lugar de Next.js.
+
+- **Frontend activo**: `/docs` (HTML, CSS, JavaScript vanilla)
+- **URL de producción**: [https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)
+- **Deployment**: Automático vía GitHub Pages
+
+## :question: ¿Por qué se cambió?
+
+1. **Simplicidad**: No requiere Node.js, npm, ni proceso de build
+2. **Rendimiento**: Carga instantánea sin bundling
+3. **Costos**: GitHub Pages es completamente gratuito
+4. **Mantenimiento**: Menos dependencias y actualizaciones
+
+## :recycle: Este directorio Next.js
+
+Este directorio se mantiene como **referencia histórica** y podría reutilizarse en el futuro si se necesitan funcionalidades más avanzadas como:
+
+- Generación dinámica de contenido desde el frontend
+- API routes para integración con backend
+- Sistema de autenticación
+- Panel de administración
+
+## :rocket: Ver el Frontend Actual
+
+Para ver el frontend en producción:
+- **URL**: [https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)
+- **Código fuente**: Directorio `/docs` en la raíz del proyecto
+
+Para desarrollo local del frontend actual:
+```bash
+cd docs
+python -m http.server 8000
+# → http://localhost:8000
+```
+
+---
+
+## :page_facing_up: Documentación Original (Next.js - No Usado)
+
+<details>
+<summary>Expandir para ver la documentación del frontend Next.js (archivado)</summary>
 
 ## 🚀 Quick Start
 
@@ -208,3 +252,10 @@ vercel
 - [Next.js Docs](https://nextjs.org/docs)
 - [Tailwind CSS](https://tailwindcss.com)
 - [TypeScript](https://www.typescriptlang.org)
+
+</details>
+
+---
+
+**Última actualización**: 17 de febrero de 2026  
+**Estado**: :no_entry: Archivado (se usa GitHub Pages en su lugar)

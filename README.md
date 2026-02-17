@@ -1,44 +1,44 @@
-# 🤖 Blogger Agent TFG
+# Blogger Agent TFG
 
-Sistema multi-agente de IA para generar contenido de blog imitando el estilo de bloggers específicos.
+> Sistema multi-agente de IA para generar contenido de blog imitando el estilo de bloggers específicos.
 
 ---
 
-## 🌐 Ver los Blogs Generados
+## :globe_with_meridians: Ver los Blogs Generados
 
 **Puedes visualizar los blogs generados en la página web de este repositorio:**
 
-👉 **[https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)**
+**:point_right: [https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)**
 
-La aplicación frontend (Next.js) está desplegada en GitHub Pages y muestra todos los posts generados por el sistema de agentes.
+El sitio está desplegado en GitHub Pages y muestra todos los posts generados por el sistema de agentes utilizando HTML estático.
 
 ---
 
-## 📊 Diagrama del Flujo DAGGR
+## :bar_chart: Diagrama del Flujo DAGGR
 
 El sistema utiliza **Daggr** (herramienta oficial de Gradio) para orquestar 7 agentes especializados que colaboran en la generación de contenido:
 
 ```mermaid
 graph TD
-    Start([🎯 Inicio: Tema del Blog]) --> StyleAnalyzer
+    Start([Inicio: Tema del Blog]) --> StyleAnalyzer
     
-    StyleAnalyzer[📏 Style Analyzer<br/>Analiza estilo del blogger] --> KeywordExtractor
-    KeywordExtractor[🔍 Keyword Extractor<br/>Extrae palabras clave] --> Research
-    Research[🔬 Research Agent<br/>Investiga el tema] --> ContentGenerator
+    StyleAnalyzer[Style Analyzer<br/>Analiza estilo del blogger] --> KeywordExtractor
+    KeywordExtractor[Keyword Extractor<br/>Extrae palabras clave] --> Research
+    Research[Research Agent<br/>Investiga el tema] --> ContentGenerator
     
-    ContentGenerator[✍️ Content Generator<br/>Genera contenido inicial] --> Critic
+    ContentGenerator[Content Generator<br/>Genera contenido inicial] --> Critic
     
-    Critic{🤔 Critic Agent<br/>Evalúa calidad}
+    Critic{Critic Agent<br/>Evalúa calidad}
     Critic -->|Score ≥ 8.0| ImageSelector
     Critic -->|Score < 8.0<br/>Máx 3 iteraciones| Refinement
     
-    Refinement[✨ Refinement<br/>Mejora el contenido] --> Critic
+    Refinement[Refinement<br/>Mejora el contenido] --> Critic
     
-    ImageSelector[🖼️ Image Selector<br/>Selecciona imágenes] --> HTMLBuilder
+    ImageSelector[Image Selector<br/>Selecciona imágenes] --> HTMLBuilder
     
-    HTMLBuilder[🖥️ HTML Builder<br/>Construye página final] --> Output
+    HTMLBuilder[HTML Builder<br/>Construye página final] --> Output
     
-    Output([📄 Post Final en JSON])
+    Output([Post Final en JSON])
     
     %% Estilos
     style Start fill:#e1f5ff
@@ -47,19 +47,19 @@ graph TD
     style Refinement fill:#ffe0b2
 ```
 
-### 🔄 Fases del Workflow
+### :arrows_counterclockwise: Fases del Workflow
 
-1. **📏 Style Analyzer**: Analiza el estilo de escritura del blogger objetivo
-2. **🔍 Keyword Extractor**: Identifica palabras clave relevantes del tema
-3. **🔬 Research Agent**: Investiga información actualizada sobre el tema
-4. **✍️ Content Generator**: Genera el contenido del post imitando el estilo
-5. **🤔 Critic Agent**: Evalúa la calidad del contenido (loop de mejora)
-6. **🖼️ Image Selector**: Selecciona imágenes apropiadas para el post
-7. **🖥️ HTML Builder**: Construye la estructura HTML final del blog
+1. **Style Analyzer**: Analiza el estilo de escritura del blogger objetivo
+2. **Keyword Extractor**: Identifica palabras clave relevantes del tema
+3. **Research Agent**: Investiga información actualizada sobre el tema
+4. **Content Generator**: Genera el contenido del post imitando el estilo
+5. **Critic Agent**: Evalúa la calidad del contenido (loop de mejora)
+6. **Image Selector**: Selecciona imágenes apropiadas para el post
+7. **HTML Builder**: Construye la estructura HTML final del blog
 
 ---
 
-## 🚀 Uso del Sistema
+## :rocket: Uso del Sistema
 
 ### Backend (Workflow Visual con Daggr)
 ```bash
@@ -68,16 +68,15 @@ python daggr_blogger_workflow.py
 # → http://localhost:7860
 ```
 
-### Frontend (Visualización de Blogs)
-```bash
-cd frontend
-npm run dev
-# → http://localhost:3000
-```
+### Visualización de Blogs
+
+Los blogs generados se publican automáticamente en:
+- **GitHub Pages**: [https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)
+- **Archivos estáticos**: Directorio `docs/` (index.html, post.html, posts.json)
 
 ---
 
-## 📚 Documentación
+## :books: Documentación
 
 - **[DAGGR_WORKFLOW.md](backend/DAGGR_WORKFLOW.md)** - Guía completa del workflow Daggr
 - **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - Estado actual del proyecto

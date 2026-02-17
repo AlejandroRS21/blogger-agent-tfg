@@ -1,5 +1,15 @@
 # Vercel Deployment - Frontend Next.js
 
+> :warning: **DOCUMENTO OBSOLETO**  
+> Este documento describe el deployment en Vercel de un frontend Next.js que **ya no se utiliza**.  
+> El proyecto ahora usa **GitHub Pages** con HTML estático en el directorio `/docs`.  
+> Ver el frontend actual en: [https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)
+
+---
+
+<details>
+<summary>:page_facing_up: Documentación original de Vercel (archivado)</summary>
+
 Guía completa para desplegar el frontend de Next.js en Vercel.
 
 ## 📋 Índice
@@ -364,3 +374,10 @@ Antes de hacer deployment a producción:
 ---
 
 **¿Problemas?** Abre un issue en GitHub o consulta la [documentación oficial de Vercel](https://vercel.com/docs).
+
+</details>
+
+---
+
+**Última actualización**: 17 de febrero de 2026  
+**Estado**: :no_entry: Obsoleto (se usa GitHub Pages en su lugar)
