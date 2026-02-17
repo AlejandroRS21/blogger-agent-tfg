@@ -239,10 +239,12 @@ class HTMLBuilder:
             alt_text = image.get('alt_text', 'Blog image')
             
             # Create image placeholder
+            image_url = image.get('url') or "/api/placeholder/800/400"
+            
             placeholder = f'''
 <figure class="blog-image" data-position="{position}">
   <img 
-    src="/api/placeholder/800/400" 
+    src="{image_url}" 
     alt="{alt_text}"
     data-image-prompt="{prompt}"
     loading="lazy"

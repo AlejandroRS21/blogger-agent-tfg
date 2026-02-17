@@ -168,6 +168,15 @@ def ensure_dict(data: Any) -> Dict[str, Any]:
         return parsed
     return {}
 
+def ensure_list(data: Any) -> List[Any]:
+    """Ensures we have a list."""
+    parsed = safe_json_load(data)
+    if isinstance(parsed, list):
+        return parsed
+    if isinstance(parsed, dict):
+        return [parsed]
+    return []
+
 def ensure_string(data: Any, key: str = None) -> str:
     """Ensures we have a string, extracting from dict if necessary."""
     if data is None:
@@ -180,29 +189,40 @@ def ensure_string(data: Any, key: str = None) -> str:
         for k in ["topic_out", "topic", "content", "text", "refined_content"]:
             if k in data:
                 return str(data[k])
+        # Si no hay ninguna de las claves que buscamos, devolver el primer valor no-dict
+        for k, v in data.items():
+            if not isinstance(v, (dict, list)):
+                return str(v)
         return str(next(iter(data.values()))) if data else ""
     
     # Si es un string, podría ser un diccionario serializado (típico en Gradio/Daggr)
     if isinstance(data, str):
         data_stripped = data.strip()
+        # Caso especial para Gradio: a veces es un string de un dict de Python
         if data_stripped.startswith("{") and data_stripped.endswith("}"):
             try:
-                # Intentar parsear como JSON
+                # Intentar parsear como JSON pero manejar comillas simples de Python repr()
                 import json
-                parsed = json.loads(data_stripped.replace("'", "\"")) # Manejar comillas simples
+                # Reemplazo agresivo de comillas simples por dobles para reprs de Python
+                # pero solo si no es JSON válido ya
+                try:
+                    parsed = json.loads(data_stripped)
+                except:
+                    # Intento ast.literal_eval que es más seguro para strings de Python
+                    import ast
+                    parsed = ast.literal_eval(data_stripped)
+                
                 if isinstance(parsed, dict):
                     if key and key in parsed:
                         return str(parsed[key])
                     for k in ["topic_out", "topic", "content", "text", "refined_content"]:
                         if k in parsed:
                             return str(parsed[k])
-            except:
-                # Fallback regex para diccionarios representados como string
-                import re
-                if key:
-                    match = re.search(f"['\"]{key}['\"]\\s*:\\s*['\"](.*?)['\"]", data_stripped)
-                    if match:
-                        return match.group(1)
+                    # Si no, devolver el valor de la primera clave
+                    if parsed:
+                        return str(next(iter(parsed.values())))
+            except Exception as e:
+                print(f"⚠️ Error parsing potential dict string: {e}")
         return data_stripped
     
     return str(data)
@@ -389,14 +409,25 @@ def build_html(topic_out: Any, content: Any, images_json: Any, style_json: Any) 
             images = images["images"]
         else:
             images = []
+    
+    # Inyectar URLs de loremflickr si no hay una real (para tener imágenes visibles)
+    import time
+    for i, img in enumerate(images):
+        if not img.get("url") or "/api/placeholder/" in img.get("url", ""):
+            # Usamos el topic como keyword
+            kw = actual_topic.split()[-1] if actual_topic else "tech"
+            img["url"] = f"https://loremflickr.com/800/400/{kw}?random={i}_{int(time.time())}"
             
     output = state.agents["html"].build(content=actual_content, topic=actual_topic, images=images, style_profile=style)
     
     # Guardar el post para el frontend
     try:
-        # Generar slug y asegurar que no esté vacío
+        # Generar slug y asegurar que no esté vacío, con límite para evitar problemas de ruta
         slug = actual_topic.lower().replace(" ", "-")
         slug = "".join([c for c in slug if c.isalnum() or c == '-'])
+        if len(slug) > 100:
+            slug = slug[:100].rstrip("-")
+            
         if not slug:
             slug = f"post-{datetime.now().strftime('%Y%m%d%H%M%S')}"
             
@@ -563,6 +594,45 @@ full_pipeline_node = FnNode(
     }
 )
 
+def run_deploy() -> str:
+    """Ejecuta el script de despliegue y devuelve el resultado."""
+    print("🚀 Iniciando despliegue en GitHub Pages...")
+    import subprocess
+    import os
+    
+    # Intentar encontrar el script en la raíz
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    script_path = os.path.join(root_dir, "deploy.ps1")
+    
+    if not os.path.exists(script_path):
+        return "❌ Error: No se encontró el archivo deploy.ps1 en la raíz."
+        
+    try:
+        # Ejecutar PowerShell para lanzar el script
+        # -ExecutionPolicy Bypass es necesario para scripts no firmados
+        result = subprocess.run(
+            ["powershell.exe", "-ExecutionPolicy", "Bypass", "-File", script_path],
+            capture_output=True,
+            text=True,
+            encoding="utf-8"
+        )
+        
+        if result.returncode == 0:
+            print("✅ Despliegue completado con éxito.")
+            return f"✅ ¡Desplegado!\n{result.stdout}"
+        else:
+            print(f"❌ Error en despliegue: {result.stderr}")
+            return f"❌ Error:\n{result.stderr}\n{result.stdout}"
+    except Exception as e:
+        return f"❌ Excepción ejecutando script: {str(e)}"
+
+deploy_node = FnNode(
+    fn=run_deploy,
+    name="🌐 DESPLEGAR BLOG",
+    inputs={},
+    outputs={"res": gr.Textbox(label="Resultado del Despliegue")}
+)
+
 # ============================================================================
 # LANZAMIENTO
 # ============================================================================
@@ -572,6 +642,7 @@ graph = Graph(
     nodes=[
         config_node, 
         full_pipeline_node, # ✅ Nodo maestro añadido
+        deploy_node,      # ✅ Botón de despliegue
         style_analyzer, 
         keyword_extractor, 
         research_node, 

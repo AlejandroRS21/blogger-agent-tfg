@@ -2,7 +2,21 @@
 
 > Sistema multi-agente de IA para mimetizar estilos de escritura, con generación visual (Daggr) y despliegue estático en GitHub Pages.
 
-## 📋 Descripción del Proyecto
+## � Despliegue Automatizado (GitHub Pages)
+
+Para que el blog se actualice en la web (`https://AlejandroRS21.github.io/blogger-agent-tfg/`), el sistema incluye un botón interactivo **🌐 DESPLEGAR BLOG** en la interfaz de usuario.
+
+### ¿Cómo funciona el despliegue?
+1.  **Generación Local**: El sistema guarda los archivos JSON en `docs/posts/`.
+2.  **Sincronización Automática**: Al pulsar el botón de despliegue, el backend ejecuta el script `deploy.ps1`.
+3.  **Git Subtree**: El script utiliza el comando `git subtree push --prefix docs origin gh-pages` para enviar **únicamente** la carpeta `docs` a la rama de producción sin interferir con el código fuente del `main`.
+
+> [!NOTE]
+> Debes tener permisos de escritura en el repositorio y haber configurado tu usuario de Git localmente para que el botón funcione sin pedir contraseña.
+
+---
+
+## �📋 Descripción del Proyecto
 
 Sistema multi-agente que analiza el estilo de un blogger y genera artículos que mimetizan su tono. Esta versión utiliza un **backend serverless en Modal** con el modelo **Qwen 2.5 7B** (desplegado en GPUs NVIDIA A10G) para máxima velocidad y privacidad, eliminando cualquier dependencia de OpenAI.
 
