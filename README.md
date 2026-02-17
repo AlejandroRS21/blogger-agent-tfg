@@ -1,19 +1,12 @@
-# Blogger Agent TFG
+# Blogger Agent TFG (Static Edition)
 
-> Multi-agent AI system for mimicking blogger writing style using Aphra workflows, Next.js on Vercel, and Modal backend deployment
+> Sistema multi-agente de IA para mimetizar estilos de escritura, con generación visual (Daggr) y despliegue estático en GitHub Pages.
 
 ## 📋 Descripción del Proyecto
 
-Sistema multi-agente de IA que analiza el estilo de escritura de un blogger y genera artículos nuevos que mimetizan su tono, estructura, y forma de escribir. El proyecto utiliza múltiples agentes especializados que colaboran para:
+Sistema multi-agente que analiza el estilo de un blogger y genera artículos que mimetizan su tono. Esta versión utiliza un **backend serverless en Modal** con el modelo **Qwen 2.5 7B** (desplegado en GPUs NVIDIA A10G) para máxima velocidad y privacidad, eliminando cualquier dependencia de OpenAI.
 
-- Analizar el estilo narrativo del blogger
-- Extraer palabras clave y patrones lingüísticos
-- Generar contenido base
-- Criticar y refinar el texto
-- Construir HTML/JSX optimizado para Next.js
-- Seleccionar y ubicar imágenes apropiadas
-
-## 🏗️ Arquitectura
+## 🏗️ Arquitectura Actualizada
 
 ```
 blogger-agent-tfg/

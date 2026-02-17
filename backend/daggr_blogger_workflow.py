@@ -215,7 +215,7 @@ def build_html(topic: str, content: str, images_json: str, style_json: str) -> s
     try:
         slug = topic.lower().replace(" ", "-").replace("?", "").replace("!", "")
         # Aseguramos que existe el directorio
-        output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "public", "posts")
+        output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs", "posts")
         os.makedirs(output_dir, exist_ok=True)
         
         post_data = {
@@ -237,6 +237,34 @@ def build_html(topic: str, content: str, images_json: str, style_json: str) -> s
             json.dump(post_data, f, indent=2, ensure_ascii=False)
             
         print(f"✅ Post guardado en: {output_dir}/{slug}.json")
+        
+        # Actualizar el índice posts.json
+        index_path = os.path.join(os.path.dirname(output_dir), "posts.json")
+        posts_index = []
+        if os.path.exists(index_path):
+            try:
+                with open(index_path, "r", encoding="utf-8") as f:
+                    posts_index = json.load(f)
+            except:
+                posts_index = []
+        
+        # Evitar duplicados
+        posts_index = [p for p in posts_index if p["id"] != slug]
+        
+        # Añadir resumen del post al principio
+        posts_index.insert(0, {
+            "id": post_data["id"],
+            "title": post_data["title"],
+            "description": post_data["description"],
+            "date": post_data["metadata"]["date"],
+            "author": post_data["metadata"]["author"],
+            "tags": post_data["metadata"]["tags"]
+        })
+        
+        with open(index_path, "w", encoding="utf-8") as f:
+            json.dump(posts_index, f, indent=2, ensure_ascii=False)
+            
+        print(f"✅ Índice de posts actualizado: {index_path}")
     except Exception as e:
         print(f"⚠️ Error al guardar el post: {e}")
 
