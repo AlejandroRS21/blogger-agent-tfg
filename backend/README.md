@@ -42,7 +42,7 @@ backend/
 │   ├── __init__.py
 │   ├── scraper.py                 # Web scraper para corpus
 │   └── README.md                  # Documentación del scraper
-├── tests/                         # Tests unitarios (40+ tests)
+├── tests/                         # Tests unitarios (76 tests)
 │   ├── test_workflow.py
 │   ├── test_orchestrator.py       # Tests del orquestador [✅]
 │   ├── test_agents.py             # Tests de agentes [✅]

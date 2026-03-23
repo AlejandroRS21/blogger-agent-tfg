@@ -55,7 +55,7 @@ blogger-agent-tfg/
 │   │   ├── scraper.py          # ✅ Web scraper WordPress-optimizado
 │   │   ├── README.md
 │   │   └── examples_scraper.py
-│   ├── tests/                  # ✅ Tests completos (40+ tests)
+│   ├── tests/                  # ✅ Tests completos (76 tests)
 │   │   ├── test_workflow.py
 │   │   ├── test_orchestrator.py
 │   │   ├── test_agents.py
@@ -475,6 +475,11 @@ Lee [CONTRIBUTING.md](CONTRIBUTING.md) para entender el flujo de trabajo con Git
 5. Push y PR contra `develop`
 6. Esperar 1 approval
 7. Merge
+
+## 🧭 Coherencia y estado
+- Notas rápidas sobre coherencia documental: existe variabilidad en las cifras de tests reportadas a lo largo de la documentación (40+ vs 75/76). Se recomienda consolidar a un único recuento (p. ej. 76 tests totales; 75 passing, 1 skipped) en todos los docs para evitar confusiones.
+- Despliegue Modal: varias secciones indican que Modal está pendiente, mientras que existen ejemplos de deployment en modal_app.py. Se sugiere actualizar el estado real y la guía correspondiente.
+- Añadir un enlace a un informe de coherencia central (docs/COHERENCE_REPORT.md) para guiar futuras revisiones.
 
 ## 📚 Documentación
 
