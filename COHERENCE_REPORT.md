@@ -33,3 +33,12 @@ Siguientes pasos propuestos
 
 Notas finales
 - Este informe no modifica código; se centra en coherencia de documentación y estado de proyecto. Si quieres, puedo generar parches para unificar textos directamente en los archivos de docs y README.
+
+## 🧭 Maintenance Checklist (Future Checks)
+- [ ] Verificar que los recuentos de tests estén unificados en todos los docs (ej. 76 tests totales; 75 passing, 1 skipped) y actualizar si cambia.
+- [ ] Confirmar el estado de despliegue de Modal y Vercel; actualizar MODAL_DEPLOYMENT.md y NEXT_STEPS en consecuencia.
+- [ ] Alinear referencias de tests en root README, backend/README.md y project_docs para evitar duplicidades o inconsistencias.
+- [ ] Validar coherencia de la arquitectura (7 fases vs 6 agentes) y mantener documentos claros para nuevos contribuyentes.
+- [ ] Actualizar versiones de dependencias en docs cuando haya cambios en package.json/requirements.txt y reflejarlo en la documentación.
+- [ ] Establecer una cadencia de revisión (p. ej. por cada release) para ejecutar tests, limpiar documentos y actualizar el informe de coherencia.
+- [ ] Opcional: añadir un mini script de verificación que detecte discrepancias entre números de tests en diferentes archivos y alerte en PR.
