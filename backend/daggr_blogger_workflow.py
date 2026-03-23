@@ -75,6 +75,9 @@ def initialize_agents(provider: str, api_key: str):
     elif provider == "openai":
         state.config.openai_api_key = actual_key or os.getenv("OPENAI_API_KEY")
         if actual_key: os.environ["OPENAI_API_KEY"] = actual_key
+    elif provider == "gemini":
+        state.config.gemini_api_key = actual_key or os.getenv("GEMINI_API_KEY")
+        if actual_key: os.environ["GEMINI_API_KEY"] = actual_key
 
     # Crear LLM
     try:
@@ -103,7 +106,7 @@ def initialize_agents(provider: str, api_key: str):
 # ============================================================================
 
 # Entradas
-provider_input = gr.Dropdown(choices=["modal", "huggingface", "openai"], value="modal", label="Proveedor LLM")
+provider_input = gr.Dropdown(choices=["gemini", "modal", "huggingface", "openai"], value="gemini", label="Proveedor LLM")
 api_key_input = gr.Textbox(label="API Key / Token", placeholder="Opcional si está en .env", type="password")
 blogger_name_input = gr.Textbox(label="Nombre del Blogger", value="TechGuru")
 sample_posts_input = gr.Textbox(label="Muestras de Estilo", lines=5, value="Hoy aprendí sobre React Hooks.\nLa IA está cambiando el mundo.")
@@ -451,9 +454,9 @@ def build_html(topic_out: Any, content: Any, images_json: Any, style_json: Any) 
         }
         
         # Guardar archivo individual
-        post_file_path = os.path.join(output_dir, f"{slug}.json")
+        post_file_path = os.path.join(output_dir, f"{slug}.html")
         with open(post_file_path, "w", encoding="utf-8") as f:
-            json.dump(post_data, f, indent=2, ensure_ascii=False)
+            f.write(output.html)
             
         print(f"✅ Post individual guardado en: {post_file_path}")
         

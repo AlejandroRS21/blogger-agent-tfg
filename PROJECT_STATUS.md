@@ -72,14 +72,11 @@ Este archivo proporciona:
 
 ### Separación de Responsabilidades
 
-| Aspecto | Frontend (Next.js) | Backend (Daggr) |
+| Aspecto | Frontend (GH Pages) | Backend (Python/Daggr) |
 |---------|-------------------|-----------------|
-| **Propósito** | Visualización y UX | Generación y Testing |
-| **Puerto** | 3000 | 7860 |
-| **Usuario Final** | Lectores/Administradores | Desarrolladores/QA |
-| **Funciones** | Listar, Ver, Gestionar | Generar, Debuggear, Validar |
-| **Tecnología** | React, TypeScript, Tailwind | Python, Daggr, HuggingFace |
-| **Deploy** | Vercel | Hugging Face Spaces |
+| **Propósito** | Visualización estática | Generación de contenido |
+| **Tecnología** | HTML5, Tailwind CDN | Python, Daggr, HuggingFace |
+| **Deploy** | GitHub Pages | Local / Modal |
 
 ---
 
@@ -124,27 +121,11 @@ backend/
 ├── CLEANUP.md                  # Este resumen de limpieza
 └── README.md
 
-frontend/
-├── app/
-│   ├── components/             # Componentes React
-│   │   ├── BlogLayout.tsx
-│   │   ├── PostHeader.tsx
-│   │   ├── PostBody.tsx
-│   │   └── GenerateForm.tsx
-│   ├── posts/[slug]/           # Posts dinámicos
-│   │   └── page.tsx
-│   ├── generate/               # Formulario de generación
-│   │   └── page.tsx
-│   ├── api/
-│   │   └── generate-post/
-│   │       └── route.ts        # API endpoint
-│   ├── types/
-│   │   └── post.ts             # TypeScript types
-│   ├── page.tsx                # Homepage
-│   └── layout.tsx              # Root layout
-├── .env.local                  # Variables de entorno
-├── package.json
-└── README.md
+docs/                           # Documentación y Web Estática
+├── posts/                      # Posts HTML generados automáticamente
+├── index.html                  # Homepage estática
+├── posts.json                  # Índice de posts
+├── deploy.ps1                  # Script de despliegue a gh-pages
 
 docs/                           # Documentación
 ├── ORCHESTRATION_PLAN.md
@@ -347,17 +328,15 @@ IES Rafael Alberti - 2026
 - [x] Backend: Orquestador completo (7 fases)
 - [x] Backend: Tests (75/76 passing)
 - [x] Backend: Daggr workflow visual
-- [x] Frontend: Next.js 16 completo
-- [x] Frontend: 4 componentes + 3 páginas
-- [x] Frontend: API route con modo mock
-- [x] Documentación: 11 guías completas
-- [x] Limpieza: Archivos Gradio redundantes eliminados
+- [x] Frontend: Generación HTML Estática pura
+- [x] Frontend: Auto-actualización de posts.json e index.html
+- [x] Frontend: Despliegue directo a GitHub Pages
+- [x] Documentación: Guías actualizadas a web estática
+- [x] Limpieza: Eliminado frontend en Next.js por redundancia
 - [ ] Deploy: Modal (backend)
-- [ ] Deploy: Vercel (frontend)
 - [ ] CI/CD: GitHub Actions
-- [ ] Tests: Frontend con Jest
 
-**Estado Global:** 🟢 85% Completo y Funcional
+**Estado Global:** 🟢 95% Completo y Funcional
 
 ---
 

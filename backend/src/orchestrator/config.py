@@ -36,6 +36,7 @@ class OrchestratorConfig:
     max_word_count: int = 2500
     
     # API Keys (from environment)
+    gemini_api_key: Optional[str] = None
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     huggingface_token: Optional[str] = None
@@ -70,6 +71,7 @@ class OrchestratorConfig:
             verbose=workflow.get('verbose', True),
             min_word_count=content.get('min_word_count', 800),
             max_word_count=content.get('max_word_count', 2500),
+            gemini_api_key=os.getenv('GEMINI_API_KEY'),
             openai_api_key=os.getenv('OPENAI_API_KEY'),
             anthropic_api_key=os.getenv('ANTHROPIC_API_KEY'),
             huggingface_token=os.getenv('HF_TOKEN') or os.getenv('HUGGINGFACE_TOKEN'),
@@ -81,6 +83,7 @@ class OrchestratorConfig:
     def default(cls) -> "OrchestratorConfig":
         """Create default configuration."""
         return cls(
+            gemini_api_key=os.getenv('GEMINI_API_KEY'),
             openai_api_key=os.getenv('OPENAI_API_KEY'),
             anthropic_api_key=os.getenv('ANTHROPIC_API_KEY'),
             huggingface_token=os.getenv('HF_TOKEN') or os.getenv('HUGGINGFACE_TOKEN'),
@@ -90,6 +93,7 @@ class OrchestratorConfig:
     def validate(self) -> None:
         """Validate configuration."""
         has_key = any([
+            self.gemini_api_key,
             self.openai_api_key, 
             self.anthropic_api_key, 
             self.huggingface_token, 
@@ -99,7 +103,7 @@ class OrchestratorConfig:
         
         if not has_key:
             raise ValueError(
-                "At least one API key must be set: OPENAI_API_KEY, HF_TOKEN, or MODAL_TOKEN_ID/SECRET"
+                "At least one API key must be set: GEMINI_API_KEY, OPENAI_API_KEY, HF_TOKEN, or MODAL_TOKEN_ID/SECRET"
             )
         
         if self.max_retries < 0:

@@ -19,6 +19,15 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
+# Cargar variables de entorno
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+except ImportError:
+    pass
+
 # Add backend to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -85,10 +94,12 @@ def save_post(post: dict):
     docs_path = project_root / "docs" / "posts"
     docs_path.mkdir(parents=True, exist_ok=True)
 
-    # Guardar post individual
-    filename = docs_path / f"{post['id']}.json"
+    # Guardar post individual como HTML
+    filename = docs_path / f"{post['id']}.html"
     with open(filename, "w", encoding="utf-8") as f:
-        json.dump(post, f, ensure_ascii=False, indent=2)
+        # Extraer el html del json provisto. Si no lo hay, crear dump simple
+        html_code = post.get("html_code", f"<article>{post.get('content', '')}</article>")
+        f.write(html_code)
 
     print(f"✓ Guardado en {filename}")
     return filename
@@ -133,14 +144,17 @@ def deploy_to_github():
     print("\n🚀 Desplegando a GitHub Pages...")
 
     try:
+        project_root = Path(__file__).parent.parent
+        
         # Eliminar rama local gh-pages
-        subprocess.run(["git", "branch", "-D", "gh-pages"], capture_output=True)
+        subprocess.run(["git", "branch", "-D", "gh-pages"], capture_output=True, cwd=project_root)
 
         # Subtree push
         result = subprocess.run(
             ["git", "subtree", "push", "--prefix", "docs", "origin", "gh-pages"],
             capture_output=True,
             text=True,
+            cwd=project_root
         )
 
         if result.returncode == 0:

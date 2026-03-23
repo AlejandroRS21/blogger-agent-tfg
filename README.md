@@ -62,48 +62,29 @@ blogger-agent-tfg/
 │   │   ├── test_scraper.py
 │   │   └── test_html_builder.py  # ✅ NUEVO: 20+ tests HTMLBuilder
 │   ├── examples_scraper.py
+│   │   ├── test_workflow.py
+│   │   ├── test_orchestrator.py
+│   │   ├── test_agents.py
+│   │   ├── test_scraper.py
+│   │   └── test_html_builder.py  # ✅ NUEVO: 20+ tests HTMLBuilder
+│   ├── examples_scraper.py
 │   ├── test_full_pipeline.py   # ✅ Test completo end-to-end
 │   ├── daggr_blogger_workflow.py  # ✅ Workflow visual con Daggr
 │   ├── outputs/                # ✅ Posts generados (JSON)
 │   ├── requirements.txt        # daggr>=0.7.0 (incluye Gradio)
 │   ├── DAGGR_WORKFLOW.md       # ✅ NUEVO: Documentación Daggr
 │   └── Dockerfile
-├── frontend/                   # ✅ Next.js + TypeScript + Tailwind
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── generate-post/
-│   │   │       └── route.ts    # ✅ API endpoint con modo mock
-│   │   ├── components/
-│   │   │   ├── BlogLayout.tsx  # ✅ Layout principal
-│   │   │   ├── PostHeader.tsx  # ✅ Metadata de posts
-│   │   │   ├── PostBody.tsx    # ✅ Renderizado HTML
-│   │   │   └── GenerateForm.tsx # ✅ Formulario de generación
-│   │   ├── generate/
-│   │   │   └── page.tsx        # ✅ Página del formulario
-│   │   ├── posts/[slug]/
-│   │   │   └── page.tsx        # ✅ Post dinámico
-│   │   ├── types/
-│   │   │   └── post.ts         # ✅ TypeScript types
-│   │   ├── layout.tsx          # ✅ Root layout
-│   │   ├── page.tsx            # ✅ Homepage con hero y features
-│   │   └── globals.css
-│   ├── .env.local              # ✅ Variables de entorno
-│   ├── package.json
-│   ├── README.md               # ✅ Documentación frontend
-│   └── tailwind.config.ts
-├── docs/                       # ✅ Documentación completa
-│   ├── ORCHESTRATION_PLAN.md   # Plan maestro
-│   ├── NEXT_STEPS.md           # Roadmap detallado
-│   ├── VERCEL_DEPLOYMENT.md    # Guía Vercel
-│   ├── MODAL_DEPLOYMENT.md     # ✅ NUEVO: Guía Modal + HuggingFace futures
-│   ├── HTMLBUILDER_INTEGRATION.md  # ✅ NUEVO: Integración HTMLBuilder
-│   ├── SCRAPER_IMPLEMENTATION.md   # ✅ NUEVO: Guía del scraper
-│   ├── HUGGINGFACE_MIGRATION.md    # ✅ NUEVO: Migración completa a HF
-│   ├── FRONTEND_IMPLEMENTATION.md  # ✅ NUEVO: Implementación frontend Next.js
-│   ├── GRADIO_INTERFACE.md         # ✅ NUEVO: Interfaz Gradio para testing
-│   └── ENVIRONMENT_VARIABLES.md
-├── vercel.json                 # ✅ Config Vercel
-└── README.md
+├── docs/                       # ✅ Web Estática (GitHub Pages)
+│   ├── posts/                  # Posts HTML generados
+│   ├── index.html              # Homepage
+│   └── posts.json              # Metadatos del blog
+├── tests/                      # ✅ Suite de pruebas
+│   ├── unit/                   # Tests unitarios por pipeline
+│   ├── integration/            # Tests End-to-End
+│   └── run_tests.py            # Runner principal
+├── requirements.txt            # Dependencias backend
+├── runtime.txt                 # Versión de Python para Modal/HF
+└── deploy.ps1                  # Script de despliegue a GH Pages
 ```
 
 ## 👥 División de Tareas (3 Personas)
@@ -145,26 +126,22 @@ blogger-agent-tfg/
 - `feature/modal-deployment`
 - `docs/architecture`
 
-### 👤 Persona 3: Frontend Full Stack + DevOps
+### 👤 Persona 3: Web Estática + DevOps
 **Responsabilidades:**
-- Frontend completo Next.js:
-  - Componentes React (`<BlogLayout>`, `<PostHeader>`, `<PostBody>`, etc.)
-  - Página dinámica `app/posts/[slug]/page.tsx`
-  - API route `app/api/generate-post/route.ts`
-  - Estilos y UX (Tailwind CSS)
+- Generación de HTML final puro (Módulo 3)
+- Despliegue automático a GitHub Pages
+- Scripting (Powershell deploy)
+- Configuración y validaciones en producción
 - DevOps:
   - `docker-compose.yml` completo
   - GitHub Actions CI/CD
-  - **Vercel deployment** para Next.js frontend
   - `SETUP.md` y `DEPLOYMENT.md`
-- Testing frontend
+- Testing de la web estática
 
 **Branches:**
-- `feature/blog-components`
-- `feature/post-page`
-- `feature/api-endpoint`
+- `feature/static-site-generation`
+- `feature/github-pages-deployment`
 - `feature/docker-setup`
-- `feature/vercel-deployment`
 - `feature/ci-cd`
 - `docs/setup`
 
@@ -183,10 +160,11 @@ cd blogger-agent-tfg/backend
 ./setup.sh   # Linux/macOS
 
 # 3. Configurar API token (gratis) 🆓
-export HF_TOKEN="your_huggingface_token"
-# Obtén tu token gratis en: https://huggingface.co/settings/tokens
+export GEMINI_API_KEY="tu_clave_de_gemini"
+# Obtén tu token gratis en: https://aistudio.google.com/app/apikey
 
-# Alternativa (pago): OpenAI como fallback
+# Alternativa: HuggingFace (gratis) u OpenAI (pago)
+export HF_TOKEN="hf_..."
 export OPENAI_API_KEY="sk-..."
 
 # 4. Activar entorno
@@ -210,33 +188,14 @@ cat post.json
 - 🔄 **Fallback**: OpenAI como respaldo si HF no disponible
 - 📖 [Guía completa de migración](docs/HUGGINGFACE_MIGRATION.md)
 
-### Frontend - Next.js con Modo Mock ✅
+### Previsualizar Web (Estático)
+Ideal para verificar la página generada tras ejecutar el backend.
 
 ```bash
-# 1. Ir al directorio frontend
-cd frontend
-
-# 2. Instalar dependencias
-npm install
-
-# 3. Configurar variables de entorno (opcional)
-# .env.local ya está configurado con modo mock por defecto
-# USE_MOCK=true (no requiere backend corriendo)
-
-# 4. Iniciar servidor de desarrollo
-npm run dev
-
-# 5. Abrir en navegador
-# http://localhost:3000
+cd docs
+python -m http.server 8000
+# Abrir http://localhost:8000
 ```
-
-**✨ Frontend Completo:**
-- 🎨 **4 Componentes**: BlogLayout, PostHeader, PostBody, GenerateForm
-- 📄 **3 Páginas**: Homepage, Generate, Posts dinámicos
-- 🔌 **API Route**: /api/generate-post con modo mock
-- 🎯 **Modo Mock**: Testing sin backend (USE_MOCK=true)
-- 📱 **Responsive**: Tailwind CSS 4 + diseño mobile-first
-- 📖 [Documentación frontend](frontend/README.md)
 
 ### Generación y Testing con Daggr (Recomendado) 🎨
 
@@ -256,22 +215,6 @@ python daggr_blogger_workflow.py
 - 💾 **Persistencia**: Estado guardado entre sesiones
 - 🧪 **Testing Manual**: Prueba diferentes estilos y temas
 - 📖 [Guía completa Daggr](backend/DAGGR_WORKFLOW.md)
-
-### Testing End-to-End (Backend + Frontend)
-
-```bash
-# Terminal 1: Backend
-cd backend
-uv run uvicorn aphra_blogger.api:app --reload
-
-# Terminal 2: Frontend (modo real)
-cd frontend
-# Editar .env.local: USE_MOCK=false
-npm run dev
-
-# Abrir http://localhost:3000 y generar posts
-```
-
 
 **Resultado:** JSON completo con:
 - ✅ Análisis de estilo del blogger
@@ -342,21 +285,20 @@ def webhook(data: dict):
     return result
 ```
 
-### Conexión Next.js → Modal
+### Conexión Web Estática → Modal
 
-```typescript
-// frontend/app/api/generate-post/route.ts
-export async function POST(request: Request) {
-  const { bloggerUrls, topic } = await request.json();
-  
-  const response = await fetch(process.env.MODAL_WEBHOOK_URL!, {
+```javascript
+// En el script de la web estática (ej: index.html o un JS externo)
+async function generatePost(bloggerUrls, topic) {
+  const response = await fetch(process.env.MODAL_WEBHOOK_URL, { // MODAL_WEBHOOK_URL debe ser accesible
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ blogger_urls: bloggerUrls, topic })
   });
   
   const post = await response.json();
-  return Response.json(post);
+  // Aquí se manejaría la respuesta para mostrar el post o guardarlo
+  return post;
 }
 ```
 
@@ -395,13 +337,6 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Frontend  
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
 ### Docker (Todo junto)
 ```bash
 docker-compose up
@@ -411,14 +346,6 @@ docker-compose up
 ```bash
 modal deploy backend/modal_app.py
 ```
-
-### Vercel Deployment (Frontend)
-```bash
-cd frontend
-vercel deploy --prod
-```
-
-O conecta tu repositorio de GitHub con Vercel para deployment automático.
 
 ## 📊 Flujo de Trabajo (Workflow)
 
@@ -448,19 +375,15 @@ O conecta tu repositorio de GitHub con Vercel para deployment automático.
 - **Tests**: 76 tests (75 passing, 1 skipped)
 - **Documentación**: 5 guías completas (ORCHESTRATION, HUGGINGFACE_MIGRATION, HTMLBUILDER, etc.)
 
-### ✅ Completado (Frontend - 100%)
-- **Next.js 16**: React 19 + TypeScript 5 + Tailwind CSS 4
-- **4 Componentes**: BlogLayout, PostHeader, PostBody, GenerateForm
-- **3 Páginas**: Homepage (hero + features), Generate (formulario), Posts dinámicos
-- **API Route**: `/api/generate-post` con modo mock para desarrollo
-- **Configuración**: .env.local con variables de entorno
-- **Servidor**: Dev server corriendo en puerto 3000/3001
+### ✅ Completado (Web Estática - 100%)
+- **App**: HTML5 Estático
+- **UI**: Tailwind CSS (via CDN)
+- **Deployment**: GitHub Pages
 
 ### ⏳ Pendiente
-- **Tests Frontend**: Jest + Testing Library
-- **Integración E2E**: Backend Python + Frontend Next.js
+- **Tests Web Estática**: Cypress/Playwright para validación de HTML/JS
+- **Integración E2E**: Backend Python + Web Estática
 - **Deploy Modal**: Backend serverless con HuggingFace
-- **Deploy Vercel**: Frontend en producción
 - **CI/CD**: GitHub Actions para testing y deployment
 
 ## 🤝 Contribuir

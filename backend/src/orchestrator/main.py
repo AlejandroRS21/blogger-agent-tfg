@@ -357,7 +357,7 @@ class BloggerOrchestrator:
             # Convert to dictionary for state storage
             return {
                 "html": html_output.html,
-                "jsx": html_output.jsx,
+                "full_page": html_output.full_page,
                 "metadata": {
                     "title": html_output.meta_title,
                     "description": html_output.meta_description,
@@ -366,8 +366,7 @@ class BloggerOrchestrator:
                     "word_count": html_output.word_count,
                     "slug": slug,
                 },
-                "headings": html_output.headings,
-                "nextjs_component": self.html_builder.generate_nextjs_component(html_output, slug)
+                "headings": html_output.headings
             }
         
         result = self._execute_with_retry(phase_name, "HTMLBuilder", build)
