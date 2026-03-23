@@ -17,9 +17,9 @@ const USE_MOCK = process.env.USE_MOCK === 'true' || true; // Default to mock for
  * Mock backend response para desarrollo sin backend corriendo
  */
 function mockGeneratePost(request: GenerateRequest): BlogPost {
+  const alias = (request as any).anonymous_alias ?? request.blogger_name ?? 'BloggerAnon';
   const slug = request.topic.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-  
-  return {
+  const post = {
     id: slug,
     title: `${request.topic}: Una Perspectiva Única`,
     description: `Explorando ${request.topic} desde el estilo de ${request.blogger_name}`,
@@ -50,10 +50,15 @@ function mockGeneratePost(request: GenerateRequest): BlogPost {
       word_count: 150,
       reading_time: 1,
       date: new Date().toISOString().split('T')[0],
-      author: request.blogger_name,
+      author: alias,
       tags: request.keywords || []
     }
-  };
+  } as BlogPost;
+
+  // Append disclaimer to HTML content
+  const disclaimer = `Este contenido fue generado por IA y simula la voz de ${alias} (anon, no representa a una persona real).`;
+  post.html_code = post.html_code + `\n<p class=\"disclaimer\">${disclaimer}</p>`;
+  return post;
 }
 
 /**

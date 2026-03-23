@@ -21,7 +21,13 @@ export default function GenerateForm() {
     blogger_sample_posts: [''],
     topic: '',
     keywords: '',
+    anonymous_alias: ''
   });
+  const [aliasOptions] = useState([
+    { value: 'BloggerAnon', label: 'BloggerAnon (Anonimo)' },
+    { value: 'TravelAnon', label: 'TravelAnon (Anonimo)' }
+  ]);
+  const [selectedAlias, setSelectedAlias] = useState('BloggerAnon');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +40,8 @@ export default function GenerateForm() {
         blogger_bio: formData.blogger_bio,
         blogger_sample_posts: formData.blogger_sample_posts.filter(Boolean),
         topic: formData.topic,
-        keywords: formData.keywords.split(',').map(k => k.trim()).filter(Boolean)
+        keywords: formData.keywords.split(',').map(k => k.trim()).filter(Boolean),
+        anonymous_alias: selectedAlias
       };
 
       const response = await fetch('/api/generate-post', {
@@ -94,6 +101,22 @@ export default function GenerateForm() {
       )}
       
       <div className="space-y-6">
+        {/* Anonymous Alias Selector */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Blogger Anónimo
+          </label>
+          <select
+            value={selectedAlias}
+            onChange={(e) => setSelectedAlias(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            {aliasOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-500">Selecciona el alias anónimo para este artículo.</p>
+        </div>
         {/* Blogger Name */}
         <div>
           <label htmlFor="blogger_name" className="block text-sm font-medium text-gray-700 mb-2">

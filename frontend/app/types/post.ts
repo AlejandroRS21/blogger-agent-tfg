@@ -27,6 +27,7 @@ export interface GenerateRequest {
   blogger_sample_posts: string[];
   topic: string;
   keywords?: string[];
+  anonymous_alias?: string;
 }
 
 export interface GenerateResponse {
