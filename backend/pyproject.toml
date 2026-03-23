@@ -3,9 +3,11 @@ name = "blogger-agent-tfg"
 version = "0.1.0"
 description = "Multi-agent AI system for mimicking blogger writing style"
 dependencies = [
+    "beautifulsoup4>=4.14.3",
     "daggr>=0.7.0",
     "gradio>=6.5.1",
     "httpx>=0.28.1",
+    "lxml>=6.0.2",
     "python-dotenv>=1.2.1",
 ]
 

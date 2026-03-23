@@ -45,7 +45,7 @@ def create_llm_provider(
         elif provider == "huggingface":
             model = "meta-llama/Meta-Llama-3.1-8B-Instruct"
         elif provider == "gemini":
-            model = "gemini-1.5-pro"
+            model = "gemini-1.5-flash"
         elif provider == "modal":
             # Default Modal function name
             model = "blogger-agent-models/LlamaModel.generate"
@@ -83,7 +83,7 @@ def create_llm_provider(
             try:
                 gemini_config = LLMConfig(
                     api_key=gemini_key,
-                    model="gemini-1.5-pro",
+                    model="gemini-1.5-flash",
                     temperature=temperature,
                     max_tokens=max_tokens,
                     **kwargs,

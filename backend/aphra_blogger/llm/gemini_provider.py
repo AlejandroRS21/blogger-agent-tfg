@@ -34,7 +34,7 @@ class GeminiProvider(LLMProvider):
         genai.configure(api_key=self.api_key)
 
         # Default model
-        self.model_name = config.model or "gemini-1.5-pro"
+        self.model_name = config.model or "gemini-1.5-flash"
         self.model = genai.GenerativeModel(self.model_name)
 
         self.temperature = config.temperature
@@ -46,7 +46,7 @@ class GeminiProvider(LLMProvider):
             return False
         try:
             # Simple test - just check the API key works
-            test_model = genai.GenerativeModel("gemini-1.5-pro")
+            test_model = genai.GenerativeModel("gemini-1.5-flash")
             return True
         except Exception:
             return False
