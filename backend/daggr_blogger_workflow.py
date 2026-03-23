@@ -610,12 +610,12 @@ def run_deploy() -> str:
         subprocess.run(["git", "add", "docs/"], capture_output=True, cwd=root_dir)
         subprocess.run(["git", "commit", "-m", "Deploy automático desde Daggr UI"], capture_output=True, cwd=root_dir)
         
-        # Eliminar local gh-pages por si acaso
-        subprocess.run(["git", "branch", "-D", "gh-pages"], capture_output=True, cwd=root_dir)
+        # Eliminar local por si acaso
+        subprocess.run(["git", "branch", "-D", "feature/github-pages-static"], capture_output=True, cwd=root_dir)
         
-        # Deploy a gh-pages
+        # Deploy a la rama correcta empujando el proyecto completo
         result = subprocess.run(
-            ["git", "subtree", "push", "--prefix", "docs", "origin", "gh-pages"],
+            ["git", "push", "origin", "HEAD:feature/github-pages-static", "--force"],
             capture_output=True,
             text=True,
             cwd=root_dir

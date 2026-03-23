@@ -150,12 +150,12 @@ def deploy_to_github():
         subprocess.run(["git", "add", "docs/"], capture_output=True, cwd=project_root)
         subprocess.run(["git", "commit", "-m", "Deploy automático de nuevo post"], capture_output=True, cwd=project_root)
 
-        # Eliminar rama local gh-pages
-        subprocess.run(["git", "branch", "-D", "gh-pages"], capture_output=True, cwd=project_root)
+        # Eliminar rama local por si acaso
+        subprocess.run(["git", "branch", "-D", "feature/github-pages-static"], capture_output=True, cwd=project_root)
 
-        # Subtree push
+        # Push directo (no subtree) hacia la rama de despliegue
         result = subprocess.run(
-            ["git", "subtree", "push", "--prefix", "docs", "origin", "gh-pages"],
+            ["git", "push", "origin", "HEAD:feature/github-pages-static", "--force"],
             capture_output=True,
             text=True,
             cwd=project_root
