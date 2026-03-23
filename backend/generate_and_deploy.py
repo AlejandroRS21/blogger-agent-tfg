@@ -146,6 +146,10 @@ def deploy_to_github():
     try:
         project_root = Path(__file__).parent.parent
         
+        # Commit de los cambios nuevos
+        subprocess.run(["git", "add", "docs/"], capture_output=True, cwd=project_root)
+        subprocess.run(["git", "commit", "-m", "Deploy automático de nuevo post"], capture_output=True, cwd=project_root)
+
         # Eliminar rama local gh-pages
         subprocess.run(["git", "branch", "-D", "gh-pages"], capture_output=True, cwd=project_root)
 

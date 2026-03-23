@@ -603,31 +603,32 @@ def run_deploy() -> str:
     import subprocess
     import os
     
-    # Intentar encontrar el script en la raíz
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    script_path = os.path.join(root_dir, "deploy.ps1")
-    
-    if not os.path.exists(script_path):
-        return "❌ Error: No se encontró el archivo deploy.ps1 en la raíz."
-        
     try:
-        # Ejecutar PowerShell para lanzar el script
-        # -ExecutionPolicy Bypass es necesario para scripts no firmados
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        # Añadir y Commitear cambios en docs
+        subprocess.run(["git", "add", "docs/"], capture_output=True, cwd=root_dir)
+        subprocess.run(["git", "commit", "-m", "Deploy automático desde Daggr UI"], capture_output=True, cwd=root_dir)
+        
+        # Eliminar local gh-pages por si acaso
+        subprocess.run(["git", "branch", "-D", "gh-pages"], capture_output=True, cwd=root_dir)
+        
+        # Deploy a gh-pages
         result = subprocess.run(
-            ["powershell.exe", "-ExecutionPolicy", "Bypass", "-File", script_path],
+            ["git", "subtree", "push", "--prefix", "docs", "origin", "gh-pages"],
             capture_output=True,
             text=True,
-            encoding="utf-8"
+            cwd=root_dir
         )
         
         if result.returncode == 0:
             print("✅ Despliegue completado con éxito.")
-            return f"✅ ¡Desplegado!\n{result.stdout}"
+            return f"✅ ¡Desplegado en GitHub Pages!\nUrl: https://alejandrors21.github.io/blogger-agent-tfg/"
         else:
             print(f"❌ Error en despliegue: {result.stderr}")
             return f"❌ Error:\n{result.stderr}\n{result.stdout}"
     except Exception as e:
-        return f"❌ Excepción ejecutando script: {str(e)}"
+        return f"❌ Excepción ejecutando git: {str(e)}"
 
 deploy_node = FnNode(
     fn=run_deploy,
