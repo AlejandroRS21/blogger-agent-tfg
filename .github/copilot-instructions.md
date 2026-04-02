@@ -289,3 +289,11 @@ Antes de hacer commit, verifica:
 ---
 
 **Última actualización**: 10 de febrero de 2026
+
+## Active Technologies
+- Python 3.11+ + `pytest`, `pytest-asyncio` (002-unify-testing-docs)
+- Python 3.11+ + `daggr`, `pytest`, OpenAI/Anthropic SDK, `beautifulsoup4` (003-analyze-style-mimicry)
+- Local JSON and Markdown/HTML files in `docs/posts/` (003-analyze-style-mimicry)
+
+## Recent Changes
+- 002-unify-testing-docs: Added Python 3.11+ + `pytest`, `pytest-asyncio`

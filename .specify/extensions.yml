@@ -1,0 +1,27 @@
+installed: []
+settings:
+  auto_execute_hooks: true
+hooks:
+  after_implement:
+  - extension: verify-tasks
+    command: speckit.verify-tasks.run
+    enabled: true
+    optional: true
+    prompt: Run verify-tasks in a fresh session to check for phantom completions
+    description: Post-implementation phantom completion detector
+    condition: null
+  - extension: cleanup
+    command: speckit.cleanup.run
+    enabled: true
+    optional: true
+    prompt: Run cleanup to review implementation changes and identify tech debt?
+    description: Post-implementation quality gate
+    condition: null
+  after_plan:
+  - extension: critique
+    command: speckit.critique.run
+    enabled: true
+    optional: true
+    prompt: Run spec critique before proceeding to tasks?
+    description: Challenges the spec and plan through product and engineering lenses
+    condition: null
