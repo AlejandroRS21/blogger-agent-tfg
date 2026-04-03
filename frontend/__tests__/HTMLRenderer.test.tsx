@@ -1,0 +1,22 @@
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import HTMLRenderer from '../app/components/HTMLRenderer';
+
+// Mock isomorphic-dompurify due to CommonJS/ESM Jest transformation issues with its deep dependencies
+jest.mock('isomorphic-dompurify', () => ({
+  sanitize: (html: string) => html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Simple mock stripping scripts
+}));
+
+describe('HTMLRenderer', () => {
+  it('renders sanitized HTML correctly', () => {
+    const rawHtml = '<h1>Test Title</h1><p>Test paragraph with <strong>bold</strong> text.</p><script>alert("xss")</script>';
+    const { container } = render(<HTMLRenderer htmlContent={rawHtml} />);
+    
+    // Check if valid HTML is rendered
+    expect(screen.getByText('Test Title')).toBeInTheDocument();
+    expect(screen.getByText(/Test paragraph/)).toBeInTheDocument();
+    
+    // Check if script tag was stripped out
+    expect(container.innerHTML).not.toContain('<script>');
+  });
+});
