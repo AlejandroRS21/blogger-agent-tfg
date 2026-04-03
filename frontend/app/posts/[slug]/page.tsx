@@ -49,7 +49,6 @@ export async function generateStaticParams() {
       slug: post.slug,
     }));
 
-  console.log(`[generateStaticParams] Generating ${params.length} posts.`);
   return params;
 }
 

@@ -7,7 +7,7 @@ interface Props {
 export default function PostMeta({ metadata }: Props) {
   if (!metadata) return null;
 
-  const entries = Object.entries(metadata).filter(([_, value]) => value !== undefined && value !== null);
+  const entries = Object.entries(metadata).filter(([_key, value]) => value !== undefined && value !== null);
   if (entries.length === 0) return null;
 
   return (

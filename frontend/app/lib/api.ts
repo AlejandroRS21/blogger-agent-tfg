@@ -16,14 +16,15 @@ export async function getAllPosts(): Promise<PostListItem[]> {
     const fileContents = await fs.readFile(POSTS_JSON_PATH, 'utf8');
     const data = JSON.parse(fileContents);
     
-    let rawPosts: any[] = [];
+    let rawPosts: unknown[] = [];
     if (Array.isArray(data)) {
       rawPosts = data;
-    } else if (data.posts && Array.isArray(data.posts)) {
+    } else if (data && typeof data === 'object' && 'posts' in data && Array.isArray(data.posts)) {
       rawPosts = data.posts;
     }
     
-    const processedPosts = rawPosts.map((item: any) => {
+    const processedPosts = rawPosts.map((untypedItem: unknown) => {
+      const item = untypedItem as Record<string, unknown>;
       const slug = (item.slug || item.id || "").toString().trim();
       let title = (item.title || "").toString().trim();
       let excerpt = (item.excerpt || item.description || "").toString().trim();
@@ -41,13 +42,12 @@ export async function getAllPosts(): Promise<PostListItem[]> {
       const normalizedPost = {
         slug,
         title: title || "Post sin título",
-        date: item.date || new Date().toISOString(),
+        date: typeof item.date === 'string' ? item.date : new Date().toISOString(),
         excerpt: excerpt || "Sin resumen disponible."
       };
 
       const result = PostListItemSchema.safeParse(normalizedPost);
       if (!result.success) {
-        console.error(`[api] Validation failed for post: ${slug}`);
         return null;
       }
       return result.data;
@@ -56,11 +56,10 @@ export async function getAllPosts(): Promise<PostListItem[]> {
     return processedPosts.filter((post: PostListItem | null): post is PostListItem => post !== null);
     
   } catch (error) {
-    if ((error as any).code === 'ENOENT') {
-      console.warn(`[api] posts.json not found at ${POSTS_JSON_PATH}. Returning empty list.`);
+    const nodeError = error as { code?: string };
+    if (nodeError.code === 'ENOENT') {
       return [];
     }
-    console.error('[api] Unexpected error reading posts.json:', error);
     return [];
   }
 }
@@ -83,14 +82,11 @@ export async function getPostBySlug(slug: string): Promise<PostDocument | null> 
 
     const result = PostDocumentSchema.safeParse(mappedData);
     if (!result.success) {
-      console.error(`[api] Invalid post document format for ${safeSlug}`);
       return null;
     }
     
     return result.data;
-  } catch (error) {
-    console.warn(`[api] Post JSON for slug ${safeSlug} not found or invalid.`);
-    
+  } catch {
     const htmlPath = path.join(POSTS_DIR, `${safeSlug}.html`);
     try {
       const htmlContent = await fs.readFile(htmlPath, 'utf8');
