@@ -16,10 +16,13 @@ export default function HTMLRenderer({ htmlContent }: Props) {
     ALLOWED_ATTR: ['href', 'name', 'target', 'src', 'alt', 'title', 'class', 'id', 'width', 'height', 'allow', 'allowfullscreen']
   });
 
+  // Cleanup for AI-generated JSON string titles in internal links
+  const polishedContent = clean.replace(/>\{'keywords':.*'topic_out':\s*'([^']*)'\}<\/a>/g, '>$1</a>');
+
   return (
     <div 
       className="prose prose-neutral dark:prose-invert max-w-none" 
-      dangerouslySetInnerHTML={{ __html: clean }} 
+      dangerouslySetInnerHTML={{ __html: polishedContent }} 
     />
   );
 }

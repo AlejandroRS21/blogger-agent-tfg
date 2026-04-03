@@ -1,13 +1,11 @@
 @import "tailwindcss";
 
-@config "../../tailwind.config.ts" /* if we need it, but let's just use native Tailwind 4 directives */
-
 :root {
   --background: #ffffff;
-  --foreground: #333333;
+  --foreground: #1a1a1b;
   --primary: #000000;
-  --secondary: #666666;
-  --accent: #d90429;
+  --secondary: #64748b;
+  --accent: #e11d48; /* Rose 600 - more modern red */
 }
 
 @theme inline {
@@ -16,17 +14,17 @@
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #121212;
-    --foreground: #e5e5e5;
+    --background: #0f172a;
+    --foreground: #f1f5f9;
     --primary: #ffffff;
-    --secondary: #a3a3a3;
-    --accent: #ef233c;
+    --secondary: #94a3b8;
+    --accent: #fb7185; /* Rose 400 */
   }
 }
 
@@ -36,24 +34,81 @@ body {
   font-family: var(--font-sans);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-wrap: anywhere;
 }
 
 a {
   color: var(--accent);
   text-decoration: none;
+  transition: opacity 0.2s;
 }
 
 a:hover {
+  opacity: 0.8;
   text-decoration: underline;
 }
 
-article {
-  max-width: 680px;
-  margin: 0 auto;
+/* Custom Prose Styling */
+.prose {
+  max-width: 65ch;
+  line-height: 1.75;
 }
 
-img, iframe {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
+.prose h1, .prose h2, .prose h3 {
+  color: var(--primary);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.prose blockquote {
+  border-left: 4px solid var(--accent);
+  font-style: italic;
+  padding-left: 1rem;
+}
+
+.prose img {
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+}
+
+.prose th {
+  background: var(--secondary);
+  color: white;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.prose td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .prose td {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }

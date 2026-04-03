@@ -55,7 +55,7 @@ As a project maintainer, I want the web application to be automatically deployed
 ### Edge Cases
 
 - What happens if the `docs/posts.json` file is malformed or empty at build time?
-- How does the system handle navigation to a blog post URL that does not exist?
+- How does the system handle navigation to a blog post URL that does not exist? (Must show a custom friendly 404 page matching the design system).
 
 ## Requirements *(mandatory)*
 
@@ -66,7 +66,7 @@ As a project maintainer, I want the web application to be automatically deployed
 - **FR-003**: System MUST apply a design system that visually mimics the typography, colors, and layout of the target author's blog.
 - **FR-004**: System MUST parse the generated post markup and correctly display headers, paragraphs, and lists.
 - **FR-005**: System MUST include a deployment configuration to ensure seamless zero-config continuous deployment.
-- **FR-006**: System MUST [NEEDS CLARIFICATION: Will the frontend provide a UI button to trigger new post generations via an API, or is it strictly read-only?]
+- **FR-006**: System MUST operate as a strictly read-only presentation layer, with no interactive generation UI, adhering to Principle I and V of the constitution.
 
 ### Key Entities 
 

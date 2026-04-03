@@ -1,0 +1,26 @@
+globalThis.__BUILD_MANIFEST = {
+  "pages": {
+    "/_app": []
+  },
+  "devFiles": [],
+  "polyfillFiles": [
+    "static/chunks/2a418_next_dist_build_polyfills_polyfill-nomodule.js"
+  ],
+  "lowPriorityFiles": [],
+  "rootMainFiles": [
+    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_35027c98._.js",
+    "static/chunks/2a418_next_dist_compiled_react-dom_16cef6a7._.js",
+    "static/chunks/2a418_next_dist_compiled_react-server-dom-turbopack_155aed2b._.js",
+    "static/chunks/2a418_next_dist_compiled_next-devtools_index_f1626600.js",
+    "static/chunks/2a418_next_dist_compiled_d6c99af8._.js",
+    "static/chunks/2a418_next_dist_client_50fc037e._.js",
+    "static/chunks/2a418_next_dist_fe7b12d1._.js",
+    "static/chunks/2a418_@swc_helpers_cjs_1f644ac0._.js",
+    "static/chunks/29e6b_PROYECTOS_Big Data IA_Modelos de IA_blogger-agent-tfg_frontend_a0ff3932._.js",
+    "static/chunks/088bd_PROYECTOS_Big Data IA_Modelos de IA_blogger-agent-tfg_frontend_151440f6._.js"
+  ]
+};
+globalThis.__BUILD_MANIFEST.lowPriorityFiles = [
+"/static/" + process.env.__NEXT_BUILD_ID + "/_buildManifest.js",
+"/static/" + process.env.__NEXT_BUILD_ID + "/_ssgManifest.js"
+];

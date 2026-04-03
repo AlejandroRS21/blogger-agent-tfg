@@ -91,6 +91,8 @@ description: "Task list for Frontend Web Application & Cloud Deployment"
 
 - [x] T017 Verify all local Next.js terminal commands (`npm run build`, `npm run start`) function properly when `docs/posts` is completely absent, outputting a friendly "No posts available" Empty State UI.
 - [x] T018 Audit all client components strictly looking for hydration errors between Server and Client states explicitly introduced by our `isomorphic-dompurify`.
+- [x] T019 [US2] Implement `frontend/app/not-found.tsx` to display a branded 404 Empty State for missing URLs to cover the Edge Case.
+- [x] T020 [US3] Add a Lighthouse CI configuration (e.g. `lighthouserc.js` or GitHub Action) to automatically enforce the >= 90 Core Web Vitals requirement.
 
 ---
 
@@ -126,4 +128,4 @@ Task: T009 [P] [US1] Build site layout navigation (Developer C)
 
 ### Detected Issues
 
-- [ ] TD001 [P] Add automated tests to frontend using Jest/React Testing Library - missing test coverage for `api.ts`, `PostCard.tsx`, and `HTMLRenderer.tsx` as defined in `plan.md`.
+- [x] TD001 [P] Add automated tests to frontend using Jest/React Testing Library - missing test coverage for `api.ts`, `PostCard.tsx`, and `HTMLRenderer.tsx` as defined in `plan.md`.
