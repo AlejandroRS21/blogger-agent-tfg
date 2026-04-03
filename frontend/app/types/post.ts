@@ -1,37 +1,25 @@
-/**
- * TypeScript types for blog posts
- */
+export interface PostMetadata {
+  style_score?: number;
+  structural_variance?: number;
+  [key: string]: any;
+}
 
-export interface BlogPost {
-  id: string;
+export interface PostListItem {
+  slug: string;
   title: string;
-  description: string;
-  html_code: string;
-  metadata: {
-    word_count: number;
-    reading_time: number;
-    date: string;
-    author?: string;
-    tags?: string[];
-  };
-  images?: {
-    url: string;
-    alt: string;
-    credit?: string;
-  }[];
+  date: string;
+  excerpt: string;
 }
 
-export interface GenerateRequest {
-  blogger_name: string;
-  blogger_bio: string;
-  blogger_sample_posts: string[];
-  topic: string;
-  keywords?: string[];
+export interface PostListResponse {
+  posts: PostListItem[];
 }
 
-export interface GenerateResponse {
-  success: boolean;
-  post?: BlogPost;
-  error?: string;
-  execution_time?: number;
+export interface PostDocument {
+  title: string;
+  content: string; // HTML markup
+  metadata?: PostMetadata;
+  // added for fallback metadata parsing from html if necessary
+  date?: string;
+  excerpt?: string;
 }

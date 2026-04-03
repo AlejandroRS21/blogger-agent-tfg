@@ -208,3 +208,10 @@ __marimo__/
 
 # Batch tracking state
 backend/batch_status.json
+
+# Frontend / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/build/
+frontend/coverage/

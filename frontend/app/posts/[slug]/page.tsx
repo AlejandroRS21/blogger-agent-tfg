@@ -1,79 +1,56 @@
-/**
- * Dynamic Post Page
- * 
- * Muestra un post generado por el sistema.
- */
-
 import { notFound } from 'next/navigation';
-import fs from 'fs';
-import path from 'path';
-import BlogLayout from '../../components/BlogLayout';
-import PostHeader from '../../components/PostHeader';
-import PostBody from '../../components/PostBody';
-import type { BlogPost } from '../../types/post';
+import { getAllPosts, getPostBySlug } from '../../lib/api';
+import HTMLRenderer from '../../components/HTMLRenderer';
+import PostMeta from '../../components/PostMeta';
+import Link from 'next/link';
 
-// Función para obtener posts desde los archivos generados por el backend
-async function getPost(slug: string): Promise<BlogPost | null> {
-  try {
-    const filePath = path.join(process.cwd(), 'public', 'posts', `${slug}.json`);
-    
-    if (!fs.existsSync(filePath)) {
-      return null;
-    }
+export const dynamic = 'force-static';
+export const dynamicParams = false;
 
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(fileContents);
-  } catch (error) {
-    console.error('Error loading post:', error);
-    return null;
-  }
+interface Props {
+  params: Promise<{ slug: string }>;
 }
 
-export default async function PostPage({ 
-  params 
-}: { 
-  params: Promise<{ slug: string }> 
-}) {
-  const { slug } = await params;
-  const post = await getPost(slug);
+export async function generateStaticParams() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
+
+export default async function PostPage(props: Props) {
+  const params = await props.params;
+  const post = await getPostBySlug(params.slug);
 
   if (!post) {
     notFound();
   }
 
   return (
-    <BlogLayout>
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <PostHeader
-          title={post.title}
-          description={post.description}
-          date={post.metadata.date}
-          readingTime={post.metadata.reading_time}
-          wordCount={post.metadata.word_count}
-          author={post.metadata.author}
-          tags={post.metadata.tags}
-        />
-        
-        <PostBody htmlContent={post.html_code} />
-        
-        {/* Navigation */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <div className="flex justify-between">
-            <a
-              href="/"
-              className="text-blue-600 hover:text-blue-700 font-medium"
-            >
-              ← Volver al inicio
-            </a>
-            <a
-              href="/generate"
-              className="text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Generar otro post →
-            </a>
+    <article className="py-8">
+      <div className="mb-8">
+        <Link href="/" className="text-sm font-medium text-accent hover:underline mb-4 inline-block">
+          &larr; Volver
+        </Link>
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 leading-tight">
+          {post.title}
+        </h1>
+        {post.date && (
+          <div className="text-zinc-500 dark:text-zinc-400">
+            {new Date(post.date).toLocaleDateString('es-ES', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
           </div>
-        </div>
-      </article>
-    </BlogLayout>
+        )}
+      </div>
+
+      <div className="prose-container">
+        <HTMLRenderer htmlContent={post.content} />
+      </div>
+
+      <PostMeta metadata={post.metadata} />
+    </article>
   );
 }
