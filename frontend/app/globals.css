@@ -49,8 +49,9 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Custom Typography Overrides */
 .prose {
+  overflow-wrap: break-word;
+  word-break: break-word;
   --tw-prose-body: var(--foreground);
   --tw-prose-headings: var(--primary);
   --tw-prose-lead: var(--secondary);
