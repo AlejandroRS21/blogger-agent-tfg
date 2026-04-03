@@ -19,27 +19,47 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   
   if (!post) return { title: 'Post no encontrado' };
 
+  const excerpt = post.excerpt || `Lee sobre ${post.title} en nuestro blog generado por IA.`;
+
   return {
-    title: `${post.title} | AI Blogger`,
-    description: post.excerpt || `Lee sobre ${post.title} en nuestro blog generado por IA.`,
+    title: post.title,
+    description: excerpt,
     openGraph: {
       title: post.title,
-      description: post.excerpt,
+      description: excerpt,
       type: 'article',
       publishedTime: post.date,
+      authors: ['Blogger Agent'],
+      tags: ['Tecnología', 'IA', 'Blog'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: excerpt,
     }
   };
 }
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+  
+  const params = posts
+    .filter(post => post && typeof post.slug === 'string' && post.slug.length > 0)
+    .map((post) => ({
+      slug: post.slug,
+    }));
+
+  console.log(`[generateStaticParams] Generating ${params.length} posts.`);
+  return params;
 }
 
 export default async function PostPage(props: Props) {
   const params = await props.params;
+  
+  if (!params.slug) {
+    notFound();
+  }
+
   const post = await getPostBySlug(params.slug);
 
   if (!post) {
@@ -47,14 +67,14 @@ export default async function PostPage(props: Props) {
   }
 
   return (
-    <article className="py-10 max-w-[65ch] mx-auto">
-      <header className="mb-12">
-        <Link href="/" className="group inline-flex items-center gap-2 text-sm font-bold text-accent mb-8 hover:no-underline">
-          <span className="group-hover:-translate-x-1 transition-transform">←</span>
+    <article className="py-12 md:py-16 max-w-[65ch] mx-auto px-4 sm:px-0">
+      <header className="mb-14 border-b border-zinc-100 dark:border-zinc-900 pb-10">
+        <Link href="/" className="group inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-accent mb-10 hover:no-underline">
+          <span className="text-lg group-hover:-translate-x-1 transition-transform">←</span>
           <span>Volver al inicio</span>
         </Link>
         
-        <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-6 leading-[1.1] text-primary">
+        <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-8 leading-[1.05] text-primary">
           {post.title}
         </h1>
         
@@ -67,21 +87,24 @@ export default async function PostPage(props: Props) {
                 day: 'numeric',
               })}
             </time>
-            <span className="h-1 w-1 rounded-full bg-accent" />
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             <span>Escrito por Blogger Agent</span>
           </div>
         )}
       </header>
 
-      <div className="prose dark:prose-invert prose-zinc max-w-none">
+      <div className="prose dark:prose-invert prose-zinc max-w-none prose-headings:tracking-tighter prose-headings:font-black prose-p:leading-relaxed prose-a:font-bold prose-img:rounded-2xl">
         <HTMLRenderer htmlContent={post.content} />
       </div>
 
-      <PostMeta metadata={post.metadata} />
+      <div className="mt-16">
+        <PostMeta metadata={post.metadata} />
+      </div>
       
-      <footer className="mt-16 pt-8 border-t border-zinc-100 dark:border-zinc-900">
-        <Link href="/" className="text-secondary hover:text-accent font-bold text-sm">
-          ¿Te ha gustado? Descubre más artículos →
+      <footer className="mt-20 pt-10 border-t border-zinc-100 dark:border-zinc-900">
+        <Link href="/" className="group inline-flex items-center gap-2 text-accent font-black text-sm uppercase tracking-widest hover:no-underline">
+          <span>Descubrir más artículos</span>
+          <span className="text-lg group-hover:translate-x-1 transition-transform">→</span>
         </Link>
       </footer>
     </article>
