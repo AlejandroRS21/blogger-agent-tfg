@@ -1,7 +1,7 @@
 export interface PostMetadata {
   style_score?: number;
   structural_variance?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface PostListItem {
