@@ -1,110 +1,84 @@
-import { notFound } from 'next/navigation';
-import { getAllPosts, getPostBySlug } from '../../lib/api';
+import { getPostBySlug, getPosts } from '../../lib/api';
 import HTMLRenderer from '../../components/HTMLRenderer';
 import PostMeta from '../../components/PostMeta';
-import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 
-import type { Metadata } from 'next';
-
-export const dynamic = 'force-static';
-export const dynamicParams = false;
-
-interface Props {
-  params: Promise<{ slug: string }>;
+interface Params {
+  slug: string;
 }
 
-export async function generateMetadata(props: Props): Promise<Metadata> {
-  const params = await props.params;
-  const post = await getPostBySlug(params.slug);
-  
-  if (!post) return { title: 'Post no encontrado' };
+export async function generateStaticParams() {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
 
-  const excerpt = post.excerpt || `Lee sobre ${post.title} en nuestro blog generado por IA.`;
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
+  
+  if (!post) return { title: 'Post No Encontrado' };
 
   return {
-    title: post.title,
-    description: excerpt,
+    title: `${post.title} | JaviPas AI Clone`,
+    description: post.excerpt || `Lee el último artículo sobre ${post.title}`,
     openGraph: {
-      title: post.title,
-      description: excerpt,
       type: 'article',
-      publishedTime: post.date,
-      authors: ['Blogger Agent'],
-      tags: ['Tecnología', 'IA', 'Blog'],
-    },
-    twitter: {
-      card: 'summary_large_image',
       title: post.title,
-      description: excerpt,
+      description: post.excerpt,
     }
   };
 }
 
-export async function generateStaticParams() {
-  const posts = await getAllPosts();
-  
-  const params = posts
-    .filter(post => post && typeof post.slug === 'string' && post.slug.length > 0)
-    .map((post) => ({
-      slug: post.slug,
-    }));
+export default async function PostPage({ params }: { params: Promise<Params> }) {
+  const { slug } = await params;
+  // Safety check
+  if (!slug) return notFound();
 
-  return params;
-}
-
-export default async function PostPage(props: Props) {
-  const params = await props.params;
-  
-  if (!params.slug) {
-    notFound();
-  }
-
-  const post = await getPostBySlug(params.slug);
+  const post = await getPostBySlug(slug);
 
   if (!post) {
-    notFound();
+    return notFound();
   }
 
+  // Use metadata or fallbacks
+  const postDate = post.date || (post.metadata?.date as string);
+  const displayDate = postDate ? new Date(postDate).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }) : null;
+
   return (
-    <article className="py-12 md:py-16 max-w-[65ch] mx-auto px-4 sm:px-0">
-      <header className="mb-14 border-b border-zinc-100 dark:border-zinc-900 pb-10">
-        <Link href="/" className="group inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-accent mb-10 hover:no-underline">
-          <span className="text-lg group-hover:-translate-x-1 transition-transform">←</span>
-          <span>Volver al inicio</span>
-        </Link>
-        
-        <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-8 leading-[1.05] text-primary">
+    <article className="max-w-4xl mx-auto px-4 py-12">
+      <header className="mb-10 text-center">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 leading-tight tracking-tight">
           {post.title}
         </h1>
-        
-        {post.date && (
-          <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-secondary">
-            <time dateTime={post.date}>
-              {new Date(post.date).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </time>
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            <span>Escrito por Blogger Agent</span>
+        {displayDate && (
+          <div className="text-muted-foreground font-medium mb-4">
+            {displayDate}
           </div>
         )}
       </header>
 
-      <div className="prose dark:prose-invert prose-zinc max-w-none prose-headings:tracking-tighter prose-headings:font-black prose-p:leading-relaxed prose-a:font-bold prose-img:rounded-2xl">
-        <HTMLRenderer htmlContent={post.content} />
+      <div className="prose-container bg-card/30 rounded-2xl p-6 md:p-10 border border-border/50 shadow-xl backdrop-blur-sm">
+        <HTMLRenderer html={post.content} />
       </div>
 
-      <div className="mt-16">
-        <PostMeta metadata={post.metadata} />
-      </div>
-      
-      <footer className="mt-20 pt-10 border-t border-zinc-100 dark:border-zinc-900">
-        <Link href="/" className="group inline-flex items-center gap-2 text-accent font-black text-sm uppercase tracking-widest hover:no-underline">
-          <span>Descubrir más artículos</span>
-          <span className="text-lg group-hover:translate-x-1 transition-transform">→</span>
-        </Link>
+      {post.metadata && Object.keys(post.metadata).length > 0 && (
+        <div className="mt-12">
+           <PostMeta metadata={post.metadata} />
+        </div>
+      )}
+
+      <footer className="mt-16 pt-8 border-t border-border/40 text-sm text-muted-foreground flex justify-between items-center">
+        <div>Escrito por un Agente de IA entrenado en el estilo de JaviPas</div>
+        <div className="flex gap-4 italic opacity-70">
+           {post.excerpt && <span>{post.excerpt.slice(0, 100)}...</span>}
+        </div>
       </footer>
     </article>
   );

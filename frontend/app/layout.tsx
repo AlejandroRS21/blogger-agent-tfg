@@ -1,60 +1,44 @@
 import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from 'next/link';
 
-/**
- * Global Metadata Configuration for SEO
- * Following the style and keywords of javipas.com
- */
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: {
-    default: "AI Blogger | Tecnología, IA y Reflexiones",
-    template: "%s | AI Blogger"
+    default: "Blog Javi Pas | Tecnología, Cacharreo y Opinión",
+    template: "%s | Blog Javi Pas"
   },
-  description: "Un blog de tecnología y reflexiones generadas por inteligencia artificial, inspirado en el estilo de Javipas.",
-  keywords: ["IA", "Inteligencia Artificial", "Tecnología", "Gadgets", "Reflexiones", "Blogger Agent", "Javipas"],
-  authors: [{ name: "Blogger Agent" }],
-  creator: "Blogger Agent",
-  publisher: "Blogger Agent",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
+  description: "El blog personal de Javi Pas. Analizamos la tecnología con alma, humor y espíritu crítico. IA, dispositivos y experimentos desde el miniresort.",
+  metadataBase: new URL('https://javipas-agent.vercel.app'),
+  alternates: {
+    canonical: '/',
   },
-  metadataBase: new URL("https://ai-blogger.vercel.app"), // Replace with actual URL when known
   openGraph: {
-    title: "AI Blogger | Tecnología, IA y Reflexiones",
-    description: "Contenido generado por IA con estilo personal.",
-    url: "https://ai-blogger.vercel.app",
-    siteName: "AI Blogger",
-    locale: "es_ES",
-    type: "website",
+    title: "Blog Javi Pas",
+    description: "Tecnología, Cacharreo y Opinión con un toque personal.",
+    url: 'https://javipas-agent.vercel.app',
+    siteName: 'Blog Javi Pas',
+    locale: 'es_ES',
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "AI Blogger | Tecnología, IA y Reflexiones",
-    description: "Contenido generado por IA con estilo personal.",
-    creator: "@AIBlogger",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+    card: 'summary_large_image',
+    title: "Blog Javi Pas",
+    description: "Tecnología y Cacharreo con alma.",
   },
   icons: {
-    icon: [
-      { url: '/favicon.ico' },
-      { url: '/icon.png', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/apple-icon.png' },
-    ],
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 };
 
@@ -64,44 +48,38 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="antialiased">
-      <body className="min-h-screen bg-background text-foreground selection:bg-accent/10">
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 flex flex-col min-h-screen">
-          
-          <header className="py-10 md:py-14 border-b border-zinc-100 dark:border-zinc-900 mb-8">
-            <nav className="flex items-center justify-between">
-              <Link href="/" className="group flex items-center gap-1">
-                <span className="font-black text-3xl tracking-tighter text-accent group-hover:scale-105 transition-transform">
-                  AI
-                </span>
-                <span className="font-bold text-2xl tracking-tight text-primary hover:no-underline">
-                  Blogger
-                </span>
-              </Link>
-              <div className="hidden sm:block text-xs font-semibold tracking-widest uppercase text-secondary">
-                Autonomous Content Lab
-              </div>
-            </nav>
-          </header>
-
-          <main className="flex-1">
-            {children}
-          </main>
-
-          <footer className="py-12 mt-20 border-t border-zinc-100 dark:border-zinc-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-medium text-secondary">
-            <div className="flex items-center gap-4">
-              <span>© {new Date().getFullYear()} AI Blogger.</span>
-              <span className="h-4 w-px bg-zinc-200 dark:bg-zinc-800" />
-              <span>Estilo inspirado en Javipas</span>
+    <html lang="es" className="scroll-smooth">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100 min-h-screen flex flex-col`}
+      >
+        <header className="sticky top-0 z-50 w-full border-b border-stone-200 bg-white/80 backdrop-blur-md dark:border-stone-800 dark:bg-stone-950/80">
+          <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
+            <Link href="/" className="text-xl font-black tracking-tighter hover:opacity-80 transition-opacity">
+              JAVI <span className="text-red-600">PAS</span>
+            </Link>
+            <div className="flex gap-6 text-sm font-medium uppercase tracking-widest">
+              <Link href="/" className="hover:text-red-600 transition-colors">Inicio</Link>
+              <a href="https://javipas.com" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">Original</a>
             </div>
-            <div className="flex items-center gap-6">
-              <a href="https://twitter.com/javipas" target="_blank" rel="noopener noreferrer" className="hover:text-accent">Twitter</a>
-              <a href="#" className="hover:text-accent">GitHub</a>
-              <a href="#" className="hover:text-accent">RSS</a>
-            </div>
-          </footer>
+          </nav>
+        </header>
 
-        </div>
+        <main className="flex-grow container mx-auto px-4 max-w-5xl">
+          {children}
+        </main>
+
+        <footer className="border-t border-stone-200 dark:border-stone-800 py-12 mt-20">
+          <div className="container mx-auto px-4 text-center text-stone-500 dark:text-stone-400 text-sm">
+            <p className="font-mono mb-4">© 2026 Blog Javi Pas - Generado con IA & Aphra</p>
+            <div className="flex justify-center gap-4">
+              <span>Next.js 15</span>
+              <span>•</span>
+              <span>Tailwind CSS v4</span>
+              <span>•</span>
+              <span>Static Export</span>
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
   );

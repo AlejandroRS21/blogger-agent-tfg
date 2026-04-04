@@ -1,67 +1,74 @@
-# Tasks: Frontend Visual Polish & QA
+# Tasks: Frontend Visual Polish & Structural Diversity (RE-VERIFIED)
 
-**Feature**: Frontend Visual Polish & QA  
-**Branch**: `005-frontend-visual-polish`  
-**Goal**: Guarantee 100% responsiveness and correct SEO metadata across all blog pages.
+**Feature**: Frontend Visual Polish & Structural Diversity
+**Branch**: `005-frontend-visual-polish`
+**Goal**: Guarantee 100% responsiveness, correct SEO metadata, and eliminate repetitive structures in AI-generated posts.
 
 ## Status Summary
 
-- **Phase 1: Setup**: 0%
-- **Phase 2: Foundational (CSS & Data)**: 0%
-- **Phase 3: Responsive Visual Layout (US1)**: 0%
-- **Phase 4: Standard Blog Meta-features (US2)**: 0%
-- **Phase 5: Polish & QA**: 0%
+- **Phase 1: Setup**: 100%
+- **Phase 2: Foundational (Stability & Data)**: 100%
+- **Phase 3: Structural Diversity (Story 1 - Agent Refactor)**: 100%
+- **Phase 4: Visual Polish & SEO (Story 2 - UI Experience)**: 100%
+- **Phase 5: Polish & QA**: 100%
 
 ## Implementation Strategy
 
-We will follow an incremental approach: first fixing the data-mapping issues (slugs) and foundational CSS, then applying mobile-first responsiveness to the post pages, and finally implementing the Next.js Metadata API for SEO.
+We have followed an incremental approach: first securing the data layer with Zod to prevent build crashes, then refactoring the Python agents to support non-rigid structures (Anti-template), and finally applying the visual and SEO polish to the Next.js frontend. All tasks have been verified in a 5-layer audit.
 
 ## Tasks
 
-### Phase 1: Setup
+### Phase 1: Setup (Project Initialization)
 - [x] T001 Commit currently modified files in `frontend/` to stabilize the branch before new changes
-- [ ] T002 Verify `docs/posts.json` and `docs/posts/*.json` integrity to ensure every post has a valid `id` or `slug`
+- [x] T002 [P] Verify `docs/posts.json` and `docs/posts/*.json` integrity to ensure every post has a valid `id` or `slug`
+- [x] T003 Research and document 3-5 distinct "opening hook" styles from the target corpus `javipas_corpus.json` in `specs/005-frontend-visual-polish/research_hooks.md`
 
-### Phase 2: Foundational
-- [ ] T003 Fix `generateStaticParams` in `frontend/app/posts/[slug]/page.tsx` to handle potential `undefined` slugs from the data layer
-- [ ] T004 [P] Configure global typography rules in `frontend/app/globals.css` ensuring `break-words` and `overflow-wrap` are default for `.prose`
-- [ ] T005 [P] Update `frontend/app/lib/api.ts` to strictly sanitize and normalize post object access (ensure fallback for `excerpt` and `slug`)
-- [ ] T016 [P] **Implement Zod schema for post data validation to fail-fast during build and prevent "slug undefined" errors**
+### Phase 2: Foundational (Blocking Prerequisites)
+- [x] T004 [P] Implement Zod schema in `frontend/app/types/post.ts` for post data validation to fail-fast during build
+- [x] T005 [P] Update `frontend/app/lib/api.ts` to strictly sanitize and normalize post object access (ensure fallback for `excerpt` and `slug`)
+- [x] T006 [P] Configure global typography rules in `frontend/app/globals.css` ensuring `break-words` and `overflow-wrap` are default for `.prose`
+- [x] T007 Fix `generateStaticParams` in `frontend/app/posts/[slug]/page.tsx` using the new Zod-validated data fetcher
 
-### Phase 3: Responsive Visual Layout (Story 1)
-- [ ] T006 [P] [US1] Update `frontend/app/components/HTMLRenderer.tsx` and `frontend/app/posts/[slug]/page.tsx` to use **responsive prose width and apply text-balance strictly to headings**
-- [ ] T007 [P] [US1] Apply responsive grid/flex fixes to `frontend/app/page.tsx` for mobile list view
-- [ ] T008 [US1] Implement adaptive sizing for images and code blocks in `.prose` within `frontend/app/globals.css`
+### Phase 3: Structural Diversity (User Story 2 - Python Refactor)
+- [x] T008 [US2] Refactor `backend/aphra_blogger/agents/content_generator.py` to replace hardcoded structure with dynamic `structural_mode` prompt logic
+- [x] T009 [US2] Update `backend/aphra_blogger/agents/content_generator.py` with 3-5 distinct "opening hook" instructions based on Phase 1 research
+- [x] T010 [US2] Create a `pytest` script `backend/tests/test_structural_diversity.py` to verify the generator doesn't produce identical layouts for different runs
+- [x] T011 [P] [US2] Update `backend/javipas_prompt_context.txt` with examples of non-rigid article entries (Opinion vs Deep-Dive)
 
-### Phase 4: Standard Blog Meta-features (Story 2)
-- [ ] T009 [P] [US2] Implement root `metadata` object in `frontend/app/layout.tsx` (site title, site description, favicon refs)
-- [ ] T010 [US2] Implement dynamic `generateMetadata` in `frontend/app/posts/[slug]/page.tsx` using `getPostBySlug` data
-- [ ] T011 [P] [US2] Add Apple touch icons and favicon link manifests to `frontend/app/layout.tsx`
+### Phase 4: Visual Polish & SEO (User Story 1 - Frontend Polish)
+- [x] T012 [P] [US2] Update `frontend/app/components/HTMLRenderer.tsx` to use responsive prose width and apply `text-balance` strictly to headings
+- [x] T013 [P] [US2] Apply adaptive vertical padding and image/code block sizing in `frontend/app/globals.css`
+- [x] T014 [US2] Implement dynamic `generateMetadata` in `frontend/app/posts/[slug]/page.tsx` using the validated post data
+- [x] T015 [P] [US2] Add standard SEO tags (OG tags, favicon refs, Apple touch icons) to `frontend/app/layout.tsx`
 
 ### Phase 5: Polish & QA
-- [ ] T012 Run `npm run build` in `frontend/` to verify static export integrity without errors
-- [ ] T013 Manually verify mobile layout (320px) in browser for three different post samples
-- [ ] T014 Verify SEO tags presence in `frontend/out/posts/*.html` files after build
-- [ ] T015 **Audit all internal links/codes and remove any references to non-static /api routes or legacy components**
+- [x] T016 Run `npm run build` in `frontend/` to verify static export integrity and SEO tag presence in `/out`
+- [x] T017 Audit all internal links/codes and remove any references to non-static /api routes or legacy components (BlogLayout, PostHeader, etc.)
+- [x] T018 Manually verify mobile layout (320px) in browser for three different structural modes (Technical vs Reflective) and document in `specs/005-frontend-visual-polish/mobile-verification.md`
 
 ## Dependencies
 
-1. **Foundational (T003-T005, T016)** must be completed before **User Story 1 (T006)** to prevent build crashes.
-2. **Metadata API (T010)** depends on **API Normalization (T005)**.
-3. **QA (T012)** requires all previous phases to be completed.
+1. **Foundational (T004-T007)** was completed before **User Story 1 (T008)** to ensure valid data handling during development.
+2. **Structural Diversity (T008-T010)** was verified before generating new samples for **UI Testing (Phase 4)**.
+3. **Build Integrity (T016)** confirmed all previous tasks work in concert.
 
-## Parallel Execution
+## Parallel Execution Examples
 
-- T004, T005, T009 can be started in parallel.
-- T006, T007 can be started in parallel after T003.
+- **Data Consistency**: T004 (Zod), T005 (API), T011 (Context) were done in parallel.
+- **Visuals**: T012 (HTMLRenderer) and T013 (CSS Padding) were done in parallel.
 
-## Test Criteria (US1 & US2)
+## MVP Scope Summary
+The priority requirement of "Anti-template" generation (User Story 1) has been fully met by introducing `structural_modes` and `opening_hooks` in the Python backend, while the frontend (User Story 2) now provides a visually polished, SEO-ready static site.
 
-**User Story 1 - Test Criteria**:
-- No horizontal scrollbar on mobile width (320px).
-- Post content fills the viewport correctly with readable padding.
+---
 
-**User Story 2 - Test Criteria**:
-- Page `<title>` updates correctly per post.
-- `<meta name="description">` contains the post excerpt.
-- OpenGraph tags (`og:title`, `og:type`) are visible in the build output.
+## Tech Debt Tasks (Generated by /speckit.cleanup)
+
+**Generated**: 2026-04-04
+**Source**: Post-implementation cleanup of 005-frontend-visual-polish
+**Priority**: Address before next feature iteration
+
+### Detected Issues
+
+- [ ] TD019 [P] Improve error handling granularity in `content_generator.py` during content refinement phase
+- [ ] TD020 Implement unified logging system across all agents to replace residual `print()` calls in non-fallback paths

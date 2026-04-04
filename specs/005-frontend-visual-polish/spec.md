@@ -2,7 +2,7 @@
 
 **Feature Branch**: `005-frontend-visual-polish`  
 **Created**: 2026-04-03
-**Status**: Draft  
+**Status**: Completed  
 **Input**: User description: "comprobacion de que el fronten funciona perfetamente y todo todo lo que necesita un blog, comprueba todo con el navegador, y soluciona errores visuales y de formato"
 
 ## User Scenarios & Testing *(mandatory)*
@@ -22,22 +22,20 @@ As a reader, I want to experience a visually perfect, distraction-free reading e
 
 ---
 
-### User Story 2 - Standard Blog Meta-features (Priority: P2)
+### User Story 2 - Distinct Structural Archetypes (Priority: P1)
 
-As a visitor arriving from social media or search engines, I want the blog to present standard metadata (titles, descriptions, favicons, OG tags) so that the content looks professional and trustworthy when shared.
+As a long-term reader of JaviPas, I want the AI-generated posts to vary their structure (sometimes opinion-heavy, sometimes purely technical, sometimes quick news flashes) so that the blog feels organic and unpredictable.
 
-**Why this priority**: "Everything a blog needs" includes off-page representations like semantic headers, favicons, and metadata vital for a complete product feel.
+**Why this priority**: Correcting the "monotonous template" issue is at the core of mimicking the target blogger's style authentically.
 
-**Independent Test**: Can be fully tested by inspecting the HTML `<head>` tag of the homepage and an individual article to ensure OpenGraph, standard title, and description tags are dynamically populated.
+**Independent Test**: Generate 3 different articles on different topics and verify that the HTML structure (heading levels, paragraph distributions, and presence of media) follows distinct patterns.
 
 **Acceptance Scenarios**:
 
-1. **Given** a user shares a post URL on a social platform, **When** the link preview is generated, **Then** it displays the correct post title, excerpt, and site name.
-2. **Given** a user opens the blog in a browser, **When** looking at the browser tab, **Then** a branded favicon and accurate page title are visible.
+1. **Given** a "Deep Dive" topic, **When** the content is generated, **Then** it includes technical subheadings and explanatory code/list blocks.
+2. **Given** a "Quick Opinion" topic, **When** the content is generated, **Then** it presents a short, punchy narrative structure without forced sections.
 
----
-
-### Edge Cases
+## Requirements *(mandatory)*
 
 - What happens when an AI-generated post contains exceptionally long words or unbroken URLs? (CSS must gracefully handle `word-break` or `overflow-wrap`).
 - How does the system handle missing excerpts or titles in the metadata? (Must provide visually balanced fallbacks).
@@ -51,6 +49,7 @@ As a visitor arriving from social media or search engines, I want the blog to pr
 - **FR-003**: System MUST include standard blog features such as dynamic `<title>`, `<meta name="description">`, OpenGraph tags, and a favicon.
 - **FR-004**: System MUST gracefully handle edge-case text outputs (long strings, large injected LLM iframes) using CSS max-widths and overflow controls.
 - **FR-005**: System MUST focus strictly on visual polish of the existing chronological view and post pages, including responsive CSS fixes, basic SEO meta tags, and favicons, without adding new data-driven features like search or related posts.
+- **FR-006**: System MUST ensure structural diversity by varying article layouts and "hooks" (opening styles) based on the topic, avoiding predictable post-level sectioning.
 
 ### Key Entities 
 
@@ -63,7 +62,7 @@ As a visitor arriving from social media or search engines, I want the blog to pr
 
 - **SC-001**: 0 visual overflow errors detected across mobile (320px), tablet (768px), and desktop (1024px+) viewports.
 - **SC-002**: 100% of posts evaluate successfully in social sharing debuggers (e.g., proper `<title>` and `<meta>` tags are present).
-- **SC-003**: 100% of HTML tags injected by the LLM (like `<table>`, `<img>`, `<pre>`) render with styled CSS rather than browser defaults.
+- **SC-003**: 100% of HTML tags injected by the LLM (like `<table>`, `<img>`, `<pre>`, `<blockquote>`, `<iframe>`) render with styled CSS rather than browser defaults.
 
 ## Assumptions
 

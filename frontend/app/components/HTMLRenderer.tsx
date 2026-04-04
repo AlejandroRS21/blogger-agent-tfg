@@ -1,28 +1,26 @@
-import React from 'react';
 import DOMPurify from 'isomorphic-dompurify';
 
-interface Props {
-  htmlContent: string;
+interface HTMLRendererProps {
+  html: string;
 }
 
-export default function HTMLRenderer({ htmlContent }: Props) {
-  // Synchronous sanitization avoiding useEffect, since isomorphic-dompurify supports SSR
-  const clean = DOMPurify.sanitize(htmlContent, {
+export default function HTMLRenderer({ html }: HTMLRendererProps) {
+  // Configure DOMPurify to allow standard HTML and focus on safety
+  const cleanHTML = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
-      'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
-      'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'span'
+      'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'strong', 'em', 'i', 'b',
+      'ul', 'ol', 'li', 'br', 'hr', 'blockquote', 'code', 'pre', 'a', 'img',
+      'table', 'thead', 'tbody', 'tr', 'th', 'td'
     ],
-    ALLOWED_ATTR: ['href', 'name', 'target', 'src', 'alt', 'title', 'class', 'id', 'width', 'height', 'allow', 'allowfullscreen']
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel', 'class'],
   });
-
-  // Cleanup for AI-generated JSON string titles in internal links
-  const polishedContent = clean.replace(/>\{'keywords':.*'topic_out':\s*'([^']*)'\}<\/a>/g, '>$1</a>');
 
   return (
     <div 
-      className="prose prose-neutral dark:prose-invert max-w-none" 
-      dangerouslySetInnerHTML={{ __html: polishedContent }} 
+      className="prose prose-stone dark:prose-invert lg:prose-lg max-w-none 
+                 prose-headings:text-balance prose-img:rounded-xl prose-img:mx-auto
+                 prose-pre:shadow-inner prose-blockquote:border-red-500 prose-blockquote:bg-red-50/20"
+      dangerouslySetInnerHTML={{ __html: cleanHTML }} 
     />
   );
 }

@@ -1,24 +1,40 @@
-# Data Model: Frontend Visual Polish & QA
+# Modelo de Datos: Diversidad Estructural y Contenido Orgánico
 
-**Feature Branch:** `005-frontend-visual-polish`  
-**Description:** Defines state and prop bindings relevant to visual polish (SEO metadata generation and visual bounds handling), as there is no backend state modification in this branch.
+Este documento define la estructura de datos para asegurar la variabilidad narrativa y el estilo "Javipas-like", evitando estructuras fijas.
 
-## Metadata Definitions
+## 01. Entidad: ArticleDiversity (Generación de Contenido)
 
-No new persisted backend entities exist. The change purely focuses on how UI models consume the existing `posts.json` and React properties.
+| Campo | Tipo | Descripción | Validación |
+| :--- | :--- | :--- | :--- |
+| `structural_mode` | `Enum` | Modo estructural del artículo: `REFLECTIVE`, `TECHNICAL`, `QUICK_FLASH`, `CURATED_LINKS`, `RANT`. | Debe ser uno de los cinco modos. |
+| `style_signature` | `String` | RASGO predominante en este post: "Conversacional", "Crítico", "Entusiasta". | Dinámico, extraído del corpus. |
+| `organic_layout` | `Boolean` | Si es true, prohíbe explícitamente subtítulos H2 en posiciones fijas. | Siempre `true`. |
 
-### 1. `Metadata` (Next.js Built-in UI DTO)
+---
 
-Constructed on the fly to render `<head>` values using the Next.js `generateMetadata` lifecycle.
+## 02. Esquema de Metadatos de SEO (Actualización)
 
-**Source**: `frontend/app/lib/api.ts` -> `getPostBySlug(slug)`
+El modelo de datos del Front-End en `frontend/app/types/post.ts` debe soportar:
 
-**Fields**:
-*   `title` (string): Extracted from `post.title`. Bound to `<title>` and `og:title`.
-*   `description` (string): Extracted from `post.excerpt`. Bound to `<meta name="description">` and `og:description`.
-*   `openGraph` (object): Generates `{ type: 'article', publishedTime: post.date }`.
-*   `twitter` (object): Handles Twitter-card formatting, derived similarly. 
+*   **Descripción Meta**: Longitud dinámica basada en el primer párrafo (no estática).
+*   **Keywords**: Extraídas de forma no repetitiva (evitar saturación).
 
-## UI View State
+---
 
-The views themselves are purely functional and statically generated (`output: export`). The focus is on container responsiveness and typography rules rather than complex component state loops. Responsive states (`sm:`, `md:`, `lg:`) are driven entirely by viewport width CSS (Tailwind 4) rather than JavaScript listeners.
+## 03. Reglas de Validación de Contenido (Zod)
+
+Para prevenir la "monotonía estructural", el sistema de validación (en tests o frontend) verificará:
+
+1.  **Variedad de Longitud de Párrafos**: No más de 3 párrafos consecutivos con longitud similar (+/- 20%).
+2.  **Densidad de Heading**: Proporción de H2/H3 menor al 20% del contenido total (evitar "libros de texto SEO").
+3.  **Presencia de "Markers" de Estilo**: Uso de frases habituales ("A ver...", "La cosa es que...", "Y sin embargo...").
+
+---
+
+## 04. Estado del Post
+
+| Estado | Significado | Transiciones |
+| :--- | :--- | :--- |
+| `STYLING` | El agente está aplicando la diversidad estructural. | -> `GENERATED` |
+| `DIVERSIFIED` | Validado por el agente `critic` como una estructura orgánica. | -> `READY_FOR_DEPLOY` |
+

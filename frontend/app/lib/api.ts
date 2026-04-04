@@ -1,101 +1,95 @@
-import fs from 'fs/promises';
+import fs from 'fs';
 import path from 'path';
-import { 
-  PostListItem, 
-  PostDocument, 
-  PostListItemSchema, 
-  PostDocumentSchema 
-} from '../types/post';
+import { PostSchema, PostsCatalogSchema, Post, PostDocumentSchema, PostDocument } from '../types/post';
 
-const DOCS_DIR = path.resolve(process.cwd(), '..', 'docs');
-const POSTS_JSON_PATH = path.join(DOCS_DIR, 'posts.json');
-const POSTS_DIR = path.join(DOCS_DIR, 'posts');
+const DATA_DIR = path.join(process.cwd(), '../docs');
+const POSTS_DIR = path.join(DATA_DIR, 'posts');
 
-export async function getAllPosts(): Promise<PostListItem[]> {
+/**
+ * Common data normalization to prevent build/runtime crashes.
+ */
+function normalizePost(post: any): Post {
+  // Ensure we have a valid slug from internal ID or fileName if slug is missing
+  const slug = post.slug || post.id || "unnamed-post";
+  
+  const parsed = PostSchema.safeParse({
+    ...post,
+    slug,
+    // Clean potential AI artifacts (backticks in title/excerpt)
+    title: post.title?.replace(/`/g, '') || "Post sin título",
+    excerpt: post.excerpt?.replace(/`/g, '') || "Sin descripción disponible."
+  });
+
+  if (!parsed.success) {
+    console.warn(`[API] Validation failed for post: ${slug}`, parsed.error.format());
+    return {
+      slug,
+      title: post.title || "Post inválido",
+      date: new Date().toISOString(),
+      excerpt: "Error en validación de datos.",
+      content: "",
+      tags: [],
+      author: "Sistema"
+    };
+  }
+  return parsed.data;
+}
+
+export async function getPosts(): Promise<Post[]> {
   try {
-    const fileContents = await fs.readFile(POSTS_JSON_PATH, 'utf8');
-    const data = JSON.parse(fileContents);
-    
-    let rawPosts: unknown[] = [];
-    if (Array.isArray(data)) {
-      rawPosts = data;
-    } else if (data && typeof data === 'object' && 'posts' in data && Array.isArray(data.posts)) {
-      rawPosts = data.posts;
-    }
-    
-    const processedPosts = rawPosts.map((untypedItem: unknown) => {
-      const item = untypedItem as Record<string, unknown>;
-      const slug = (item.slug || item.id || "").toString().trim();
-      let title = (item.title || "").toString().trim();
-      let excerpt = (item.excerpt || item.description || "").toString().trim();
-
-      if (title.startsWith('{')) {
-        try {
-          const parsed = JSON.parse(title.replace(/'/g, '"'));
-          title = parsed.topic_out || parsed.title || title;
-        } catch {}
-      }
-
-      excerpt = excerpt.replace(/```markdown\s*/g, '').replace(/```\s*/g, '').replace(/^#+\s+.*/g, '').trim();
-      if (excerpt.length > 200) excerpt = excerpt.substring(0, 197) + "...";
-
-      const normalizedPost = {
-        slug,
-        title: title || "Post sin título",
-        date: typeof item.date === 'string' ? item.date : new Date().toISOString(),
-        excerpt: excerpt || "Sin resumen disponible."
-      };
-
-      const result = PostListItemSchema.safeParse(normalizedPost);
-      if (!result.success) {
-        return null;
-      }
-      return result.data;
-    });
-
-    return processedPosts.filter((post: PostListItem | null): post is PostListItem => post !== null);
-    
-  } catch (error) {
-    const nodeError = error as { code?: string };
-    if (nodeError.code === 'ENOENT') {
+    const filePath = path.join(DATA_DIR, 'posts.json');
+    if (!fs.existsSync(filePath)) {
+      console.warn(`[API] posts.json not found at ${filePath}`);
       return [];
     }
+    const fileContents = fs.readFileSync(filePath, 'utf8');
+    const data = JSON.parse(fileContents);
+    
+    const catalog = Array.isArray(data) ? data : (data.posts || []);
+    return catalog.map(normalizePost);
+  } catch (error) {
+    console.error('[API] Error reading posts catalog:', error);
     return [];
   }
 }
 
 export async function getPostBySlug(slug: string): Promise<PostDocument | null> {
-  const safeSlug = path.basename(slug);
-  const jsonPath = path.join(POSTS_DIR, `${safeSlug}.json`);
-
+  if (!slug) return null;
+  
   try {
-    const jsonContent = await fs.readFile(jsonPath, 'utf8');
-    const rawData = JSON.parse(jsonContent);
-    
-    const mappedData = {
-      title: rawData.title || safeSlug.replace(/-/g, ' '),
-      content: rawData.html_code || rawData.content || "",
-      metadata: rawData.metadata || {},
-      date: rawData.date || rawData.metadata?.date,
-      excerpt: rawData.description || rawData.excerpt
-    };
+    // Check for .json or .html versions
+    const jsonPath = path.join(POSTS_DIR, `${slug}.json`);
+    const htmlPath = path.join(POSTS_DIR, `${slug}.html`);
 
-    const result = PostDocumentSchema.safeParse(mappedData);
-    if (!result.success) {
-      return null;
-    }
+    if (fs.existsSync(jsonPath)) {
+      const fileContents = fs.readFileSync(jsonPath, 'utf8');
+      const data = JSON.parse(fileContents);
+      
+      const parsed = PostDocumentSchema.safeParse({
+        ...data,
+        content: data.content || data.body || "",
+        title: data.title || slug
+      });
+
+      if (!parsed.success) {
+         console.warn(`[API] Invalid Document for ${slug}`, parsed.error.format());
+         return null;
+      }
+      return parsed.data;
+    } 
     
-    return result.data;
-  } catch {
-    const htmlPath = path.join(POSTS_DIR, `${safeSlug}.html`);
-    try {
-      const htmlContent = await fs.readFile(htmlPath, 'utf8');
+    if (fs.existsSync(htmlPath)) {
+      const content = fs.readFileSync(htmlPath, 'utf8');
       return {
-        title: safeSlug.replace(/-/g, ' '),
-        content: htmlContent,
+        title: slug.replace(/-/g, ' '),
+        content: content,
+        date: new Date().toISOString()
       };
-    } catch {
-      return null;
     }
+
+    return null;
+  } catch (error) {
+    console.error(`[API] Error fetching post ${slug}:`, error);
+    return null;
   }
 }

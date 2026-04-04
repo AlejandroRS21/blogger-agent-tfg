@@ -1,28 +1,36 @@
-# Quickstart: Frontend Visual Polish & QA
+# Guía Rápida: Generación de Contenido Diversificado (Anti-Plantilla)
 
-**Feature Branch**: `005-frontend-visual-polish`  
+Esta guía explica cómo ejecutar la nueva generación de posts que evita estructuras fijas y mimetiza la espontaneidad del blog objetivo.
 
-This guide provides steps to manually verify the visual fixes and SEO metadata locally.
+## 01. Generar Post con Diversidad Estructural (Simulado)
 
-## 1. Running the Next.js preview
-
-Navigate to the frontend folder and spin up the development server. In dev mode, Next.js will generate elements on the fly simulating static export.
+Para generar un post que use el nuevo motor de diversidad:
 
 ```bash
-cd frontend
-npm run dev
+# Ejecución del pipeline con inyección de modo estructural
+python backend/generate_and_deploy.py \
+  --topic "El futuro de los procesadores RISC-V" \
+  --mode "TECHNICAL" \
+  --random-signature
 ```
 
-Open `http://localhost:3000` in your browser.
+## 02. Parámetros de Control Clave
 
-## 2. Validating P1 constraints (Responsive Typography)
+*   `--mode`: `REFLECTIVE` (Ensayo largo), `TECHNICAL` (Specs + Crítica), `QUICK_FLASH` (Opinión corta).
+*   `--random-signature`: Si se activa, el agente elegirá una "firma" de estilo aleatoria del corpus de Javipas.
 
-1. Use Chrome/Firefox Developer Tools (F12) and toggle Device Mode (Ctrl+Shift+M).
-2. Set the resolution to typical mobile breakpoints (e.g. 375px width, 414px width).
-3. Scroll through `[slug]` pages containing tables or code blocks and ensure text breaks seamlessly without horizontal scrolling (`max-w-prose break-words` should be active).
+## 03. Verificación de "Salud Estructural"
 
-## 3. Validating P2 constraints (SEO Metadata & OG)
+El sistema ahora falla (error de validación) si:
+1.  El post tiene exactamente 3 subtítulos H2 equidistantes.
+2.  Todos los párrafos superan los 500 caracteres (falta de ritmo).
+3.  No hay nigún elemento de énfasis (negritas, cursivas, listas o blockquotes).
 
-1. Navigate to `/` (Home) and verify the `<title>` tag is dynamically populated using DevTools Elements panel. Ensure `<meta name="description">` exists.
-2. Navigate to an article (e.g., `/posts/el-futuro-de-la-ia-en-2026`).
-3. Check the DOM `<head>` to ensure `og:title`, `og:description`, and `twitter:card` populate correctly from the localized `getPostBySlug()` mapping.
+## 04. Desarrollo Local
+
+1.  Ajusta el prompt en `backend/aphra_blogger/agents/content_generator.py`.
+2.  Ejecuta los tests de validación estructural:
+    ```bash
+    pytest backend/tests/test_structural_diversity.py
+    ```
+

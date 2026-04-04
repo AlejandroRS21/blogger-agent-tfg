@@ -1,29 +1,35 @@
-import { getAllPosts } from './lib/api';
+import { getPosts } from './lib/api';
 import PostCard from './components/PostCard';
 
 export const dynamic = 'force-static';
-export const revalidate = false;
 
 export default async function Home() {
-  const posts = await getAllPosts();
-
-  if (!posts || posts.length === 0) {
-    return (
-      <div className="py-20 text-center">
-        <h2 className="text-2xl font-semibold mb-4">Aún no hay publicaciones</h2>
-        <p className="text-gray-500">El agente no ha generado ningún artículo todavía.</p>
-      </div>
-    );
-  }
-
-  // Sort by date (newest first)
-  const sortedPosts = posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const posts = await getPosts();
 
   return (
-    <div className="space-y-4">
-      {sortedPosts.map((post) => (
-        <PostCard key={post.slug} post={post} />
-      ))}
+    <div className="space-y-16">
+      <section className="text-center py-12 px-4 bg-linear-to-b from-primary/10 via-transparent to-transparent rounded-3xl mb-12 border border-border/20 backdrop-blur-sm">
+        <h1 className="text-4xl md:text-6xl font-black text-foreground mb-6 tracking-tight">
+          JaviPas <span className="text-primary decoration-primary/30 underline underline-offset-8">AI Clone</span>
+        </h1>
+        <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Explorando la frontera de la tecnología, IA y gadgets con el estilo inconfundible de Javier Pastor.
+        </p>
+      </section>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <PostCard key={post.slug} post={post} />
+          ))
+        ) : (
+          <div className="col-span-full py-20 text-center border-2 border-dashed border-border rounded-3xl bg-card/10">
+            <p className="text-xl text-muted-foreground italic">
+              Todavía no se ha generado ningún post. ¡Ejecuta el agente de IA para empezar!
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

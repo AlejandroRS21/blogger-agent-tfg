@@ -215,3 +215,15 @@ frontend/.next/
 frontend/dist/
 frontend/build/
 frontend/coverage/
+
+# VS Code
+.vscode/
+
+# Node.js
+node_modules/
+dist/
+build/
+.next/
+out/
+*.log
+.env*
