@@ -7,8 +7,11 @@ from a blogger's content.
 
 from typing import List, Dict, Any, Optional
 import os
+import logging
 from collections import Counter
 import re
+
+logger = logging.getLogger(__name__)
 
 try:
     from ..llm import create_llm_provider, LLMProvider
@@ -57,7 +60,7 @@ class KeywordExtractor:
                     max_tokens=800
                 )
             except Exception as e:
-                print(f"Warning: Failed to initialize LLM provider: {e}")
+                logger.warning(f"Failed to initialize LLM provider: {e}")
                 self.llm = None
         else:
             self.llm = None
@@ -111,7 +114,7 @@ Return ONLY valid JSON, no other text."""
             return result
             
         except Exception as e:
-            print(f"Warning: Keyword extraction failed: {e}. Using fallback.")
+            logger.warning(f"Keyword extraction failed: {e}. Using fallback.")
             return self._fallback_extraction()
     
     def _fallback_extraction(self) -> Dict[str, Any]:

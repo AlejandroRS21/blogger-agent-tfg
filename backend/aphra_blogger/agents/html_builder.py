@@ -468,7 +468,7 @@ Y un poco de código:
 
 ```python
 def hello_world():
-    print("Hello, World!")
+    pass
 ```
 
 ## Conclusión

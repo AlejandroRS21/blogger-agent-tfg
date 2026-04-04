@@ -7,6 +7,9 @@ structure, and characteristic expressions.
 
 from typing import List, Dict, Any, Optional
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 try:
     from ..llm import create_llm_provider, LLMProvider
@@ -56,7 +59,7 @@ class StyleAnalyzer:
                     max_tokens=1000
                 )
             except Exception as e:
-                print(f"Warning: Failed to initialize LLM provider: {e}")
+                logger.warning(f"Failed to initialize LLM provider: {e}")
                 self.llm = None
         else:
             self.llm = None
@@ -127,7 +130,7 @@ Respond with ONLY the JSON, no other text."""
             return result
             
         except Exception as e:
-            print(f"Warning: LLM analysis failed: {e}. Using fallback.")
+            logger.warning(f"LLM analysis failed: {e}. Using fallback.")
             return self._fallback_analysis(sample_text or "")
     
     def _fallback_analysis(self, text: str) -> Dict[str, Any]:

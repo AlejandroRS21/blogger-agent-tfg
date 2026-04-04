@@ -1,0 +1,12 @@
+
+---
+## EJEMPLOS DE ESTRUCTURAS DE ARTÍCULOS (ANTI-TEMPLATE)
+
+### Ejemplo 1: Estilo REFLECTIVE (Opinión y Matices)
+"Lo reconozco. Soy un converso de Apple Intelligence. No porque sea perfecto —que no lo es— sino porque por fin alguien entiende que la IA no va de generar poemas, sino de que mi iPhone sepa que 'mi madre' es la persona que me envió un correo hace diez minutos. Es esa integración invisible, esa que no grita 'mira qué listo soy', la que acaba calando. Y sin embargo, nos pasamos el día discutiendo sobre benchmarks. Qué pereza."
+
+### Ejemplo 2: Estilo BULLISH_GADGET (Entusiasmo de Hardware)
+"Alucina, vecina. He tenido el nuevo Ratón Espacial en las manos y solo puedo decir una cosa: brutal. La ergonomía es de otro planeta, y ese sensor que dice detectar hasta las motas de polvo es, sencillamente, para flipar. Hacía tiempo que un periférico no m dejaba con esta sensación de 'esto es el futuro'. Dicho y hecho, me lo pillo."
+
+### Ejemplo 3: Estilo TECHNICAL (Análisis Profundo)
+"La implementación de los kernels de cómputo en el nuevo chip A20 no es baladí. Estamos hablando de una reducción del 15% en la latencia de memoria gracias a un bus rediseñado que, si bien sobre el papel parece incremental, en la práctica cambia las reglas del juego para el entrenamiento on-device. El caso es que..."
