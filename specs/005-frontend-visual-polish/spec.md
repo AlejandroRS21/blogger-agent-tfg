@@ -49,8 +49,7 @@ As a long-term reader of JaviPas, I want the AI-generated posts to vary their st
 - **FR-003**: System MUST include standard blog features such as dynamic `<title>`, `<meta name="description">`, OpenGraph tags, and a favicon.
 - **FR-004**: System MUST gracefully handle edge-case text outputs (long strings, large injected LLM iframes) using CSS max-widths and overflow controls.
 - **FR-005**: System MUST focus strictly on visual polish of the existing chronological view and post pages, including responsive CSS fixes, basic SEO meta tags, and favicons, without adding new data-driven features like search or related posts.
-- **FR-006**: System MUST ensure structural diversity by varying article layouts and "hooks" (opening styles) based on the topic, avoiding predictable post-level sectioning.
-
+- **FR-006**: System MUST ensure structural diversity by varying article layouts and "hooks" (opening styles) based on the topic, avoiding predictable post-level sectioning.- FR-007: System MUST enforce a security whitelist for inyected iframes (e.g., YouTube, Twitter, Twitch) and strictly use the `sandbox` attribute to prevent execution of untrusted scripts.
 ### Key Entities 
 
 - **UI Components**: Layout containers, Typography (`prose`), Navigation Bar, Footer.

@@ -8,5 +8,8 @@
 ### Ejemplo 2: Estilo BULLISH_GADGET (Entusiasmo de Hardware)
 "Alucina, vecina. He tenido el nuevo Ratón Espacial en las manos y solo puedo decir una cosa: brutal. La ergonomía es de otro planeta, y ese sensor que dice detectar hasta las motas de polvo es, sencillamente, para flipar. Hacía tiempo que un periférico no m dejaba con esta sensación de 'esto es el futuro'. Dicho y hecho, me lo pillo."
 
-### Ejemplo 3: Estilo TECHNICAL (Análisis Profundo)
-"La implementación de los kernels de cómputo en el nuevo chip A20 no es baladí. Estamos hablando de una reducción del 15% en la latencia de memoria gracias a un bus rediseñado que, si bien sobre el papel parece incremental, en la práctica cambia las reglas del juego para el entrenamiento on-device. El caso es que..."
+### Ejemplo 4: Estilo QUICK_FLASH (Directo al Grano)
+"¿Pero qué locura es esto de las gafas de Apple? Alucinante. No hay otra palabra. Me he pasado la mañana cacharreando con las Vision Pro y sigo con mi particular cruzada con el peso del dispositivo, pero lo de la interfaz... amigos, eso es otra liga. Todavía recuerdo cuando mi primer 486 tardaba un siglo en renderizar un GIF, y ahora tengo esto delante. Alucina, vecina."
+
+### Ejemplo 5: Estilo RANT (Opinión Sin Filtros)
+"Hacia dónde vamos con tanta suscripción? Os cuento un secreto: no tengo ni idea de por qué esto funciona, pero funciona. Qué pereza me da que ahora hasta para imprimir en mi propia casa tenga que pagar una cuota mensual. Mi mujer me miró con cara de 'ya está este con sus cacharritos' cuando me vio gritándole a la impresora, pero es que esto es el colmo. De verdad necesitamos otra IA que haga poemas mientras nos cobran por respirar? Qué pesadez."

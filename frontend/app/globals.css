@@ -51,6 +51,32 @@ body {
   @apply max-w-full overflow-x-auto rounded-md bg-stone-100 dark:bg-stone-900;
 }
 
+/* SC-003: Complex HTML Tags styling (Tables, Iframes) */
+.prose table {
+  @apply w-full text-sm my-8 border-collapse overflow-hidden rounded-lg;
+}
+
+.prose thead {
+  @apply bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300;
+}
+
+.prose th {
+  @apply p-4 font-bold border-b border-stone-200 dark:border-stone-700 text-left;
+}
+
+.prose td {
+  @apply p-4 border-stone-100 dark:border-stone-800 border-b;
+}
+
+.prose iframe {
+  @apply w-full aspect-video rounded-xl shadow-lg my-10 border-0;
+  max-width: 100%;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-stone-300 dark:border-stone-700 italic pl-6 my-10 text-stone-600 dark:text-stone-400 font-serif text-xl leading-relaxed;
+}
+
 /* Adaptive vertical padding for mobile */
 @media (max-width: 640px) {
   .prose {

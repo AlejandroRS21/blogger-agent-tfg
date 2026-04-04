@@ -51,11 +51,12 @@
 ## 6. Phase 2: Implementation (Tasks)
 
 - **Task 1**: Refactor Orchestrator and `aphra_blogger/agents/content_generator.py` to support variable `STRUCTURAL_MODE` instructions (Reflective, Technical, Flash).
-- **Task 1.1**: Update `html_builder` agent to respect the structural variance produced by the generator without enforcing a fixed layout.
-- **Task 2**: Update `javipas_prompt_context.txt` with examples of varied entry styles (Opinion vs News).
-- **Task 3**: Finalize CSS polish in `frontend/app/globals.css` (mobile-first, typography) and integrate `next/font/google`.
-- **Task 4**: Implement robust Zod validation in `frontend/app/lib/api.ts` with fail-safe defaults to prevent build crashes.
-- **Task 5**: Verify SEO and build integrity (`npm run build`).
+- Task 1.1: Update `html_builder` agent to respect the structural variance produced by the generator AND implement HTML tag balance validation before writing files.
+- Task 2: Update `javipas_prompt_context.txt` with examples of varied entry styles (Opinion vs News).
+- Task 3: Finalize CSS polish in `frontend/app/globals.css` (mobile-first, typography) ensuring `contain: layout` is applied to `.prose` for performance.
+- Task 4: Implement robust Zod validation in `frontend/app/lib/api.ts` with fail-safe defaults to prevent build crashes.
+- Task 5: Verify SEO and build integrity (`npm run build`).
+- Task 6: Implement Iframe Sanitization Strategy (Whitelist + Sandbox) in `HTMLRenderer.tsx`.
 
 ---
 **Note on User Input**: The user correctly pointed out that "Javipas" never follows a rigid structure. The articles must vary their layout and expressions based on the topic. Fixed structures are forbidden for high-fidelity mimicry.

@@ -46,6 +46,12 @@ We have followed an incremental approach: first securing the data layer with Zod
 - [x] T017 Audit all internal links/codes and remove any references to non-static /api routes or legacy components (BlogLayout, PostHeader, etc.)
 - [x] T018 Manually verify mobile layout (320px) in browser for three different structural modes (Technical vs Reflective) and document in `specs/005-frontend-visual-polish/mobile-verification.md`
 
+### Phase 6: Critique Remediation (Security & Stability)
+- [ ] T019 [P] Implement Iframe Security Sandbox and Whitelist in `frontend/app/components/HTMLRenderer.tsx`
+- [ ] T020 [US2] Add HTML Tag Balance check to `backend/aphra_blogger/agents/html_builder.py` to prevent broken layouts
+- [ ] T021 Apply `contain: layout` and `content-visibility: auto` to `.prose` in `frontend/app/globals.css` for enhanced performance on long posts
+- [ ] T022 [P] Create automated "Post Integrity" audit script (Playwright or node script) to replace manual T018 in future builds
+
 ## Dependencies
 
 1. **Foundational (T004-T007)** was completed before **User Story 1 (T008)** to ensure valid data handling during development.
