@@ -1,0 +1,216 @@
+{
+  "workflow_id": "2abfabc7",
+  "topic": "NVIDIA NeMo: por qué va a cambiar cómo construimos agentes de IA",
+  "blogger_urls": [
+    "https://javipas.com"
+  ],
+  "style_profile": {
+    "tone": "conversational, humorous, personal, enthusiastic",
+    "voice": "first person, close to reader",
+    "language_level": "colloquial",
+    "structure": "personal intro → experience → technical details → reflection",
+    "expressions": [
+      "me alucina",
+      "dicho y hecho",
+      "el caso es que",
+      "total, que",
+      "ciertamente",
+      "como digo",
+      "insisto",
+      "miniresort burgués",
+      "mis maravillosos niños"
+    ],
+    "avg_sentence_length": 15,
+    "paragraph_pattern": "3-5 lines, medium complexity",
+    "use_of_humor": "Subtle irony and self-deprecating humor",
+    "technical_depth": "Medium-high, explains complex topics accessibly",
+    "personality_traits": [
+      "curious",
+      "enthusiastic about technology",
+      "family-oriented",
+      "reflective",
+      "critical thinker"
+    ],
+    "engagement_style": "Invites reader comments, asks questions, shares personal experiences"
+  },
+  "keywords": [
+    "IA",
+    "inteligencia artificial",
+    "OpenClaw",
+    "Claude",
+    "ChatGPT",
+    "tecnología",
+    "Apple",
+    "Anthropic",
+    "innovación",
+    "desarrollo",
+    "software",
+    "hardware",
+    "futuro",
+    "educación",
+    "familia",
+    "experimento",
+    "prueba",
+    "análisis",
+    "opinión",
+    "crítica",
+    "nostalgia",
+    "retro",
+    "gaming",
+    "ordenadores",
+    "Internet"
+  ],
+  "content": "# NVIDIA NeMo y la rebelión de las máquinas (que por fin hacen lo que les pides)\n\nEstaba yo el otro día en el **miniresort burgués**, disfrutando de ese silencio precario que solo se consigue cuando **mis maravillosos niños** han decidido, por fin, que enterrar al gato en piezas de LEGO no es una actividad productiva para la tarde del sábado. Tenía el portátil sobre las rodillas, una Coca-Cola Zero al lado y esa sensación de que el mundo de la tecnología va tan rápido que, si parpadeas, te has perdido tres revoluciones industriales y dos cambios de paradigma en el kernel de Linux.\n\nEl caso es que estaba dándole vueltas a lo de los agentes de **IA**. Ya sabéis, esa promesa de que pronto no tendremos que \"chatear\" con una caja de texto, sino que tendremos entes digitales que *hacen cosas*. Que les dices \"oye, organízame el viaje a Teruel\" y el bicho te busca el hotel, te reserva la cena y te avisa de que va a llover, todo sin que tú muevas un dedo.\n\nPero claro, la realidad suele ser más cruda. Hasta ahora, montar un agente de estos era un suplicio de **cacharreo** nivel experto. Que si LangChain por aquí, que si pelearse con las APIs de **Anthropic** o **ChatGPT** por allá, y rezar para que el modelo no alucine y acabe comprándote un billete de ida a Marte en lugar de la reserva en Teruel.\n\nY entonces, **me alucina** lo que ha hecho NVIDIA con **NeMo**. \n\nCiertamente, todos pensamos en NVIDIA como \"los tíos que hacen las tarjetas gráficas que no puedo pagar para jugar al Cyberpunk\". Pero lo que están montando a nivel de software es, sencillamente, el sistema nervioso central de lo que viene.\n\n### No es un chat, es una fábrica de mentes\n\n**Total, que** me puse a investigar cómo funciona NeMo y la cabeza me hizo *clac*. No es solo un modelo de lenguaje. Es un framework (palabra técnica donde las haya, lo sé, perdonadme) diseñado para que la **inteligencia artificial** deje de ser una mascota que repite frases y se convierta en un trabajador cualificado.\n\nLo que me mola de NeMo es que NVIDIA ha entendido que el problema de los agentes no es la inteligencia (que ya nos sobra con modelos como **Claude** o GPT-4), sino el control. **Insisto**: el control. \n\n¿Os acordáis de **OpenClaw**? Ese proyecto que intenta que la IA use el ordenador como un humano. Pues bien, NeMo es la infraestructura que permite que eso no sea un experimento de fin de semana en un garaje, sino algo que una empresa pueda usar sin miedo a que la IA borre la base de datos de clientes porque \"le pareció que ocupaba mucho espacio\".\n\n**Dicho y hecho**, me puse a probar un par de microservicios de los que llaman NIMs (NVIDIA Inference Microservices). La idea es brillante: te dan el modelo empaquetado en un contenedor que vuela. Literalmente. Está optimizado para que el **hardware** (sus dichosas H100 y compañía) y el **software** se entiendan en un lenguaje íntimo y prohibido para el resto de los mortales.\n\n### El fin de la \"paja\" en el desarrollo de IA\n\nA ver, como digo siempre, lo que nos gusta aquí es el barro. Y el barro de la IA hasta ahora era muy farragoso. Tenías que ser casi un ingeniero de la NASA para que un agente fuera persistente, tuviera memoria y, sobre todo, no se saliera de los raíles.\n\nNVIDIA ha metido algo llamado \"Guardrails\" en NeMo que es, básicamente, ponerle un guardaespaldas a la IA. Si el usuario intenta que el agente de atención al cliente de una aerolínea se ponga a hablar de política o a insultar a la competencia, el guardrail le da un pescozón digital y lo devuelve al carril. Esto, amigos míos, es lo que va a permitir que veamos agentes de verdad en el mundo real.\n\n(Inciso: mientras escribo esto, uno de mis hijos acaba de gritar porque el otro le ha robado un mando de la Switch. La vida real es un agente de IA sin guardrails. Caos absoluto).\n\nLo que me vuela la cabeza es pensar en la integración. NVIDIA no está compitiendo con **Apple** o con Google por ver quién tiene el emoji más bonito. Está construyendo las tuberías por las que va a fluir toda la **innovación** de la próxima década. Si quieres construir un agente que use herramientas, que consulte manuales técnicos y que ejecute código de forma segura, NeMo es el camino más corto.\n\n### ¿Por qué esto lo cambia todo?\n\nEl cambio fundamental es que pasamos de la IA \"generativa\" (que escribe poemas reguleros) a la IA \"agentic\" (que ejecuta flujos de trabajo). \n\nHasta ahora, si querías que una IA hiciera algo complejo, tenías que darle instrucciones paso a paso. Con NeMo y la nueva arquitectura de agentes, le das un objetivo. El agente descompone ese objetivo en tareas, busca las herramientas que necesita, y las ejecuta. Es como pasar de darle órdenes a un niño de cinco años a contratar a un consultor senior que sabe dónde tiene la mano derecha.\n\nY ojo, que aquí entra el juego de tronos de las grandes. Mientras Anthropic nos enseña lo que puede hacer Claude manejando el cursor, NVIDIA les está diciendo: \"Vale, muy bonito, pero si quieres que eso escale y que lo usen millones de personas sin que los servidores exploten, vas a tener que usar mis herramientas\". \n\nEs una jugada maestra. Es ser el dueño de la gasolinera en un mundo donde todo el mundo acaba de comprarse un coche.\n\nTotal, que después de un par de horas de **cacharreo**, me di cuenta de que la barrera de entrada para crear algo realmente potente ha bajado de un muro de hormigón a un pequeño bordillo. Ya no necesitas un equipo de 50 doctores en matemáticas para montar un sistema que entienda el contexto de tu empresa y actúe en consecuencia. \n\nMe pregunto qué pasará cuando estas herramientas lleguen al gran público. Cuando el **software** deje de ser una herramienta estática y se convierta en algo maleable que se adapta a nosotros. Ciertamente, estamos en ese momento dulce y aterrador a la vez en el que todo parece posible.\n\nAl final, la **tecnología** de verdad es la que desaparece. La que se vuelve invisible. Y NVIDIA NeMo es un paso gigante hacia esa invisibilidad. Queremos que las cosas funcionen, no queremos saber qué modelo de lenguaje está corriendo por debajo o cuántos tokens por segundo está escupiendo la GPU.\n\nMe voy a ver qué tal va la excavación de LEGO en el salón, que me temo que el gato ya ha aceptado su destino como pieza decorativa. Pero os dejo con una reflexión: si pudierais construir un agente que hiciera una sola tarea tediosa de vuestro día a día (esa que odiáis con toda vuestra alma), ¿cuál sería? \n\nOs leo en los comentarios. No me falléis, que esto se pone interesante.",
+  "html_structure": {
+    "html": "<article class=\"blog-post\">\n<h1 id=\"nvidia-nemo-y-la-rebelion-de-las-maquinas-que-por-fin-hacen-lo-que-les-pides\">NVIDIA NeMo y la rebelión de las máquinas (que por fin hacen lo que les pides)</h1>\n<p>Estaba yo el otro día en el <strong>miniresort burgués</strong>, disfrutando de ese silencio precario que solo se consigue cuando <strong>mis maravillosos niños</strong> han decidido, por fin, que enterrar al gato en piezas de LEGO no es una actividad productiva para la tarde del sábado. Tenía el portátil sobre las rodillas, una Coca-Cola Zero al lado y esa sensación de que el mundo de la tecnología va tan rápido que, si parpadeas, te has perdido tres revoluciones industriales y dos cambios de paradigma en el kernel de Linux.</p>\n<p>El caso es que estaba dándole vueltas a lo de los agentes de <strong>IA</strong>. Ya sabéis, esa promesa de que pronto no tendremos que \"chatear\" con una caja de texto, sino que tendremos entes digitales que <em>hacen cosas</em>. Que les dices \"oye, organízame el viaje a Teruel\" y el bicho te busca el hotel, te reserva la cena y te avisa de que va a llover, todo sin que tú muevas un dedo.</p>\n<p>Pero claro, la realidad suele ser más cruda. Hasta ahora, montar un agente de estos era un suplicio de <strong>cacharreo</strong> nivel experto. Que si LangChain por aquí, que si pelearse con las APIs de <strong>Anthropic</strong> o <strong>ChatGPT</strong> por allá, y rezar para que el modelo no alucine y acabe comprándote un billete de ida a Marte en lugar de la reserva en Teruel.</p>\n<p>Y entonces, <strong>me alucina</strong> lo que ha hecho NVIDIA con <strong>NeMo</strong>. </p>\n<p>Ciertamente, todos pensamos en NVIDIA como \"los tíos que hacen las tarjetas gráficas que no puedo pagar para jugar al Cyberpunk\". Pero lo que están montando a nivel de software es, sencillamente, el sistema nervioso central de lo que viene.</p>\n<h3 id=\"no-es-un-chat-es-una-fabrica-de-mentes\">No es un chat, es una fábrica de mentes</h3>\n<p><strong>Total, que</strong> me puse a investigar cómo funciona NeMo y la cabeza me hizo <em>clac</em>. No es solo un modelo de lenguaje. Es un framework (palabra técnica donde las haya, lo sé, perdonadme) diseñado para que la <strong>inteligencia artificial</strong> deje de ser una mascota que repite frases y se convierta en un trabajador cualificado.</p>\n<p>Lo que me mola de NeMo es que NVIDIA ha entendido que el problema de los agentes no es la inteligencia (que ya nos sobra con modelos como <strong>Claude</strong> o GPT-4), sino el control. <strong>Insisto</strong>: el control. </p>\n<p>¿Os acordáis de <strong>OpenClaw</strong>? Ese proyecto que intenta que la IA use el ordenador como un humano. Pues bien, NeMo es la infraestructura que permite que eso no sea un experimento de fin de semana en un garaje, sino algo que una empresa pueda usar sin miedo a que la IA borre la base de datos de clientes porque \"le pareció que ocupaba mucho espacio\".</p>\n<p><strong>Dicho y hecho</strong>, me puse a probar un par de microservicios de los que llaman NIMs (NVIDIA Inference Microservices). La idea es brillante: te dan el modelo empaquetado en un contenedor que vuela. Literalmente. Está optimizado para que el <strong>hardware</strong> (sus dichosas H100 y compañía) y el <strong>software</strong> se entiendan en un lenguaje íntimo y prohibido para el resto de los mortales.</p>\n<h3 id=\"el-fin-de-la-paja-en-el-desarrollo-de-ia\">El fin de la \"paja\" en el desarrollo de IA</h3>\n<p>A ver, como digo siempre, lo que nos gusta aquí es el barro. Y el barro de la IA hasta ahora era muy farragoso. Tenías que ser casi un ingeniero de la NASA para que un agente fuera persistente, tuviera memoria y, sobre todo, no se saliera de los raíles.</p>\n<p>NVIDIA ha metido algo llamado \"Guardrails\" en NeMo que es, básicamente, ponerle un guardaespaldas a la IA. Si el usuario intenta que el agente de atención al cliente de una aerolínea se ponga a hablar de política o a insultar a la competencia, el guardrail le da un pescozón digital y lo devuelve al carril. Esto, amigos míos, es lo que va a permitir que veamos agentes de verdad en el mundo real.</p>\n<p>(Inciso: mientras escribo esto, uno de mis hijos acaba de gritar porque el otro le ha robado un mando de la Switch. La vida real es un agente de IA sin guardrails. Caos absoluto).</p>\n<p>Lo que me vuela la cabeza es pensar en la integración. NVIDIA no está compitiendo con <strong>Apple</strong> o con Google por ver quién tiene el emoji más bonito. Está construyendo las tuberías por las que va a fluir toda la <strong>innovación</strong> de la próxima década. Si quieres construir un agente que use herramientas, que consulte manuales técnicos y que ejecute código de forma segura, NeMo es el camino más corto.</p>\n<h3 id=\"por-que-esto-lo-cambia-todo\">¿Por qué esto lo cambia todo?</h3>\n<p>El cambio fundamental es que pasamos de la IA \"generativa\" (que escribe poemas reguleros) a la IA \"agentic\" (que ejecuta flujos de trabajo). </p>\n<p>Hasta ahora, si querías que una IA hiciera algo complejo, tenías que darle instrucciones paso a paso. Con NeMo y la nueva arquitectura de agentes, le das un objetivo. El agente descompone ese objetivo en tareas, busca las herramientas que necesita, y las ejecuta. Es como pasar de darle órdenes a un niño de cinco años a contratar a un consultor senior que sabe dónde tiene la mano derecha.</p>\n<p>Y ojo, que aquí entra el juego de tronos de las grandes. Mientras Anthropic nos enseña lo que puede hacer Claude manejando el cursor, NVIDIA les está diciendo: \"Vale, muy bonito, pero si quieres que eso escale y que lo usen millones de personas sin que los servidores exploten, vas a tener que usar mis herramientas\". </p>\n<p>Es una jugada maestra. Es ser el dueño de la gasolinera en un mundo donde todo el mundo acaba de comprarse un coche.</p>\n<p>Total, que después de un par de horas de <strong>cacharreo</strong>, me di cuenta de que la barrera de entrada para crear algo realmente potente ha bajado de un muro de hormigón a un pequeño bordillo. Ya no necesitas un equipo de 50 doctores en matemáticas para montar un sistema que entienda el contexto de tu empresa y actúe en consecuencia. </p>\n<p>Me pregunto qué pasará cuando estas herramientas lleguen al gran público. Cuando el <strong>software</strong> deje de ser una herramienta estática y se convierta en algo maleable que se adapta a nosotros. Ciertamente, estamos en ese momento dulce y aterrador a la vez en el que todo parece posible.</p>\n<p>Al final, la <strong>tecnología</strong> de verdad es la que desaparece. La que se vuelve invisible. Y NVIDIA NeMo es un paso gigante hacia esa invisibilidad. Queremos que las cosas funcionen, no queremos saber qué modelo de lenguaje está corriendo por debajo o cuántos tokens por segundo está escupiendo la GPU.</p>\n<p>Me voy a ver qué tal va la excavación de LEGO en el salón, que me temo que el gato ya ha aceptado su destino como pieza decorativa. Pero os dejo con una reflexión: si pudierais construir un agente que hiciera una sola tarea tediosa de vuestro día a día (esa que odiáis con toda vuestra alma), ¿cuál sería? </p>\n<p>Os leo en los comentarios. No me falléis, que esto se pone interesante.</p>\n</article>",
+    "jsx": "<article className=\"blog-post\">\n<h1 id=\"nvidia-nemo-y-la-rebelion-de-las-maquinas-que-por-fin-hacen-lo-que-les-pides\">NVIDIA NeMo y la rebelión de las máquinas (que por fin hacen lo que les pides)</h1>\n<p>Estaba yo el otro día en el <strong>miniresort burgués</strong>, disfrutando de ese silencio precario que solo se consigue cuando <strong>mis maravillosos niños</strong> han decidido, por fin, que enterrar al gato en piezas de LEGO no es una actividad productiva para la tarde del sábado. Tenía el portátil sobre las rodillas, una Coca-Cola Zero al lado y esa sensación de que el mundo de la tecnología va tan rápido que, si parpadeas, te has perdido tres revoluciones industriales y dos cambios de paradigma en el kernel de Linux.</p>\n<p>El caso es que estaba dándole vueltas a lo de los agentes de <strong>IA</strong>. Ya sabéis, esa promesa de que pronto no tendremos que \"chatear\" con una caja de texto, sino que tendremos entes digitales que <em>hacen cosas</em>. Que les dices \"oye, organízame el viaje a Teruel\" y el bicho te busca el hotel, te reserva la cena y te avisa de que va a llover, todo sin que tú muevas un dedo.</p>\n<p>Pero claro, la realidad suele ser más cruda. Hasta ahora, montar un agente de estos era un suplicio de <strong>cacharreo</strong> nivel experto. Que si LangChain por aquí, que si pelearse con las APIs de <strong>Anthropic</strong> o <strong>ChatGPT</strong> por allá, y rezar para que el modelo no alucine y acabe comprándote un billete de ida a Marte en lugar de la reserva en Teruel.</p>\n<p>Y entonces, <strong>me alucina</strong> lo que ha hecho NVIDIA con <strong>NeMo</strong>. </p>\n<p>Ciertamente, todos pensamos en NVIDIA como \"los tíos que hacen las tarjetas gráficas que no puedo pagar para jugar al Cyberpunk\". Pero lo que están montando a nivel de software es, sencillamente, el sistema nervioso central de lo que viene.</p>\n<h3 id=\"no-es-un-chat-es-una-fabrica-de-mentes\">No es un chat, es una fábrica de mentes</h3>\n<p><strong>Total, que</strong> me puse a investigar cómo funciona NeMo y la cabeza me hizo <em>clac</em>. No es solo un modelo de lenguaje. Es un framework (palabra técnica donde las haya, lo sé, perdonadme) diseñado para que la <strong>inteligencia artificial</strong> deje de ser una mascota que repite frases y se convierta en un trabajador cualificado.</p>\n<p>Lo que me mola de NeMo es que NVIDIA ha entendido que el problema de los agentes no es la inteligencia (que ya nos sobra con modelos como <strong>Claude</strong> o GPT-4), sino el control. <strong>Insisto</strong>: el control. </p>\n<p>¿Os acordáis de <strong>OpenClaw</strong>? Ese proyecto que intenta que la IA use el ordenador como un humano. Pues bien, NeMo es la infraestructura que permite que eso no sea un experimento de fin de semana en un garaje, sino algo que una empresa pueda usar sin miedo a que la IA borre la base de datos de clientes porque \"le pareció que ocupaba mucho espacio\".</p>\n<p><strong>Dicho y hecho</strong>, me puse a probar un par de microservicios de los que llaman NIMs (NVIDIA Inference Microservices). La idea es brillante: te dan el modelo empaquetado en un contenedor que vuela. Literalmente. Está optimizado para que el <strong>hardware</strong> (sus dichosas H100 y compañía) y el <strong>software</strong> se entiendan en un lenguaje íntimo y prohibido para el resto de los mortales.</p>\n<h3 id=\"el-fin-de-la-paja-en-el-desarrollo-de-ia\">El fin de la \"paja\" en el desarrollo de IA</h3>\n<p>A ver, como digo siempre, lo que nos gusta aquí es el barro. Y el barro de la IA hasta ahora era muy farragoso. Tenías que ser casi un ingeniero de la NASA para que un agente fuera persistente, tuviera memoria y, sobre todo, no se saliera de los raíles.</p>\n<p>NVIDIA ha metido algo llamado \"Guardrails\" en NeMo que es, básicamente, ponerle un guardaespaldas a la IA. Si el usuario intenta que el agente de atención al cliente de una aerolínea se ponga a hablar de política o a insultar a la competencia, el guardrail le da un pescozón digital y lo devuelve al carril. Esto, amigos míos, es lo que va a permitir que veamos agentes de verdad en el mundo real.</p>\n<p>(Inciso: mientras escribo esto, uno de mis hijos acaba de gritar porque el otro le ha robado un mando de la Switch. La vida real es un agente de IA sin guardrails. Caos absoluto).</p>\n<p>Lo que me vuela la cabeza es pensar en la integración. NVIDIA no está compitiendo con <strong>Apple</strong> o con Google por ver quién tiene el emoji más bonito. Está construyendo las tuberías por las que va a fluir toda la <strong>innovación</strong> de la próxima década. Si quieres construir un agente que use herramientas, que consulte manuales técnicos y que ejecute código de forma segura, NeMo es el camino más corto.</p>\n<h3 id=\"por-que-esto-lo-cambia-todo\">¿Por qué esto lo cambia todo?</h3>\n<p>El cambio fundamental es que pasamos de la IA \"generativa\" (que escribe poemas reguleros) a la IA \"agentic\" (que ejecuta flujos de trabajo). </p>\n<p>Hasta ahora, si querías que una IA hiciera algo complejo, tenías que darle instrucciones paso a paso. Con NeMo y la nueva arquitectura de agentes, le das un objetivo. El agente descompone ese objetivo en tareas, busca las herramientas que necesita, y las ejecuta. Es como pasar de darle órdenes a un niño de cinco años a contratar a un consultor senior que sabe dónde tiene la mano derecha.</p>\n<p>Y ojo, que aquí entra el juego de tronos de las grandes. Mientras Anthropic nos enseña lo que puede hacer Claude manejando el cursor, NVIDIA les está diciendo: \"Vale, muy bonito, pero si quieres que eso escale y que lo usen millones de personas sin que los servidores exploten, vas a tener que usar mis herramientas\". </p>\n<p>Es una jugada maestra. Es ser el dueño de la gasolinera en un mundo donde todo el mundo acaba de comprarse un coche.</p>\n<p>Total, que después de un par de horas de <strong>cacharreo</strong>, me di cuenta de que la barrera de entrada para crear algo realmente potente ha bajado de un muro de hormigón a un pequeño bordillo. Ya no necesitas un equipo de 50 doctores en matemáticas para montar un sistema que entienda el contexto de tu empresa y actúe en consecuencia. </p>\n<p>Me pregunto qué pasará cuando estas herramientas lleguen al gran público. Cuando el <strong>software</strong> deje de ser una herramienta estática y se convierta en algo maleable que se adapta a nosotros. Ciertamente, estamos en ese momento dulce y aterrador a la vez en el que todo parece posible.</p>\n<p>Al final, la <strong>tecnología</strong> de verdad es la que desaparece. La que se vuelve invisible. Y NVIDIA NeMo es un paso gigante hacia esa invisibilidad. Queremos que las cosas funcionen, no queremos saber qué modelo de lenguaje está corriendo por debajo o cuántos tokens por segundo está escupiendo la GPU.</p>\n<p>Me voy a ver qué tal va la excavación de LEGO en el salón, que me temo que el gato ya ha aceptado su destino como pieza decorativa. Pero os dejo con una reflexión: si pudierais construir un agente que hiciera una sola tarea tediosa de vuestro día a día (esa que odiáis con toda vuestra alma), ¿cuál sería? </p>\n<p>Os leo en los comentarios. No me falléis, que esto se pone interesante.</p>\n</article>",
+    "metadata": {
+      "title": "NVIDIA NeMo y la rebelión de las máquinas (que por fin hacen lo que les pides)",
+      "description": "Estaba yo el otro día en el miniresort burgués, disfrutando de ese silencio precario que solo se consigue cuando mis maravillosos niños han decidido, por fin...",
+      "keywords": [
+        "nvidia",
+        "agente",
+        "mundo",
+        "modelo",
+        "hacen",
+        "cuando",
+        "agentes",
+        "hasta",
+        "software",
+        "estaba"
+      ],
+      "reading_time": 5,
+      "word_count": 1165,
+      "slug": "nvidia-nemo-por-que-va-a-cambiar-como-construimos-agentes-de-ia"
+    },
+    "headings": [
+      {
+        "level": "h3",
+        "id": "no-es-un-chat-es-una-fabrica-de-mentes",
+        "text": "No es un chat, es una fábrica de mentes"
+      },
+      {
+        "level": "h3",
+        "id": "el-fin-de-la-paja-en-el-desarrollo-de-ia",
+        "text": "El fin de la \"paja\" en el desarrollo de IA"
+      },
+      {
+        "level": "h3",
+        "id": "por-que-esto-lo-cambia-todo",
+        "text": "¿Por qué esto lo cambia todo?"
+      }
+    ],
+    "nextjs_component": "import React from 'react';\nimport Head from 'next/head';\n\nexport default function BlogPost() {\n  return (\n    <>\n      <Head>\n        <title>NVIDIA NeMo y la rebelión de las máquinas (que por fin hacen lo que les pides)</title>\n        <meta name=\"description\" content=\"Estaba yo el otro día en el miniresort burgués, disfrutando de ese silencio precario que solo se consigue cuando mis maravillosos niños han decidido, por fin...\" />\n        <meta name=\"keywords\" content=\"nvidia, agente, mundo, modelo, hacen, cuando, agentes, hasta, software, estaba\" />\n        <meta property=\"og:title\" content=\"NVIDIA NeMo y la rebelión de las máquinas (que por fin hacen lo que les pides)\" />\n        <meta property=\"og:description\" content=\"Estaba yo el otro día en el miniresort burgués, disfrutando de ese silencio precario que solo se consigue cuando mis maravillosos niños han decidido, por fin...\" />\n        <meta property=\"og:type\" content=\"article\" />\n        <meta name=\"twitter:card\" content=\"summary_large_image\" />\n      </Head>\n      \n      <div className=\"container mx-auto px-4 py-8\">\n        <div className=\"max-w-4xl mx-auto\">\n          <div className=\"mb-4 text-sm text-gray-600\">\n            5 min lectura • 1165 palabras\n          </div>\n          \n          <article className=\"blog-post\">\n<h1 id=\"nvidia-nemo-y-la-rebelion-de-las-maquinas-que-por-fin-hacen-lo-que-les-pides\">NVIDIA NeMo y la rebelión de las máquinas (que por fin hacen lo que les pides)</h1>\n<p>Estaba yo el otro día en el <strong>miniresort burgués</strong>, disfrutando de ese silencio precario que solo se consigue cuando <strong>mis maravillosos niños</strong> han decidido, por fin, que enterrar al gato en piezas de LEGO no es una actividad productiva para la tarde del sábado. Tenía el portátil sobre las rodillas, una Coca-Cola Zero al lado y esa sensación de que el mundo de la tecnología va tan rápido que, si parpadeas, te has perdido tres revoluciones industriales y dos cambios de paradigma en el kernel de Linux.</p>\n<p>El caso es que estaba dándole vueltas a lo de los agentes de <strong>IA</strong>. Ya sabéis, esa promesa de que pronto no tendremos que \"chatear\" con una caja de texto, sino que tendremos entes digitales que <em>hacen cosas</em>. Que les dices \"oye, organízame el viaje a Teruel\" y el bicho te busca el hotel, te reserva la cena y te avisa de que va a llover, todo sin que tú muevas un dedo.</p>\n<p>Pero claro, la realidad suele ser más cruda. Hasta ahora, montar un agente de estos era un suplicio de <strong>cacharreo</strong> nivel experto. Que si LangChain por aquí, que si pelearse con las APIs de <strong>Anthropic</strong> o <strong>ChatGPT</strong> por allá, y rezar para que el modelo no alucine y acabe comprándote un billete de ida a Marte en lugar de la reserva en Teruel.</p>\n<p>Y entonces, <strong>me alucina</strong> lo que ha hecho NVIDIA con <strong>NeMo</strong>. </p>\n<p>Ciertamente, todos pensamos en NVIDIA como \"los tíos que hacen las tarjetas gráficas que no puedo pagar para jugar al Cyberpunk\". Pero lo que están montando a nivel de software es, sencillamente, el sistema nervioso central de lo que viene.</p>\n<h3 id=\"no-es-un-chat-es-una-fabrica-de-mentes\">No es un chat, es una fábrica de mentes</h3>\n<p><strong>Total, que</strong> me puse a investigar cómo funciona NeMo y la cabeza me hizo <em>clac</em>. No es solo un modelo de lenguaje. Es un framework (palabra técnica donde las haya, lo sé, perdonadme) diseñado para que la <strong>inteligencia artificial</strong> deje de ser una mascota que repite frases y se convierta en un trabajador cualificado.</p>\n<p>Lo que me mola de NeMo es que NVIDIA ha entendido que el problema de los agentes no es la inteligencia (que ya nos sobra con modelos como <strong>Claude</strong> o GPT-4), sino el control. <strong>Insisto</strong>: el control. </p>\n<p>¿Os acordáis de <strong>OpenClaw</strong>? Ese proyecto que intenta que la IA use el ordenador como un humano. Pues bien, NeMo es la infraestructura que permite que eso no sea un experimento de fin de semana en un garaje, sino algo que una empresa pueda usar sin miedo a que la IA borre la base de datos de clientes porque \"le pareció que ocupaba mucho espacio\".</p>\n<p><strong>Dicho y hecho</strong>, me puse a probar un par de microservicios de los que llaman NIMs (NVIDIA Inference Microservices). La idea es brillante: te dan el modelo empaquetado en un contenedor que vuela. Literalmente. Está optimizado para que el <strong>hardware</strong> (sus dichosas H100 y compañía) y el <strong>software</strong> se entiendan en un lenguaje íntimo y prohibido para el resto de los mortales.</p>\n<h3 id=\"el-fin-de-la-paja-en-el-desarrollo-de-ia\">El fin de la \"paja\" en el desarrollo de IA</h3>\n<p>A ver, como digo siempre, lo que nos gusta aquí es el barro. Y el barro de la IA hasta ahora era muy farragoso. Tenías que ser casi un ingeniero de la NASA para que un agente fuera persistente, tuviera memoria y, sobre todo, no se saliera de los raíles.</p>\n<p>NVIDIA ha metido algo llamado \"Guardrails\" en NeMo que es, básicamente, ponerle un guardaespaldas a la IA. Si el usuario intenta que el agente de atención al cliente de una aerolínea se ponga a hablar de política o a insultar a la competencia, el guardrail le da un pescozón digital y lo devuelve al carril. Esto, amigos míos, es lo que va a permitir que veamos agentes de verdad en el mundo real.</p>\n<p>(Inciso: mientras escribo esto, uno de mis hijos acaba de gritar porque el otro le ha robado un mando de la Switch. La vida real es un agente de IA sin guardrails. Caos absoluto).</p>\n<p>Lo que me vuela la cabeza es pensar en la integración. NVIDIA no está compitiendo con <strong>Apple</strong> o con Google por ver quién tiene el emoji más bonito. Está construyendo las tuberías por las que va a fluir toda la <strong>innovación</strong> de la próxima década. Si quieres construir un agente que use herramientas, que consulte manuales técnicos y que ejecute código de forma segura, NeMo es el camino más corto.</p>\n<h3 id=\"por-que-esto-lo-cambia-todo\">¿Por qué esto lo cambia todo?</h3>\n<p>El cambio fundamental es que pasamos de la IA \"generativa\" (que escribe poemas reguleros) a la IA \"agentic\" (que ejecuta flujos de trabajo). </p>\n<p>Hasta ahora, si querías que una IA hiciera algo complejo, tenías que darle instrucciones paso a paso. Con NeMo y la nueva arquitectura de agentes, le das un objetivo. El agente descompone ese objetivo en tareas, busca las herramientas que necesita, y las ejecuta. Es como pasar de darle órdenes a un niño de cinco años a contratar a un consultor senior que sabe dónde tiene la mano derecha.</p>\n<p>Y ojo, que aquí entra el juego de tronos de las grandes. Mientras Anthropic nos enseña lo que puede hacer Claude manejando el cursor, NVIDIA les está diciendo: \"Vale, muy bonito, pero si quieres que eso escale y que lo usen millones de personas sin que los servidores exploten, vas a tener que usar mis herramientas\". </p>\n<p>Es una jugada maestra. Es ser el dueño de la gasolinera en un mundo donde todo el mundo acaba de comprarse un coche.</p>\n<p>Total, que después de un par de horas de <strong>cacharreo</strong>, me di cuenta de que la barrera de entrada para crear algo realmente potente ha bajado de un muro de hormigón a un pequeño bordillo. Ya no necesitas un equipo de 50 doctores en matemáticas para montar un sistema que entienda el contexto de tu empresa y actúe en consecuencia. </p>\n<p>Me pregunto qué pasará cuando estas herramientas lleguen al gran público. Cuando el <strong>software</strong> deje de ser una herramienta estática y se convierta en algo maleable que se adapta a nosotros. Ciertamente, estamos en ese momento dulce y aterrador a la vez en el que todo parece posible.</p>\n<p>Al final, la <strong>tecnología</strong> de verdad es la que desaparece. La que se vuelve invisible. Y NVIDIA NeMo es un paso gigante hacia esa invisibilidad. Queremos que las cosas funcionen, no queremos saber qué modelo de lenguaje está corriendo por debajo o cuántos tokens por segundo está escupiendo la GPU.</p>\n<p>Me voy a ver qué tal va la excavación de LEGO en el salón, que me temo que el gato ya ha aceptado su destino como pieza decorativa. Pero os dejo con una reflexión: si pudierais construir un agente que hiciera una sola tarea tediosa de vuestro día a día (esa que odiáis con toda vuestra alma), ¿cuál sería? </p>\n<p>Os leo en los comentarios. No me falléis, que esto se pone interesante.</p>\n</article>\n        </div>\n      </div>\n    </>\n  );\n}\n"
+  },
+  "image_prompts": [
+    {
+      "position": "header",
+      "prompt": "Professional, modern hero image representing NVIDIA NeMo: por qué va a cambiar cómo construimos agentes de IA. Clean design, technology theme, high quality, 16:9 aspect ratio",
+      "alt_text": "Hero image about NVIDIA NeMo: por qué va a cambiar cómo construimos agentes de IA",
+      "context": "Main visual to grab attention"
+    },
+    {
+      "position": "section-1",
+      "prompt": "Illustrative image for blog section about No es un chat, es una fábrica de mentes. Related to NVIDIA NeMo: por qué va a cambiar cómo construimos agentes de IA, professional style, clear and informative",
+      "alt_text": "Illustration for section: No es un chat, es una fábrica de mentes",
+      "context": "Visual support for No es un chat, es una fábrica de mentes section"
+    },
+    {
+      "position": "section-2",
+      "prompt": "Illustrative image for blog section about El fin de la \"paja\" en el desarrollo de IA. Related to NVIDIA NeMo: por qué va a cambiar cómo construimos agentes de IA, professional style, clear and informative",
+      "alt_text": "Illustration for section: El fin de la \"paja\" en el desarrollo de IA",
+      "context": "Visual support for El fin de la \"paja\" en el desarrollo de IA section"
+    }
+  ],
+  "metadata": {
+    "duration": 46.915576,
+    "phases": {
+      "style_analysis": {
+        "phase_name": "style_analysis",
+        "status": "completed",
+        "start_time": "2026-04-06T18:12:41.320431",
+        "end_time": "2026-04-06T18:12:48.579097",
+        "duration": 7.258666,
+        "agent_name": "StyleAnalyzer",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "keyword_extraction": {
+        "phase_name": "keyword_extraction",
+        "status": "completed",
+        "start_time": "2026-04-06T18:12:48.579110",
+        "end_time": "2026-04-06T18:12:54.334156",
+        "duration": 5.755046,
+        "agent_name": "KeywordExtractor",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "content_generation": {
+        "phase_name": "content_generation",
+        "status": "completed",
+        "start_time": "2026-04-06T18:12:54.334169",
+        "end_time": "2026-04-06T18:13:13.756234",
+        "duration": 19.422065,
+        "agent_name": "ContentGenerator",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "critique": {
+        "phase_name": "critique",
+        "status": "completed",
+        "start_time": "2026-04-06T18:13:13.756249",
+        "end_time": "2026-04-06T18:13:20.935521",
+        "duration": 7.179272,
+        "agent_name": "CriticAgent",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "html_building": {
+        "phase_name": "html_building",
+        "status": "completed",
+        "start_time": "2026-04-06T18:13:20.935537",
+        "end_time": "2026-04-06T18:13:21.261993",
+        "duration": 0.326456,
+        "agent_name": "HTMLBuilder",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gpt-4-turbo-preview",
+        "retry_count": 0
+      },
+      "image_selection": {
+        "phase_name": "image_selection",
+        "status": "completed",
+        "start_time": "2026-04-06T18:13:21.262006",
+        "end_time": "2026-04-06T18:13:28.235969",
+        "duration": 6.973963,
+        "agent_name": "ImageSelectorAgent",
+        "error": null,
+        "error_type": null,
+        "fallback_used": true,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      }
+    },
+    "errors": [],
+    "warnings": []
+  }
+}

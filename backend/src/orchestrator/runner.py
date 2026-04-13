@@ -16,6 +16,7 @@ Example:
 import argparse
 import sys
 import json
+from dotenv import load_dotenv
 from pathlib import Path
 from typing import List
 
@@ -82,6 +83,34 @@ Examples:
         '-o',
         type=str,
         help='Output file path for generated content (JSON format)'
+    )
+    
+    parser.add_argument(
+        '--provider',
+        type=str,
+        choices=['openai', 'huggingface', 'gemini', 'modal', 'auto'],
+        default='auto',
+        help='LLM provider to use (default: auto)'
+    )
+
+    parser.add_argument(
+        '--continuous',
+        action='store_true',
+        help='Run bounded continuous publishing cycles instead of a single run'
+    )
+
+    parser.add_argument(
+        '--cycles',
+        type=int,
+        default=1,
+        help='Number of cycles to run in --continuous mode (default: 1)'
+    )
+
+    parser.add_argument(
+        '--interval-seconds',
+        type=float,
+        default=0.0,
+        help='Sleep between cycles in --continuous mode (default: 0 for tests/local)'
     )
     
     parser.add_argument(
@@ -164,8 +193,10 @@ def load_config(args: argparse.Namespace) -> OrchestratorConfig:
     if args.no_critique:
         config.enable_critique = False
     
+    config.provider = args.provider
     config.max_retries = args.max_retries
     config.verbose = not args.quiet
+    config.enable_continuous_publishing = args.continuous
     
     return config
 
@@ -213,6 +244,9 @@ def print_result_summary(result: dict) -> None:
 
 def main() -> int:
     """Main entry point."""
+    # Load environment variables
+    load_dotenv()
+    
     # Parse arguments
     args = parse_args()
     validate_args(args)
@@ -232,28 +266,56 @@ def main() -> int:
         )
     except Exception as e:
         print(f"Error initializing orchestrator: {e}", file=sys.stderr)
+        msg = str(e).lower()
+        if "provider" in msg and "not configured" in msg:
+            print("Hint: verify required environment variables for the selected provider.", file=sys.stderr)
         return 1
     
     # Run workflow
     try:
-        result = orchestrator.run(
-            topic=args.topic,
-            blogger_urls=args.blog_urls,
-            output_path=args.output
-        )
+        if args.continuous:
+            topic_candidates = [
+                {
+                    "title": args.topic,
+                    "category": "general",
+                    "source": "cli",
+                    "published_at": None,
+                }
+            ]
+            result = orchestrator.start_continuous_publishing(
+                blogger_urls=args.blog_urls,
+                topic_candidates=topic_candidates,
+                cycles=args.cycles,
+                interval_seconds=args.interval_seconds,
+            )
+        else:
+            result = orchestrator.run(
+                topic=args.topic,
+                blogger_urls=args.blog_urls,
+                output_path=args.output
+            )
     except KeyboardInterrupt:
         print("\n\nWorkflow interrupted by user", file=sys.stderr)
         return 130
     except Exception as e:
         print(f"\nError during workflow execution: {e}", file=sys.stderr)
+        msg = str(e).lower()
+        if "incompatible with provider 'gemini'" in msg or "gemini api error" in msg:
+            print("Hint: use a Gemini model id (e.g. gemini-1.5-flash) when --provider gemini.", file=sys.stderr)
         if config.verbose:
             import traceback
             traceback.print_exc()
         return 1
     
     # Print summary
-    if not args.quiet:
+    if not args.quiet and not args.continuous:
         print_result_summary(result)
+
+    if not args.quiet and args.continuous:
+        print("\n" + "=" * 70)
+        print("✓ CONTINUOUS PUBLISHING COMPLETED")
+        print("=" * 70)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
     
     # Save output if requested
     if args.output:

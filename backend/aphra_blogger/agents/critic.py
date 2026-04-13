@@ -7,6 +7,8 @@ style matching, and quality.
 
 from typing import Dict, Any, Optional
 import os
+import json
+import re
 
 try:
     from ..llm import create_llm_provider, LLMProvider
@@ -122,14 +124,34 @@ Return ONLY valid JSON."""
             )
             
             response = self.llm.chat_completion(messages)
-            
-            import json
-            result = json.loads(response.content)
+            result = self._parse_critique_payload(response.content)
             return result
             
         except Exception as e:
             print(f"Warning: Critique failed: {e}. Using fallback.")
             return self._fallback_critique(content)
+
+    def _parse_critique_payload(self, raw_content: str) -> Dict[str, Any]:
+        """Parse critique payload allowing markdown wrappers and noisy prefixes."""
+        content = (raw_content or "").strip()
+        if not content:
+            raise ValueError("Empty critique response")
+
+        content = re.sub(r"^```(?:json)?\s*", "", content, flags=re.IGNORECASE)
+        content = re.sub(r"\s*```$", "", content)
+
+        try:
+            parsed = json.loads(content)
+        except json.JSONDecodeError:
+            match = re.search(r"\{(.|\n)*\}", content)
+            if not match:
+                raise
+            parsed = json.loads(match.group(0))
+
+        if not isinstance(parsed, dict):
+            raise ValueError("Critique payload is not a JSON object")
+
+        return parsed
     
     def _fallback_critique(self, content: str) -> Dict[str, Any]:
         """Fallback critique based on simple heuristics."""

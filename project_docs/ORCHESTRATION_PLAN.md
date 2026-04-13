@@ -8,6 +8,48 @@
 **Prioridad:** 2 P1 (Alta), 3 P2 (Media), 2 P3 (Baja)  
 **Estrategia:** Desarrollo paralelo con orquestación central
 
+## 🔄 Operacion Continua (Feature 009)
+
+### Objetivo operativo
+
+- Publicacion continua cada 12 horas (2 publicaciones/día).
+- Seleccion temática multi-fuente con fallback.
+- Reintentos con backoff 5m / 15m / 30m para fallos transitorios.
+
+### Estados operativos
+
+- `active`: ejecución continua normal.
+- `paused`: pausa manual con preservación de planificación.
+- `degraded`: degradación operacional por fallos sostenidos.
+- `source_exhausted`: agotamiento de fuentes confiables tras fallback.
+- `skipped_with_reason`: ciclo cerrado sin publicación por falta de tema válido.
+
+### SLI/SLO y alertas
+
+- `SLI-1 Daily Success Rate`: porcentaje de ciclos válidos (`success` o `skipped_with_reason`).
+- `SLI-2 Cycle Lag`: diferencia entre hora planificada y cierre de ciclo.
+- `SLI-3 Critical Open Incidents`: incidentes críticos abiertos.
+- Objetivos operativos:
+  - success-rate >= 95%,
+  - cycle lag <= 90 minutos,
+  - incidentes críticos abiertos = 0.
+- Alertas:
+  - `SLI_SUCCESS_RATE_BREACH`,
+  - `SLI_CYCLE_LAG_BREACH`,
+  - `CRITICAL_INCIDENT_OPEN`.
+
+### Trazabilidad
+
+- Historial de ciclos e incidentes en `backend/outputs/continuous_history.json`.
+- Artefactos canónicos publicados en `docs/posts.json` y `docs/posts/*.json`.
+
+### Troubleshooting rápido
+
+1. Verificar estado actual desde el orquestador (`get_operational_status`).
+2. Revisar incidentes abiertos y `reason_code` en historial.
+3. Confirmar disponibilidad de fuentes (API/RSS) y credenciales.
+4. Reanudar operación con `resume_continuous_publishing` tras mitigación.
+
 ---
 
 ## 🎯 Fase 1: Infraestructura Core (P1) - PRIORITARIO

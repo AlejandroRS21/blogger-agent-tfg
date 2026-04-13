@@ -12,12 +12,25 @@ Coordinates all agents through a multi-phase workflow:
 
 import time
 import uuid
-from datetime import datetime
+import logging
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 
 from .config import OrchestratorConfig
-from .state import StateManager, WorkflowState, PhaseStatus
+from .state import StateManager, WorkflowState, PhaseStatus, OperationalStatus
+from .continuous import (
+    AlertDispatcher,
+    ContinuousScheduler,
+    DraftValidator,
+    HistoryStore,
+    IncidentManager,
+    OperationalMonitor,
+    RetryPolicy,
+    SourceGuard,
+    TopicCandidate,
+    TopicSelector,
+)
 from aphra_blogger.workflows.blogger_style import BloggerStyleWorkflow
 from aphra_blogger.context import BloggerContext
 from aphra_blogger.agents.style_analyzer import StyleAnalyzer
@@ -26,6 +39,9 @@ from aphra_blogger.agents.content_generator import ContentGenerator
 from aphra_blogger.agents.critic import CriticAgent
 from aphra_blogger.agents.image_selector import ImageSelectorAgent
 from aphra_blogger.agents.html_builder import HTMLBuilder
+
+
+logger = logging.getLogger(__name__)
 
 
 class BloggerOrchestrator:
@@ -64,22 +80,73 @@ class BloggerOrchestrator:
         self.config = config
         self.verbose = verbose or config.verbose
         self.workflow = BloggerStyleWorkflow()
-        self.state_manager: Optional[StateManager] = None
+        self.state_manager = None
+        self.history_store = HistoryStore()
+        self.alert_dispatcher = AlertDispatcher(alerts=[])
+        self.incident_manager = IncidentManager(self.history_store)
+        self.monitor = OperationalMonitor(
+            history_store=self.history_store,
+            alert_dispatcher=self.alert_dispatcher,
+            min_success_rate=0.95,
+            max_lag_minutes=90.0,
+        )
+        self.scheduler = ContinuousScheduler(interval_hours=config.publish_interval_hours)
+        self.retry_policy = RetryPolicy(
+            max_retries=config.max_retries,
+            backoff_seconds=config.continuous_backoff_seconds,
+        )
+        self.validator = DraftValidator(redundancy_threshold=config.redundancy_threshold)
+        self.topic_selector = TopicSelector()
+        self.source_guard = SourceGuard()
         
         # Initialize agents
-        api_key = config.openai_api_key
-        self.style_analyzer = StyleAnalyzer(api_key=api_key, model=config.default_model)
-        self.keyword_extractor = KeywordExtractor(api_key=api_key)
-        self.content_generator = ContentGenerator(api_key=api_key, model=config.default_model)
-        self.critic = CriticAgent(api_key=api_key, model=config.default_model)
-        self.image_selector = ImageSelectorAgent(api_key=api_key)
+        api_key = config.openai_api_key or config.huggingface_token or config.gemini_api_key or config.modal_api_key
+        provider = config.provider
+        
+        # Determine shared API key for agents based on provider
+        agent_api_key = api_key
+        if provider == "gemini":
+            agent_api_key = config.gemini_api_key
+        elif provider == "openai":
+            agent_api_key = config.openai_api_key
+        elif provider == "huggingface":
+            agent_api_key = config.huggingface_token
+        elif provider == "modal":
+            agent_api_key = config.modal_api_key
+            
+        self.style_analyzer = StyleAnalyzer(api_key=agent_api_key, model=config.default_model, provider=provider)
+        self.keyword_extractor = KeywordExtractor(api_key=agent_api_key, provider=provider)
+        self.content_generator = ContentGenerator(api_key=agent_api_key, model=config.default_model, provider=provider)
+        self.critic = CriticAgent(api_key=agent_api_key, model=config.default_model, provider=provider)
+        self.image_selector = ImageSelectorAgent(api_key=agent_api_key, provider=provider)
         self.html_builder = HTMLBuilder()
     
     def _log(self, message: str, level: str = "INFO") -> None:
         """Log a message if verbose mode is enabled."""
         if self.verbose:
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            print(f"[{timestamp}] [{level}] {message}")
+            log_level = getattr(logging, level.upper(), logging.INFO)
+            logger.log(log_level, message)
+
+    def _classify_error(self, error_msg: str) -> str:
+        """Classify error into a normalized error type."""
+        message = (error_msg or "").lower()
+        if "json" in message or "expecting value" in message:
+            return "parse_error"
+        if "timeout" in message:
+            return "timeout"
+        if "provider" in message or "api error" in message or "gemini" in message:
+            return "provider_error"
+        return "unknown"
+
+    def _effective_model_for_agent(self, agent: Any) -> Optional[str]:
+        """Best-effort extraction of effective model from an agent."""
+        llm = getattr(agent, "llm", None)
+        if not llm:
+            return None
+        if hasattr(llm, "model_id"):
+            return getattr(llm, "model_id")
+        llm_config = getattr(llm, "config", None)
+        return getattr(llm_config, "model", None)
     
     def _execute_with_retry(
         self,
@@ -128,7 +195,12 @@ class BloggerOrchestrator:
                         f"{phase_name}: ✗ Failed (attempt {retry_count}/{self.config.max_retries + 1}): {error_msg}",
                         "WARNING"
                     )
-                    self.state_manager.fail_phase(phase_name, error_msg, retry=True)
+                    self.state_manager.fail_phase(
+                        phase_name,
+                        error_msg,
+                        retry=True,
+                        error_type=self._classify_error(error_msg),
+                    )
                     time.sleep(delay)
                     delay *= self.config.backoff_factor
                 else:
@@ -186,6 +258,8 @@ class BloggerOrchestrator:
                 # Phase 5: Refinement (if critique suggests changes)
                 if self._needs_refinement():
                     self._phase_refinement()
+                else:
+                    state.final_content = state.draft_content
             else:
                 self.state_manager.skip_phase("critique", "Critique disabled in config")
                 self.state_manager.skip_phase("refinement", "Critique disabled")
@@ -196,8 +270,14 @@ class BloggerOrchestrator:
             
             # Phase 7: Image Selection
             self._phase_image_selection()
+
+            # Guardrail: workflow cannot succeed with empty final output.
+            effective_content = (state.final_content or state.draft_content or "").strip()
+            if not effective_content:
+                raise RuntimeError("Workflow produced empty content; refusing successful completion")
             
             # Finalize
+            self.state_manager.mark_cycle_completed()
             self.state_manager.finalize()
             
             # Summary
@@ -216,15 +296,290 @@ class BloggerOrchestrator:
                 self._log(f"State saved to: {output_path}")
             
             # Return result
-            return self._build_result()
+            result = self._build_result()
+
+            if self.config.write_canonical_docs and self.state_manager.state.html_structure:
+                published = self.html_builder.write_canonical_artifacts(
+                    html_structure=self.state_manager.state.html_structure,
+                    topic=topic,
+                    docs_root=self.config.docs_output_dir,
+                    content=result["content"],
+                )
+                result["metadata"]["published_record"] = published
+                self.history_store.add_published(published)
+
+            return result
             
         except Exception as e:
             self._log(f"Workflow Failed: {str(e)}", "ERROR")
+            self.incident_manager.report(
+                stage=self.state_manager.state.current_phase if self.state_manager else "workflow",
+                reason_code=self._classify_error(str(e)),
+                severity="major",
+                recovery_action="retry",
+            )
             if self.state_manager:
                 self.state_manager.finalize()
                 if output_path:
                     self.state_manager.save_to_file(output_path)
             raise
+
+    def start_continuous_publishing(
+        self,
+        blogger_urls: List[str],
+        topic_candidates: List[Dict[str, Any]],
+        cycles: int = 1,
+        interval_seconds: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """Run bounded continuous publishing cycles (useful for cron or Modal jobs)."""
+        if cycles <= 0:
+            raise ValueError("cycles must be > 0")
+
+        interval = interval_seconds if interval_seconds is not None else self.config.publish_interval_hours * 3600
+        operational = {"published": 0, "failed": 0, "cycles": []}
+        self.state_manager = StateManager(
+            WorkflowState(
+                workflow_id=str(uuid.uuid4())[:8],
+                topic="continuous",
+                blogger_urls=blogger_urls,
+            )
+        )
+        self.state_manager.set_operational_status(OperationalStatus.ACTIVE)
+        last_cycle_at = None
+
+        for _ in range(cycles):
+            if self.state_manager.state.pause_requested:
+                break
+
+            scheduled_at_dt = self.scheduler.next_run_at(last_run_at=last_cycle_at)
+            cycle_id = str(uuid.uuid4())[:8]
+            started_at_dt = datetime.now(timezone.utc)
+            start_at = started_at_dt.isoformat()
+
+            sanitized_candidates = self.source_guard.sanitize_candidates(topic_candidates)
+            if not sanitized_candidates:
+                self.history_store.add_cycle(
+                    self._cycle_record(
+                        cycle_id=cycle_id,
+                        topic="source-exhausted",
+                        status="source_exhausted",
+                        scheduled_at=scheduled_at_dt.isoformat(),
+                        started_at=start_at,
+                        ended_at=datetime.now(timezone.utc).isoformat(),
+                        retry_count=0,
+                        reason="No trusted source candidates available",
+                        reason_code="source_exhausted",
+                        lag_minutes=self.scheduler.cycle_lag_minutes(scheduled_at_dt),
+                        trace={"source_refs": [], "provider": self.config.provider},
+                    )
+                )
+                self._emit_operational_event("source_exhausted", "major", cycle_id)
+                operational["failed"] += 1
+                self.state_manager.set_operational_status(OperationalStatus.DEGRADED)
+                if interval > 0:
+                    time.sleep(interval)
+                continue
+
+            selected = self.topic_selector.select(
+                [
+                    TopicCandidate(
+                        title=item["title"],
+                        category=item.get("category", "general"),
+                        source=item.get("source", "unknown"),
+                        published_at=item.get("published_at"),
+                    )
+                    for item in sanitized_candidates
+                ]
+            )
+            if not selected:
+                self.history_store.add_cycle(
+                    self._cycle_record(
+                        cycle_id=cycle_id,
+                        topic="no-topic",
+                        status="skipped_with_reason",
+                        scheduled_at=scheduled_at_dt.isoformat(),
+                        started_at=start_at,
+                        ended_at=datetime.now(timezone.utc).isoformat(),
+                        retry_count=0,
+                        reason="No valid TopicCandidate after selection filters",
+                        reason_code="no_topic_candidate",
+                        lag_minutes=self.scheduler.cycle_lag_minutes(scheduled_at_dt),
+                        trace={"source_refs": [c.get("source") for c in sanitized_candidates], "provider": self.config.provider},
+                    )
+                )
+                self._emit_operational_event("skipped_with_reason", "warning", cycle_id)
+                operational["cycles"].append(cycle_id)
+                continue
+
+            try:
+                result = self.retry_policy.run(
+                    lambda: self.run(topic=selected.title, blogger_urls=blogger_urls, output_path=None)
+                )
+                closed_at = datetime.now(timezone.utc)
+                trace = {
+                    "source_refs": [selected.source],
+                    "provider": self.config.provider,
+                    "topic_category": selected.category,
+                    "prompt_fingerprint": f"{self.config.provider}:{self.config.default_model}:{selected.title}"[:120],
+                }
+                self.history_store.add_cycle(
+                    self._cycle_record(
+                        cycle_id=cycle_id,
+                        topic=selected.title,
+                        status="success",
+                        scheduled_at=scheduled_at_dt.isoformat(),
+                        started_at=start_at,
+                        ended_at=closed_at.isoformat(),
+                        retry_count=0,
+                        reason_code="published",
+                        lag_minutes=self.scheduler.cycle_lag_minutes(scheduled_at_dt, closed_at),
+                        trace=trace,
+                    )
+                )
+                generated_record = self.content_generator.build_generation_record(
+                    topic=selected.title,
+                    content=result.get("content", ""),
+                    source_refs=[selected.source],
+                    category=selected.category,
+                )
+                generated_record["published_at"] = closed_at.isoformat()
+                generated_record["relevance_score"] = result.get("metadata", {}).get("relevance_score", 100.0)
+                self.history_store.add_published(generated_record)
+                operational["published"] += 1
+                operational["cycles"].append(result.get("workflow_id"))
+                self._emit_operational_event("cycle_success", "info", cycle_id)
+                last_cycle_at = closed_at
+            except Exception as exc:  # noqa: BLE001
+                closed_at = datetime.now(timezone.utc)
+                self.history_store.add_cycle(
+                    self._cycle_record(
+                        cycle_id=cycle_id,
+                        topic=selected.title,
+                        status="failed",
+                        scheduled_at=scheduled_at_dt.isoformat(),
+                        started_at=start_at,
+                        ended_at=closed_at.isoformat(),
+                        retry_count=self.config.max_retries,
+                        reason=str(exc),
+                        reason_code=self._classify_error(str(exc)),
+                        lag_minutes=self.scheduler.cycle_lag_minutes(scheduled_at_dt, closed_at),
+                        trace={"source_refs": [selected.source], "provider": self.config.provider, "topic_category": selected.category},
+                    )
+                )
+                self.incident_manager.report(
+                    stage="publish",
+                    reason_code=self._classify_error(str(exc)),
+                    severity="critical",
+                    recovery_action="retry",
+                )
+                operational["failed"] += 1
+                self._emit_operational_event("cycle_failed", "critical", cycle_id)
+
+            if operational["failed"] > 0 and self._degradation_exceeds_threshold():
+                self.state_manager.set_operational_status(OperationalStatus.DEGRADED)
+
+            monitor_snapshot = self.monitor.evaluate()
+            if self.history_store.should_pause_for_quality(min_relevance=70.0):
+                self.state_manager.state.pause_requested = True
+                self.state_manager.set_operational_status(OperationalStatus.PAUSED)
+                self._emit_operational_event("quality_pause", "major", cycle_id)
+            operational["monitoring"] = {
+                "success_rate": monitor_snapshot["success_rate"],
+                "avg_lag_minutes": monitor_snapshot["avg_lag_minutes"],
+                "critical_open_incidents": monitor_snapshot["critical_open_incidents"],
+            }
+
+            if interval > 0:
+                time.sleep(interval)
+
+        return {
+            "status": self.state_manager.get_operational_snapshot(),
+            "summary": operational,
+            "history": self.history_store.get_status_snapshot(),
+            "alerts": self.alert_dispatcher.snapshot(),
+        }
+
+    def pause_continuous_publishing(self) -> Dict[str, Any]:
+        """Pause continuous publishing while preserving scheduler state."""
+        if not self.state_manager:
+            raise RuntimeError("Continuous mode not initialized")
+        self.state_manager.state.pause_requested = True
+        self.state_manager.set_operational_status(OperationalStatus.PAUSED)
+        return self.state_manager.get_operational_snapshot()
+
+    def resume_continuous_publishing(self) -> Dict[str, Any]:
+        """Resume continuous publishing after pause."""
+        if not self.state_manager:
+            raise RuntimeError("Continuous mode not initialized")
+        self.state_manager.state.pause_requested = False
+        self.state_manager.set_operational_status(OperationalStatus.ACTIVE)
+        return self.state_manager.get_operational_snapshot()
+
+    def get_operational_status(self) -> Dict[str, Any]:
+        """Expose operational status and last cycles/incidents summary."""
+        base = self.state_manager.get_operational_snapshot() if self.state_manager else {
+            "status": OperationalStatus.PAUSED.value,
+            "pause_requested": False,
+            "last_cycle_at": None,
+            "degradation_started_at": None,
+            "errors": 0,
+            "warnings": 0,
+        }
+        return {
+            "operational": base,
+            "history": self.history_store.get_status_snapshot(),
+        }
+
+    def _degradation_exceeds_threshold(self) -> bool:
+        """Check if degraded runtime exceeded configured threshold."""
+        if not self.state_manager:
+            return False
+        started = self.state_manager.state.degradation_started_at
+        if started is None:
+            self.state_manager.state.degradation_started_at = datetime.now(timezone.utc)
+            return False
+        elapsed = (datetime.now(timezone.utc) - started).total_seconds() / 3600.0
+        return elapsed >= self.config.critical_degradation_hours
+
+    def _cycle_record(
+        self,
+        cycle_id: str,
+        topic: str,
+        status: str,
+        scheduled_at: str,
+        started_at: str,
+        ended_at: str,
+        retry_count: int,
+        reason: Optional[str] = None,
+        reason_code: Optional[str] = None,
+        lag_minutes: float = 0.0,
+        trace: Optional[Dict[str, Any]] = None,
+    ) -> Any:
+        """Build cycle record object lazily to avoid import cycles."""
+        from .continuous.history_store import CycleRecord
+
+        return CycleRecord(
+            cycle_id=cycle_id,
+            scheduled_at=scheduled_at,
+            started_at=started_at,
+            ended_at=ended_at,
+            status=status,
+            topic=topic,
+            retry_count=retry_count,
+            reason=reason,
+            reason_code=reason_code,
+            lag_minutes=lag_minutes,
+            trace=trace,
+        )
+
+    def _emit_operational_event(self, event: str, severity: str, cycle_id: str) -> None:
+        """Emit an operational event to alert dispatcher and logger."""
+        self.alert_dispatcher.emit(
+            code=f"EVENT_{event.upper()}",
+            message=f"Operational event: {event}",
+            severity=severity,
+            context={"cycle_id": cycle_id},
+        )
     
     def _phase_style_analysis(self, blogger_urls: List[str]) -> None:
         """Phase 1: Analyze blogger style."""
@@ -236,7 +591,12 @@ class BloggerOrchestrator:
         
         result = self._execute_with_retry(phase_name, "StyleAnalyzer", analyze)
         self.state_manager.state.style_profile = result
-        self.state_manager.complete_phase(phase_name, result)
+        self.state_manager.complete_phase(
+            phase_name,
+            result,
+            effective_provider=self.config.provider,
+            effective_model=self._effective_model_for_agent(self.style_analyzer),
+        )
     
     def _phase_keyword_extraction(self, blogger_urls: List[str]) -> None:
         """Phase 2: Extract keywords and phrases."""
@@ -250,7 +610,12 @@ class BloggerOrchestrator:
         
         result = self._execute_with_retry(phase_name, "KeywordExtractor", extract)
         self.state_manager.state.keywords = result
-        self.state_manager.complete_phase(phase_name, result)
+        self.state_manager.complete_phase(
+            phase_name,
+            result,
+            effective_provider=self.config.provider,
+            effective_model=self._effective_model_for_agent(self.keyword_extractor),
+        )
     
     def _phase_content_generation_draft(self, topic: str) -> None:
         """Phase 3: Generate initial draft."""
@@ -272,7 +637,14 @@ class BloggerOrchestrator:
         
         result = self._execute_with_retry(phase_name, "ContentGenerator", generate)
         self.state_manager.state.draft_content = result
-        self.state_manager.complete_phase(phase_name, output=f"{len(result)} characters")
+        fallback_used = result.strip().startswith("# ") and "A ver, que me habéis preguntado mucho" in result
+        self.state_manager.complete_phase(
+            phase_name,
+            output=f"{len(result)} characters",
+            fallback_used=fallback_used,
+            effective_provider=self.config.provider,
+            effective_model=self._effective_model_for_agent(self.content_generator),
+        )
     
     def _phase_critique(self) -> None:
         """Phase 4: Critique the draft."""
@@ -293,7 +665,12 @@ class BloggerOrchestrator:
         result = self._execute_with_retry(phase_name, "CriticAgent", critique)
         self.state_manager.state.critique_feedback = str(result)
         self.state_manager.state.metadata['critique_result'] = result
-        self.state_manager.complete_phase(phase_name, result)
+        self.state_manager.complete_phase(
+            phase_name,
+            result,
+            effective_provider=self.config.provider,
+            effective_model=self._effective_model_for_agent(self.critic),
+        )
     
     def _needs_refinement(self) -> bool:
         """Check if content needs refinement based on critique."""
@@ -317,19 +694,22 @@ class BloggerOrchestrator:
             draft = self.state_manager.state.draft_content
             critique = self.state_manager.state.metadata.get('critique_result', {})
             style = self.state_manager.state.style_profile
-            keywords = self.state_manager.state.keywords
             
             refined = self.content_generator.refine_content(
                 draft=draft,
                 critique_feedback=critique,
                 style_profile=style,
-                keywords=keywords
             )
             return refined
         
         result = self._execute_with_retry(phase_name, "ContentGenerator", refine)
         self.state_manager.state.final_content = result
-        self.state_manager.complete_phase(phase_name, output=f"{len(result)} characters")
+        self.state_manager.complete_phase(
+            phase_name,
+            output=f"{len(result)} characters",
+            effective_provider=self.config.provider,
+            effective_model=self._effective_model_for_agent(self.content_generator),
+        )
     def _phase_html_building(self) -> None:
         """Phase 6: Build HTML structure."""
         phase_name = "html_building"
@@ -372,7 +752,12 @@ class BloggerOrchestrator:
         
         result = self._execute_with_retry(phase_name, "HTMLBuilder", build)
         self.state_manager.state.html_structure = result
-        self.state_manager.complete_phase(phase_name, result['metadata'])
+        self.state_manager.complete_phase(
+            phase_name,
+            result['metadata'],
+            effective_provider=self.config.provider,
+            effective_model=self._effective_model_for_agent(self.html_builder),
+        )
     
     def _phase_image_selection(self) -> None:
         """Phase 7: Select and place images."""
@@ -391,7 +776,14 @@ class BloggerOrchestrator:
         
         result = self._execute_with_retry(phase_name, "ImageSelectorAgent", select)
         self.state_manager.state.image_prompts = result
-        self.state_manager.complete_phase(phase_name, result)
+        fallback_used = bool(result and isinstance(result, list) and "Professional, modern hero image" in result[0].get("prompt", ""))
+        self.state_manager.complete_phase(
+            phase_name,
+            result,
+            fallback_used=fallback_used,
+            effective_provider=self.config.provider,
+            effective_model=self._effective_model_for_agent(self.image_selector),
+        )
     
     def _build_result(self) -> Dict[str, Any]:
         """Build final result dictionary."""
@@ -403,7 +795,7 @@ class BloggerOrchestrator:
             "blogger_urls": state.blogger_urls,
             "style_profile": state.style_profile,
             "keywords": state.keywords,
-            "content": state.final_content,
+            "content": state.final_content or state.draft_content,
             "html_structure": state.html_structure,
             "image_prompts": state.image_prompts,
             "metadata": {

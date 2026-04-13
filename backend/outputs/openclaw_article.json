@@ -1,0 +1,200 @@
+{
+  "workflow_id": "7c5fbec8",
+  "topic": "El futuro de OpenClaw",
+  "blogger_urls": [
+    "https://javipas.com"
+  ],
+  "style_profile": {
+    "tone": "conversational, humorous, personal, enthusiastic",
+    "voice": "first person, close to reader",
+    "language_level": "colloquial",
+    "structure": "personal intro → experience → technical details → reflection",
+    "expressions": [
+      "me alucina",
+      "dicho y hecho",
+      "el caso es que",
+      "total, que",
+      "ciertamente",
+      "como digo",
+      "insisto",
+      "miniresort burgués",
+      "mis maravillosos niños"
+    ],
+    "avg_sentence_length": 15,
+    "paragraph_pattern": "3-5 lines, medium complexity",
+    "use_of_humor": "Subtle irony and self-deprecating humor",
+    "technical_depth": "Medium-high, explains complex topics accessibly",
+    "personality_traits": [
+      "curious",
+      "enthusiastic about technology",
+      "family-oriented",
+      "reflective",
+      "critical thinker"
+    ],
+    "engagement_style": "Invites reader comments, asks questions, shares personal experiences"
+  },
+  "keywords": [
+    "IA",
+    "inteligencia artificial",
+    "OpenClaw",
+    "Claude",
+    "ChatGPT",
+    "tecnología",
+    "Apple",
+    "Anthropic",
+    "innovación",
+    "desarrollo",
+    "software",
+    "hardware",
+    "futuro",
+    "educación",
+    "familia",
+    "experimento",
+    "prueba",
+    "análisis",
+    "opinión",
+    "crítica",
+    "nostalgia",
+    "retro",
+    "gaming",
+    "ordenadores",
+    "Internet"
+  ],
+  "content": "# Me he obsesionado con un cursor que se mueve solo (y lo que eso significa para OpenClaw)\n\nTengo que confesar algo, y no es algo de lo que me sienta especialmente orgulloso después de tantos años analizando tecnología: he vuelto a caer en la madriguera del conejo. Pero de forma insana. He pasado las últimas tres madrugadas, mientras mis maravillosos niños y mi mujer dormían plácidamente en nuestro miniresort burgués, mirando fijamente la pantalla de mi monitor. No estaba jugando, ni editando vídeo, ni siquiera escribiendo uno de esos sesudos análisis que tanto me gustan. Estaba mirando cómo un cursor se movía erráticamente por la pantalla, fallando estrepitosamente al intentar abrir una hoja de Excel, para luego, de repente, acertar y hacer algo que me voló la cabeza.\n\nEsa es mi cruzada particular ahora mismo: la autonomía. Pero no la autonomía de la batería de un iPhone, que eso ya nos da un poco igual a todos, sino la autonomía de la inteligencia artificial para \"tocarnos\" el ordenador. Y ahí es donde entra OpenClaw y todo este ecosistema que se está montando alrededor de Claude y su capacidad de *Computer Use*.\n\nEl caso es que llevamos un par de años flipando con ChatGPT y sus respuestas, pero siempre ha habido una barrera física, una especie de cristal que separaba al modelo de nuestro sistema operativo. Tú le pedías algo, él te daba el código o el texto, y tú, como un humilde operario, lo pegabas donde tocaba. Ciertamente, eso era útil, pero no era \"mágico\". OpenClaw es parte de ese movimiento que quiere romper el cristal. Me alucina pensar que estamos a dos tardes de que la IA no solo me diga qué tengo que comprar en Amazon, sino que abra el navegador, busque la mejor oferta, gestione el carrito y me pregunte: \"Javi, ¿le doy a pagar?\".\n\nTotal, que me puse a cacharrear. Dicho y hecho. Me bajé el repositorio, configuré las API keys de Anthropic (previa recarga de dólares, que esto no es gratis, amigos) y me dispuse a ver el futuro. La idea detrás de OpenClaw es fascinante porque intenta democratizar lo que Anthropic soltó de forma algo cruda con su implementación de referencia de *Computer Use*. Es ese puente que permite que el modelo de IA vea capturas de pantalla de tu escritorio, decida dónde está el botón de \"Enviar\" y mueva el ratón virtualmente para hacer clic.\n\nComo digo, el primer intento fue un desastre absoluto. Le pedí que buscara una foto de un Amiga 500 en Google Imágenes y la guardara en mi escritorio. El cursor empezó a bailar como si estuviera poseído por el espíritu de un usuario de Windows 95 con el ratón sucio. Abrió la calculadora, se quedó mirando el fondo de pantalla y luego decidió que lo mejor era cerrar la sesión. Me reí, claro. Pero en el segundo intento, tras ajustar un par de parámetros en el script de Python, la cosa cambió. Vi cómo abría Firefox, cómo escribía —letra a letra, con esa cadencia casi humana— la búsqueda, y cómo finalmente descargaba la imagen.\n\nMe quedé helado. Insanto. Es una sensación extraña, casi mística, ver que tu ordenador ha dejado de ser una herramienta pasiva para convertirse en un ente con \"manos\".\n\n¿Hacia dónde va todo esto? Pues mirad, yo creo que el futuro de OpenClaw y proyectos similares no es ser una curiosidad para cuatro locos del *cacharreo* como yo. El futuro es la desaparición de la interfaz tal y como la conocemos. Llevamos décadas aprendiendo dónde están los menús, memorizando atajos de teclado (el Cmd+Space es mi religión) y lidiando con diseños de experiencia de usuario que a veces parecen diseñados por el mismísimo diablo. Si la IA puede manejar el software por nosotros, ¿para qué necesito yo saber dónde está la opción de \"Combinar correspondencia\" en Word? Se lo pido a la IA, ella toma el control de OpenClaw, mueve el cursor, hace los clics necesarios y yo me dedico a lo mío, que probablemente sea jugar con mis maravillosos niños o pensar en qué nuevo gadget voy a comprarme para alimentar este vicio.\n\nApple está intentando hacer algo parecido con su Apple Intelligence y el control de aplicaciones, pero ya sabéis cómo son en Cupertino: todo cerrado, todo bajo su control, y solo si usas sus apps. Lo que me atrae de OpenClaw es ese espíritu abierto. La posibilidad de que esto funcione en Linux, en Windows, en un Mac viejo o en una Raspberry Pi si me apuras. Es la innovación desde abajo, sin los muros de jardín vallado de las grandes corporaciones.\n\nCiertamente, hay riesgos. El otro día pensaba: \"Si le doy permiso para mover el ratón y ver mi pantalla, ¿qué le impide vaciarme la cuenta corriente si el modelo alucina o si alguien hackea el intermediario?\". Es una pregunta legítima. Pero, qué queréis que os diga, la curiosidad siempre vence al miedo en mi caso. El potencial de automatización es tan salvaje que merece la pena el riesgo. Imaginaos el flujo de trabajo: recibes un correo con una factura, la IA la detecta, abre el programa de contabilidad, pica los datos, genera el PDF del trimestre y te deja el borrador listo para que tú solo le des al botón de enviar a la AEAT. Eso es salud mental, amigos. Eso es tiempo de vida recuperado.\n\nEl caso es que OpenClaw todavía está verde. Muy verde. A veces se queda tonto mirando un icono, otras veces entra en un bucle infinito porque un pop-up le ha tapado la vista. Pero es que estamos en el momento \"módem de 14.400\". Estamos escuchando los ruidos de la conexión, esperando a que la web cargue línea a línea. Pero sabemos que después viene la fibra óptica.\n\nMe alucina el ritmo al que avanza Anthropic. Mientras OpenAI parece más centrada en que ChatGPT sea un compañero de voz encantador (que también está bien, no me malinterpretéis), la gente de Anthropic con Claude ha ido a por el trabajo sucio. A por la productividad real. Y OpenClaw es el brazo articulado que le faltaba a ese cerebro. Es la diferencia entre tener un consultor muy listo al lado y tener un asistente que además sabe usar las herramientas.\n\nAyer, mientras cenaba un poco de embutido del bueno en el miniresort, le daba vueltas a la idea de si algún día escribiré estos posts simplemente dictando ideas generales y dejando que una instancia de OpenClaw mueva el cursor en mi Markdown editor, busque las imágenes, las optimice y las suba al blog. ¿Perdería el alma el texto? Quizás. Por eso insisto tanto en que el *cacharreo* debe ser personal. La IA debe ser el pincel, pero el brazo (aunque sea virtual) debe seguir nuestras órdenes.\n\nTotal, que el futuro de OpenClaw es, en realidad, el futuro de nuestra relación con las máquinas. Vamos a pasar de \"usar\" ordenadores a \"dirigir\" ordenadores. Y eso, para alguien que empezó con un Spectrum cargando cintas durante diez minutos para luego jugar al *Jetpac*, es poco menos que ciencia ficción hecha realidad.\n\nMe voy a dormir, que mañana mis maravillosos niños me despertarán temprano y quiero tener la cabeza despejada para intentar que OpenClaw aprenda a organizar mi carpeta de descargas, que ahora mismo parece el escenario de una guerra nuclear de archivos .zip y .dmg.\n\nPero antes de cerrar, decidme una cosa... ¿os da miedo que la IA tome el control de vuestro ratón, o estáis tan hartos como yo de hacer clics repetitivos que le daríais hasta las llaves de casa?\n\nNos leemos. O nos lee la IA, quién sabe.",
+  "html_structure": {
+    "html": "<article class=\"blog-post\">\n<h1 id=\"me-he-obsesionado-con-un-cursor-que-se-mueve-solo-y-lo-que-eso-significa-para-openclaw\">Me he obsesionado con un cursor que se mueve solo (y lo que eso significa para OpenClaw)</h1>\n<p>Tengo que confesar algo, y no es algo de lo que me sienta especialmente orgulloso después de tantos años analizando tecnología: he vuelto a caer en la madriguera del conejo. Pero de forma insana. He pasado las últimas tres madrugadas, mientras mis maravillosos niños y mi mujer dormían plácidamente en nuestro miniresort burgués, mirando fijamente la pantalla de mi monitor. No estaba jugando, ni editando vídeo, ni siquiera escribiendo uno de esos sesudos análisis que tanto me gustan. Estaba mirando cómo un cursor se movía erráticamente por la pantalla, fallando estrepitosamente al intentar abrir una hoja de Excel, para luego, de repente, acertar y hacer algo que me voló la cabeza.</p>\n<p>Esa es mi cruzada particular ahora mismo: la autonomía. Pero no la autonomía de la batería de un iPhone, que eso ya nos da un poco igual a todos, sino la autonomía de la inteligencia artificial para \"tocarnos\" el ordenador. Y ahí es donde entra OpenClaw y todo este ecosistema que se está montando alrededor de Claude y su capacidad de <em>Computer Use</em>.</p>\n<p>El caso es que llevamos un par de años flipando con ChatGPT y sus respuestas, pero siempre ha habido una barrera física, una especie de cristal que separaba al modelo de nuestro sistema operativo. Tú le pedías algo, él te daba el código o el texto, y tú, como un humilde operario, lo pegabas donde tocaba. Ciertamente, eso era útil, pero no era \"mágico\". OpenClaw es parte de ese movimiento que quiere romper el cristal. Me alucina pensar que estamos a dos tardes de que la IA no solo me diga qué tengo que comprar en Amazon, sino que abra el navegador, busque la mejor oferta, gestione el carrito y me pregunte: \"Javi, ¿le doy a pagar?\".</p>\n<p>Total, que me puse a cacharrear. Dicho y hecho. Me bajé el repositorio, configuré las API keys de Anthropic (previa recarga de dólares, que esto no es gratis, amigos) y me dispuse a ver el futuro. La idea detrás de OpenClaw es fascinante porque intenta democratizar lo que Anthropic soltó de forma algo cruda con su implementación de referencia de <em>Computer Use</em>. Es ese puente que permite que el modelo de IA vea capturas de pantalla de tu escritorio, decida dónde está el botón de \"Enviar\" y mueva el ratón virtualmente para hacer clic.</p>\n<p>Como digo, el primer intento fue un desastre absoluto. Le pedí que buscara una foto de un Amiga 500 en Google Imágenes y la guardara en mi escritorio. El cursor empezó a bailar como si estuviera poseído por el espíritu de un usuario de Windows 95 con el ratón sucio. Abrió la calculadora, se quedó mirando el fondo de pantalla y luego decidió que lo mejor era cerrar la sesión. Me reí, claro. Pero en el segundo intento, tras ajustar un par de parámetros en el script de Python, la cosa cambió. Vi cómo abría Firefox, cómo escribía —letra a letra, con esa cadencia casi humana— la búsqueda, y cómo finalmente descargaba la imagen.</p>\n<p>Me quedé helado. Insanto. Es una sensación extraña, casi mística, ver que tu ordenador ha dejado de ser una herramienta pasiva para convertirse en un ente con \"manos\".</p>\n<p>¿Hacia dónde va todo esto? Pues mirad, yo creo que el futuro de OpenClaw y proyectos similares no es ser una curiosidad para cuatro locos del <em>cacharreo</em> como yo. El futuro es la desaparición de la interfaz tal y como la conocemos. Llevamos décadas aprendiendo dónde están los menús, memorizando atajos de teclado (el Cmd+Space es mi religión) y lidiando con diseños de experiencia de usuario que a veces parecen diseñados por el mismísimo diablo. Si la IA puede manejar el software por nosotros, ¿para qué necesito yo saber dónde está la opción de \"Combinar correspondencia\" en Word? Se lo pido a la IA, ella toma el control de OpenClaw, mueve el cursor, hace los clics necesarios y yo me dedico a lo mío, que probablemente sea jugar con mis maravillosos niños o pensar en qué nuevo gadget voy a comprarme para alimentar este vicio.</p>\n<p>Apple está intentando hacer algo parecido con su Apple Intelligence y el control de aplicaciones, pero ya sabéis cómo son en Cupertino: todo cerrado, todo bajo su control, y solo si usas sus apps. Lo que me atrae de OpenClaw es ese espíritu abierto. La posibilidad de que esto funcione en Linux, en Windows, en un Mac viejo o en una Raspberry Pi si me apuras. Es la innovación desde abajo, sin los muros de jardín vallado de las grandes corporaciones.</p>\n<p>Ciertamente, hay riesgos. El otro día pensaba: \"Si le doy permiso para mover el ratón y ver mi pantalla, ¿qué le impide vaciarme la cuenta corriente si el modelo alucina o si alguien hackea el intermediario?\". Es una pregunta legítima. Pero, qué queréis que os diga, la curiosidad siempre vence al miedo en mi caso. El potencial de automatización es tan salvaje que merece la pena el riesgo. Imaginaos el flujo de trabajo: recibes un correo con una factura, la IA la detecta, abre el programa de contabilidad, pica los datos, genera el PDF del trimestre y te deja el borrador listo para que tú solo le des al botón de enviar a la AEAT. Eso es salud mental, amigos. Eso es tiempo de vida recuperado.</p>\n<p>El caso es que OpenClaw todavía está verde. Muy verde. A veces se queda tonto mirando un icono, otras veces entra en un bucle infinito porque un pop-up le ha tapado la vista. Pero es que estamos en el momento \"módem de 14.400\". Estamos escuchando los ruidos de la conexión, esperando a que la web cargue línea a línea. Pero sabemos que después viene la fibra óptica.</p>\n<p>Me alucina el ritmo al que avanza Anthropic. Mientras OpenAI parece más centrada en que ChatGPT sea un compañero de voz encantador (que también está bien, no me malinterpretéis), la gente de Anthropic con Claude ha ido a por el trabajo sucio. A por la productividad real. Y OpenClaw es el brazo articulado que le faltaba a ese cerebro. Es la diferencia entre tener un consultor muy listo al lado y tener un asistente que además sabe usar las herramientas.</p>\n<p>Ayer, mientras cenaba un poco de embutido del bueno en el miniresort, le daba vueltas a la idea de si algún día escribiré estos posts simplemente dictando ideas generales y dejando que una instancia de OpenClaw mueva el cursor en mi Markdown editor, busque las imágenes, las optimice y las suba al blog. ¿Perdería el alma el texto? Quizás. Por eso insisto tanto en que el <em>cacharreo</em> debe ser personal. La IA debe ser el pincel, pero el brazo (aunque sea virtual) debe seguir nuestras órdenes.</p>\n<p>Total, que el futuro de OpenClaw es, en realidad, el futuro de nuestra relación con las máquinas. Vamos a pasar de \"usar\" ordenadores a \"dirigir\" ordenadores. Y eso, para alguien que empezó con un Spectrum cargando cintas durante diez minutos para luego jugar al <em>Jetpac</em>, es poco menos que ciencia ficción hecha realidad.</p>\n<p>Me voy a dormir, que mañana mis maravillosos niños me despertarán temprano y quiero tener la cabeza despejada para intentar que OpenClaw aprenda a organizar mi carpeta de descargas, que ahora mismo parece el escenario de una guerra nuclear de archivos .zip y .dmg.</p>\n<p>Pero antes de cerrar, decidme una cosa... ¿os da miedo que la IA tome el control de vuestro ratón, o estáis tan hartos como yo de hacer clics repetitivos que le daríais hasta las llaves de casa?</p>\n<p>Nos leemos. O nos lee la IA, quién sabe.</p>\n</article>",
+    "jsx": "<article className=\"blog-post\">\n<h1 id=\"me-he-obsesionado-con-un-cursor-que-se-mueve-solo-y-lo-que-eso-significa-para-openclaw\">Me he obsesionado con un cursor que se mueve solo (y lo que eso significa para OpenClaw)</h1>\n<p>Tengo que confesar algo, y no es algo de lo que me sienta especialmente orgulloso después de tantos años analizando tecnología: he vuelto a caer en la madriguera del conejo. Pero de forma insana. He pasado las últimas tres madrugadas, mientras mis maravillosos niños y mi mujer dormían plácidamente en nuestro miniresort burgués, mirando fijamente la pantalla de mi monitor. No estaba jugando, ni editando vídeo, ni siquiera escribiendo uno de esos sesudos análisis que tanto me gustan. Estaba mirando cómo un cursor se movía erráticamente por la pantalla, fallando estrepitosamente al intentar abrir una hoja de Excel, para luego, de repente, acertar y hacer algo que me voló la cabeza.</p>\n<p>Esa es mi cruzada particular ahora mismo: la autonomía. Pero no la autonomía de la batería de un iPhone, que eso ya nos da un poco igual a todos, sino la autonomía de la inteligencia artificial para \"tocarnos\" el ordenador. Y ahí es donde entra OpenClaw y todo este ecosistema que se está montando alrededor de Claude y su capacidad de <em>Computer Use</em>.</p>\n<p>El caso es que llevamos un par de años flipando con ChatGPT y sus respuestas, pero siempre ha habido una barrera física, una especie de cristal que separaba al modelo de nuestro sistema operativo. Tú le pedías algo, él te daba el código o el texto, y tú, como un humilde operario, lo pegabas donde tocaba. Ciertamente, eso era útil, pero no era \"mágico\". OpenClaw es parte de ese movimiento que quiere romper el cristal. Me alucina pensar que estamos a dos tardes de que la IA no solo me diga qué tengo que comprar en Amazon, sino que abra el navegador, busque la mejor oferta, gestione el carrito y me pregunte: \"Javi, ¿le doy a pagar?\".</p>\n<p>Total, que me puse a cacharrear. Dicho y hecho. Me bajé el repositorio, configuré las API keys de Anthropic (previa recarga de dólares, que esto no es gratis, amigos) y me dispuse a ver el futuro. La idea detrás de OpenClaw es fascinante porque intenta democratizar lo que Anthropic soltó de forma algo cruda con su implementación de referencia de <em>Computer Use</em>. Es ese puente que permite que el modelo de IA vea capturas de pantalla de tu escritorio, decida dónde está el botón de \"Enviar\" y mueva el ratón virtualmente para hacer clic.</p>\n<p>Como digo, el primer intento fue un desastre absoluto. Le pedí que buscara una foto de un Amiga 500 en Google Imágenes y la guardara en mi escritorio. El cursor empezó a bailar como si estuviera poseído por el espíritu de un usuario de Windows 95 con el ratón sucio. Abrió la calculadora, se quedó mirando el fondo de pantalla y luego decidió que lo mejor era cerrar la sesión. Me reí, claro. Pero en el segundo intento, tras ajustar un par de parámetros en el script de Python, la cosa cambió. Vi cómo abría Firefox, cómo escribía —letra a letra, con esa cadencia casi humana— la búsqueda, y cómo finalmente descargaba la imagen.</p>\n<p>Me quedé helado. Insanto. Es una sensación extraña, casi mística, ver que tu ordenador ha dejado de ser una herramienta pasiva para convertirse en un ente con \"manos\".</p>\n<p>¿Hacia dónde va todo esto? Pues mirad, yo creo que el futuro de OpenClaw y proyectos similares no es ser una curiosidad para cuatro locos del <em>cacharreo</em> como yo. El futuro es la desaparición de la interfaz tal y como la conocemos. Llevamos décadas aprendiendo dónde están los menús, memorizando atajos de teclado (el Cmd+Space es mi religión) y lidiando con diseños de experiencia de usuario que a veces parecen diseñados por el mismísimo diablo. Si la IA puede manejar el software por nosotros, ¿para qué necesito yo saber dónde está la opción de \"Combinar correspondencia\" en Word? Se lo pido a la IA, ella toma el control de OpenClaw, mueve el cursor, hace los clics necesarios y yo me dedico a lo mío, que probablemente sea jugar con mis maravillosos niños o pensar en qué nuevo gadget voy a comprarme para alimentar este vicio.</p>\n<p>Apple está intentando hacer algo parecido con su Apple Intelligence y el control de aplicaciones, pero ya sabéis cómo son en Cupertino: todo cerrado, todo bajo su control, y solo si usas sus apps. Lo que me atrae de OpenClaw es ese espíritu abierto. La posibilidad de que esto funcione en Linux, en Windows, en un Mac viejo o en una Raspberry Pi si me apuras. Es la innovación desde abajo, sin los muros de jardín vallado de las grandes corporaciones.</p>\n<p>Ciertamente, hay riesgos. El otro día pensaba: \"Si le doy permiso para mover el ratón y ver mi pantalla, ¿qué le impide vaciarme la cuenta corriente si el modelo alucina o si alguien hackea el intermediario?\". Es una pregunta legítima. Pero, qué queréis que os diga, la curiosidad siempre vence al miedo en mi caso. El potencial de automatización es tan salvaje que merece la pena el riesgo. Imaginaos el flujo de trabajo: recibes un correo con una factura, la IA la detecta, abre el programa de contabilidad, pica los datos, genera el PDF del trimestre y te deja el borrador listo para que tú solo le des al botón de enviar a la AEAT. Eso es salud mental, amigos. Eso es tiempo de vida recuperado.</p>\n<p>El caso es que OpenClaw todavía está verde. Muy verde. A veces se queda tonto mirando un icono, otras veces entra en un bucle infinito porque un pop-up le ha tapado la vista. Pero es que estamos en el momento \"módem de 14.400\". Estamos escuchando los ruidos de la conexión, esperando a que la web cargue línea a línea. Pero sabemos que después viene la fibra óptica.</p>\n<p>Me alucina el ritmo al que avanza Anthropic. Mientras OpenAI parece más centrada en que ChatGPT sea un compañero de voz encantador (que también está bien, no me malinterpretéis), la gente de Anthropic con Claude ha ido a por el trabajo sucio. A por la productividad real. Y OpenClaw es el brazo articulado que le faltaba a ese cerebro. Es la diferencia entre tener un consultor muy listo al lado y tener un asistente que además sabe usar las herramientas.</p>\n<p>Ayer, mientras cenaba un poco de embutido del bueno en el miniresort, le daba vueltas a la idea de si algún día escribiré estos posts simplemente dictando ideas generales y dejando que una instancia de OpenClaw mueva el cursor en mi Markdown editor, busque las imágenes, las optimice y las suba al blog. ¿Perdería el alma el texto? Quizás. Por eso insisto tanto en que el <em>cacharreo</em> debe ser personal. La IA debe ser el pincel, pero el brazo (aunque sea virtual) debe seguir nuestras órdenes.</p>\n<p>Total, que el futuro de OpenClaw es, en realidad, el futuro de nuestra relación con las máquinas. Vamos a pasar de \"usar\" ordenadores a \"dirigir\" ordenadores. Y eso, para alguien que empezó con un Spectrum cargando cintas durante diez minutos para luego jugar al <em>Jetpac</em>, es poco menos que ciencia ficción hecha realidad.</p>\n<p>Me voy a dormir, que mañana mis maravillosos niños me despertarán temprano y quiero tener la cabeza despejada para intentar que OpenClaw aprenda a organizar mi carpeta de descargas, que ahora mismo parece el escenario de una guerra nuclear de archivos .zip y .dmg.</p>\n<p>Pero antes de cerrar, decidme una cosa... ¿os da miedo que la IA tome el control de vuestro ratón, o estáis tan hartos como yo de hacer clics repetitivos que le daríais hasta las llaves de casa?</p>\n<p>Nos leemos. O nos lee la IA, quién sabe.</p>\n</article>",
+    "metadata": {
+      "title": "Me he obsesionado con un cursor que se mueve solo (y lo que eso significa para OpenClaw)",
+      "description": "Tengo que confesar algo, y no es algo de lo que me sienta especialmente orgulloso después de tantos años analizando tecnología: he vuelto a caer en la madrig...",
+      "keywords": [
+        "openclaw",
+        "cursor",
+        "mirando",
+        "hacer",
+        "dónde",
+        "futuro",
+        "mientras",
+        "maravillosos",
+        "niños",
+        "pantalla"
+      ],
+      "reading_time": 6,
+      "word_count": 1273,
+      "slug": "el-futuro-de-openclaw"
+    },
+    "headings": [],
+    "nextjs_component": "import React from 'react';\nimport Head from 'next/head';\n\nexport default function BlogPost() {\n  return (\n    <>\n      <Head>\n        <title>Me he obsesionado con un cursor que se mueve solo (y lo que eso significa para OpenClaw)</title>\n        <meta name=\"description\" content=\"Tengo que confesar algo, y no es algo de lo que me sienta especialmente orgulloso después de tantos años analizando tecnología: he vuelto a caer en la madrig...\" />\n        <meta name=\"keywords\" content=\"openclaw, cursor, mirando, hacer, dónde, futuro, mientras, maravillosos, niños, pantalla\" />\n        <meta property=\"og:title\" content=\"Me he obsesionado con un cursor que se mueve solo (y lo que eso significa para OpenClaw)\" />\n        <meta property=\"og:description\" content=\"Tengo que confesar algo, y no es algo de lo que me sienta especialmente orgulloso después de tantos años analizando tecnología: he vuelto a caer en la madrig...\" />\n        <meta property=\"og:type\" content=\"article\" />\n        <meta name=\"twitter:card\" content=\"summary_large_image\" />\n      </Head>\n      \n      <div className=\"container mx-auto px-4 py-8\">\n        <div className=\"max-w-4xl mx-auto\">\n          <div className=\"mb-4 text-sm text-gray-600\">\n            6 min lectura • 1273 palabras\n          </div>\n          \n          <article className=\"blog-post\">\n<h1 id=\"me-he-obsesionado-con-un-cursor-que-se-mueve-solo-y-lo-que-eso-significa-para-openclaw\">Me he obsesionado con un cursor que se mueve solo (y lo que eso significa para OpenClaw)</h1>\n<p>Tengo que confesar algo, y no es algo de lo que me sienta especialmente orgulloso después de tantos años analizando tecnología: he vuelto a caer en la madriguera del conejo. Pero de forma insana. He pasado las últimas tres madrugadas, mientras mis maravillosos niños y mi mujer dormían plácidamente en nuestro miniresort burgués, mirando fijamente la pantalla de mi monitor. No estaba jugando, ni editando vídeo, ni siquiera escribiendo uno de esos sesudos análisis que tanto me gustan. Estaba mirando cómo un cursor se movía erráticamente por la pantalla, fallando estrepitosamente al intentar abrir una hoja de Excel, para luego, de repente, acertar y hacer algo que me voló la cabeza.</p>\n<p>Esa es mi cruzada particular ahora mismo: la autonomía. Pero no la autonomía de la batería de un iPhone, que eso ya nos da un poco igual a todos, sino la autonomía de la inteligencia artificial para \"tocarnos\" el ordenador. Y ahí es donde entra OpenClaw y todo este ecosistema que se está montando alrededor de Claude y su capacidad de <em>Computer Use</em>.</p>\n<p>El caso es que llevamos un par de años flipando con ChatGPT y sus respuestas, pero siempre ha habido una barrera física, una especie de cristal que separaba al modelo de nuestro sistema operativo. Tú le pedías algo, él te daba el código o el texto, y tú, como un humilde operario, lo pegabas donde tocaba. Ciertamente, eso era útil, pero no era \"mágico\". OpenClaw es parte de ese movimiento que quiere romper el cristal. Me alucina pensar que estamos a dos tardes de que la IA no solo me diga qué tengo que comprar en Amazon, sino que abra el navegador, busque la mejor oferta, gestione el carrito y me pregunte: \"Javi, ¿le doy a pagar?\".</p>\n<p>Total, que me puse a cacharrear. Dicho y hecho. Me bajé el repositorio, configuré las API keys de Anthropic (previa recarga de dólares, que esto no es gratis, amigos) y me dispuse a ver el futuro. La idea detrás de OpenClaw es fascinante porque intenta democratizar lo que Anthropic soltó de forma algo cruda con su implementación de referencia de <em>Computer Use</em>. Es ese puente que permite que el modelo de IA vea capturas de pantalla de tu escritorio, decida dónde está el botón de \"Enviar\" y mueva el ratón virtualmente para hacer clic.</p>\n<p>Como digo, el primer intento fue un desastre absoluto. Le pedí que buscara una foto de un Amiga 500 en Google Imágenes y la guardara en mi escritorio. El cursor empezó a bailar como si estuviera poseído por el espíritu de un usuario de Windows 95 con el ratón sucio. Abrió la calculadora, se quedó mirando el fondo de pantalla y luego decidió que lo mejor era cerrar la sesión. Me reí, claro. Pero en el segundo intento, tras ajustar un par de parámetros en el script de Python, la cosa cambió. Vi cómo abría Firefox, cómo escribía —letra a letra, con esa cadencia casi humana— la búsqueda, y cómo finalmente descargaba la imagen.</p>\n<p>Me quedé helado. Insanto. Es una sensación extraña, casi mística, ver que tu ordenador ha dejado de ser una herramienta pasiva para convertirse en un ente con \"manos\".</p>\n<p>¿Hacia dónde va todo esto? Pues mirad, yo creo que el futuro de OpenClaw y proyectos similares no es ser una curiosidad para cuatro locos del <em>cacharreo</em> como yo. El futuro es la desaparición de la interfaz tal y como la conocemos. Llevamos décadas aprendiendo dónde están los menús, memorizando atajos de teclado (el Cmd+Space es mi religión) y lidiando con diseños de experiencia de usuario que a veces parecen diseñados por el mismísimo diablo. Si la IA puede manejar el software por nosotros, ¿para qué necesito yo saber dónde está la opción de \"Combinar correspondencia\" en Word? Se lo pido a la IA, ella toma el control de OpenClaw, mueve el cursor, hace los clics necesarios y yo me dedico a lo mío, que probablemente sea jugar con mis maravillosos niños o pensar en qué nuevo gadget voy a comprarme para alimentar este vicio.</p>\n<p>Apple está intentando hacer algo parecido con su Apple Intelligence y el control de aplicaciones, pero ya sabéis cómo son en Cupertino: todo cerrado, todo bajo su control, y solo si usas sus apps. Lo que me atrae de OpenClaw es ese espíritu abierto. La posibilidad de que esto funcione en Linux, en Windows, en un Mac viejo o en una Raspberry Pi si me apuras. Es la innovación desde abajo, sin los muros de jardín vallado de las grandes corporaciones.</p>\n<p>Ciertamente, hay riesgos. El otro día pensaba: \"Si le doy permiso para mover el ratón y ver mi pantalla, ¿qué le impide vaciarme la cuenta corriente si el modelo alucina o si alguien hackea el intermediario?\". Es una pregunta legítima. Pero, qué queréis que os diga, la curiosidad siempre vence al miedo en mi caso. El potencial de automatización es tan salvaje que merece la pena el riesgo. Imaginaos el flujo de trabajo: recibes un correo con una factura, la IA la detecta, abre el programa de contabilidad, pica los datos, genera el PDF del trimestre y te deja el borrador listo para que tú solo le des al botón de enviar a la AEAT. Eso es salud mental, amigos. Eso es tiempo de vida recuperado.</p>\n<p>El caso es que OpenClaw todavía está verde. Muy verde. A veces se queda tonto mirando un icono, otras veces entra en un bucle infinito porque un pop-up le ha tapado la vista. Pero es que estamos en el momento \"módem de 14.400\". Estamos escuchando los ruidos de la conexión, esperando a que la web cargue línea a línea. Pero sabemos que después viene la fibra óptica.</p>\n<p>Me alucina el ritmo al que avanza Anthropic. Mientras OpenAI parece más centrada en que ChatGPT sea un compañero de voz encantador (que también está bien, no me malinterpretéis), la gente de Anthropic con Claude ha ido a por el trabajo sucio. A por la productividad real. Y OpenClaw es el brazo articulado que le faltaba a ese cerebro. Es la diferencia entre tener un consultor muy listo al lado y tener un asistente que además sabe usar las herramientas.</p>\n<p>Ayer, mientras cenaba un poco de embutido del bueno en el miniresort, le daba vueltas a la idea de si algún día escribiré estos posts simplemente dictando ideas generales y dejando que una instancia de OpenClaw mueva el cursor en mi Markdown editor, busque las imágenes, las optimice y las suba al blog. ¿Perdería el alma el texto? Quizás. Por eso insisto tanto en que el <em>cacharreo</em> debe ser personal. La IA debe ser el pincel, pero el brazo (aunque sea virtual) debe seguir nuestras órdenes.</p>\n<p>Total, que el futuro de OpenClaw es, en realidad, el futuro de nuestra relación con las máquinas. Vamos a pasar de \"usar\" ordenadores a \"dirigir\" ordenadores. Y eso, para alguien que empezó con un Spectrum cargando cintas durante diez minutos para luego jugar al <em>Jetpac</em>, es poco menos que ciencia ficción hecha realidad.</p>\n<p>Me voy a dormir, que mañana mis maravillosos niños me despertarán temprano y quiero tener la cabeza despejada para intentar que OpenClaw aprenda a organizar mi carpeta de descargas, que ahora mismo parece el escenario de una guerra nuclear de archivos .zip y .dmg.</p>\n<p>Pero antes de cerrar, decidme una cosa... ¿os da miedo que la IA tome el control de vuestro ratón, o estáis tan hartos como yo de hacer clics repetitivos que le daríais hasta las llaves de casa?</p>\n<p>Nos leemos. O nos lee la IA, quién sabe.</p>\n</article>\n        </div>\n      </div>\n    </>\n  );\n}\n"
+  },
+  "image_prompts": [
+    {
+      "position": "header",
+      "prompt": "Professional, modern hero image representing El futuro de OpenClaw. Clean design, technology theme, high quality, 16:9 aspect ratio",
+      "alt_text": "Hero image about El futuro de OpenClaw",
+      "context": "Main visual to grab attention"
+    },
+    {
+      "position": "section-1",
+      "prompt": "Supporting image about El futuro de OpenClaw, modern design, technology theme",
+      "alt_text": "Supporting image 1 for El futuro de OpenClaw",
+      "context": "Additional visual content"
+    },
+    {
+      "position": "section-2",
+      "prompt": "Supporting image about El futuro de OpenClaw, modern design, technology theme",
+      "alt_text": "Supporting image 2 for El futuro de OpenClaw",
+      "context": "Additional visual content"
+    }
+  ],
+  "metadata": {
+    "duration": 44.435274,
+    "phases": {
+      "style_analysis": {
+        "phase_name": "style_analysis",
+        "status": "completed",
+        "start_time": "2026-04-06T16:59:51.977681",
+        "end_time": "2026-04-06T16:59:57.955597",
+        "duration": 5.977916,
+        "agent_name": "StyleAnalyzer",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "keyword_extraction": {
+        "phase_name": "keyword_extraction",
+        "status": "completed",
+        "start_time": "2026-04-06T16:59:57.955607",
+        "end_time": "2026-04-06T17:00:03.223148",
+        "duration": 5.267541,
+        "agent_name": "KeywordExtractor",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "content_generation": {
+        "phase_name": "content_generation",
+        "status": "completed",
+        "start_time": "2026-04-06T17:00:03.223159",
+        "end_time": "2026-04-06T17:00:21.367268",
+        "duration": 18.144109,
+        "agent_name": "ContentGenerator",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "critique": {
+        "phase_name": "critique",
+        "status": "completed",
+        "start_time": "2026-04-06T17:00:21.367278",
+        "end_time": "2026-04-06T17:00:28.569719",
+        "duration": 7.202441,
+        "agent_name": "CriticAgent",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "html_building": {
+        "phase_name": "html_building",
+        "status": "completed",
+        "start_time": "2026-04-06T17:00:28.569732",
+        "end_time": "2026-04-06T17:00:28.878029",
+        "duration": 0.308297,
+        "agent_name": "HTMLBuilder",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gpt-4-turbo-preview",
+        "retry_count": 0
+      },
+      "image_selection": {
+        "phase_name": "image_selection",
+        "status": "completed",
+        "start_time": "2026-04-06T17:00:28.878041",
+        "end_time": "2026-04-06T17:00:36.412815",
+        "duration": 7.534774,
+        "agent_name": "ImageSelectorAgent",
+        "error": null,
+        "error_type": null,
+        "fallback_used": true,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      }
+    },
+    "errors": [],
+    "warnings": []
+  }
+}

@@ -7,7 +7,7 @@ LLM settings, retry policies, and workflow parameters.
 
 import os
 from dataclasses import dataclass, field
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 import toml
 from pathlib import Path
 
@@ -30,19 +30,28 @@ class OrchestratorConfig:
     enable_critique: bool = True
     max_critique_iterations: int = 2
     verbose: bool = True
+    enable_continuous_publishing: bool = False
     
     # Content Settings
     min_word_count: int = 800
     max_word_count: int = 2500
+    publish_interval_hours: float = 12.0
+    redundancy_threshold: float = 0.8
+    redundancy_window_days: int = 14
+    critical_degradation_hours: float = 24.0
+    continuous_backoff_seconds: Tuple[float, ...] = (300.0, 900.0, 1800.0)
+    write_canonical_docs: bool = False
+    docs_output_dir: str = "docs"
     
     # API Keys (from environment)
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     huggingface_token: Optional[str] = None
+    gemini_api_key: Optional[str] = None
     modal_api_key: Optional[str] = None
     
     # Provider Settings
-    provider: str = "auto"  # "auto", "huggingface", "openai", "modal"
+    provider: str = "auto"  # "auto", "huggingface", "openai", "gemini", "modal"
     
     # Timeouts
     agent_timeout: int = 60  # seconds per agent
@@ -68,13 +77,21 @@ class OrchestratorConfig:
             enable_critique=workflow.get('enable_critic', True),
             max_critique_iterations=workflow.get('max_iterations', 2),
             verbose=workflow.get('verbose', True),
+            enable_continuous_publishing=workflow.get('enable_continuous_publishing', False),
             min_word_count=content.get('min_word_count', 800),
             max_word_count=content.get('max_word_count', 2500),
+            publish_interval_hours=workflow.get('publish_interval_hours', 12.0),
+            redundancy_threshold=workflow.get('redundancy_threshold', 0.8),
+            redundancy_window_days=workflow.get('redundancy_window_days', 14),
+            critical_degradation_hours=workflow.get('critical_degradation_hours', 24.0),
             openai_api_key=os.getenv('OPENAI_API_KEY'),
             anthropic_api_key=os.getenv('ANTHROPIC_API_KEY'),
             huggingface_token=os.getenv('HF_TOKEN') or os.getenv('HUGGINGFACE_TOKEN'),
+            gemini_api_key=os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY'),
             modal_api_key=os.getenv('MODAL_API_KEY'),
             provider=models.get('provider', 'auto'),
+            write_canonical_docs=workflow.get('write_canonical_docs', False),
+            docs_output_dir=workflow.get('docs_output_dir', 'docs'),
         )
     
     @classmethod
@@ -84,22 +101,40 @@ class OrchestratorConfig:
             openai_api_key=os.getenv('OPENAI_API_KEY'),
             anthropic_api_key=os.getenv('ANTHROPIC_API_KEY'),
             huggingface_token=os.getenv('HF_TOKEN') or os.getenv('HUGGINGFACE_TOKEN'),
+            gemini_api_key=os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY'),
             modal_api_key=os.getenv('MODAL_API_KEY'),
         )
     
     def validate(self) -> None:
         """Validate configuration."""
+        def _has_value(value: Optional[str]) -> bool:
+            return bool(value and str(value).strip())
+
+        modal_pair = bool(os.getenv('MODAL_TOKEN_ID') and os.getenv('MODAL_TOKEN_SECRET'))
+
+        provider = (self.provider or "auto").lower()
+        if provider == "openai" and not _has_value(self.openai_api_key):
+            raise ValueError("Provider 'openai' selected but OPENAI_API_KEY is not configured")
+        if provider == "huggingface" and not _has_value(self.huggingface_token):
+            raise ValueError("Provider 'huggingface' selected but HF_TOKEN/HUGGINGFACE_TOKEN is not configured")
+        if provider == "gemini" and not _has_value(self.gemini_api_key):
+            raise ValueError("Provider 'gemini' selected but GEMINI_API_KEY/GOOGLE_API_KEY is not configured")
+        if provider == "modal" and not (_has_value(self.modal_api_key) or modal_pair):
+            raise ValueError("Provider 'modal' selected but MODAL_API_KEY or MODAL_TOKEN_ID/SECRET is not configured")
+
+        # Check standard env vars as fallback for validation
         has_key = any([
-            self.openai_api_key, 
-            self.anthropic_api_key, 
-            self.huggingface_token, 
-            self.modal_api_key,
-            os.getenv('MODAL_TOKEN_ID') and os.getenv('MODAL_TOKEN_SECRET')
+            _has_value(self.openai_api_key), 
+            _has_value(self.anthropic_api_key), 
+            _has_value(self.huggingface_token), 
+            _has_value(self.gemini_api_key),
+            _has_value(self.modal_api_key),
+            modal_pair,
         ])
         
         if not has_key:
             raise ValueError(
-                "At least one API key must be set: OPENAI_API_KEY, HF_TOKEN, or MODAL_TOKEN_ID/SECRET"
+                "At least one API key must be set: OPENAI_API_KEY, HF_TOKEN, GEMINI_API_KEY, or MODAL_TOKEN_ID/SECRET"
             )
         
         if self.max_retries < 0:
@@ -110,6 +145,21 @@ class OrchestratorConfig:
         
         if self.min_word_count > self.max_word_count:
             raise ValueError("min_word_count cannot be greater than max_word_count")
+
+        if self.publish_interval_hours <= 0:
+            raise ValueError("publish_interval_hours must be > 0")
+
+        if not 0 <= self.redundancy_threshold <= 1:
+            raise ValueError("redundancy_threshold must be between 0 and 1")
+
+        if self.redundancy_window_days <= 0:
+            raise ValueError("redundancy_window_days must be > 0")
+
+        if self.critical_degradation_hours <= 0:
+            raise ValueError("critical_degradation_hours must be > 0")
+
+        if self.max_retries > 0 and len(self.continuous_backoff_seconds) == 0:
+            raise ValueError("continuous_backoff_seconds cannot be empty when retries are enabled")
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert config to dictionary."""
@@ -120,4 +170,11 @@ class OrchestratorConfig:
             'max_retries': self.max_retries,
             'enable_critique': self.enable_critique,
             'verbose': self.verbose,
+            'enable_continuous_publishing': self.enable_continuous_publishing,
+            'publish_interval_hours': self.publish_interval_hours,
+            'redundancy_threshold': self.redundancy_threshold,
+            'redundancy_window_days': self.redundancy_window_days,
+            'critical_degradation_hours': self.critical_degradation_hours,
+            'write_canonical_docs': self.write_canonical_docs,
+            'docs_output_dir': self.docs_output_dir,
         }

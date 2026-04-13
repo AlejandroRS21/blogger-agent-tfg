@@ -227,3 +227,10 @@ build/
 out/
 *.log
 .env*
+
+# Universal OS/editor temp files
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.idea/

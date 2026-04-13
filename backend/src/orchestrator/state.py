@@ -20,6 +20,14 @@ class PhaseStatus(Enum):
     SKIPPED = "skipped"
 
 
+class OperationalStatus(Enum):
+    """Operational status for continuous publishing mode."""
+
+    ACTIVE = "active"
+    PAUSED = "paused"
+    DEGRADED = "degraded"
+
+
 @dataclass
 class PhaseResult:
     """Result of a single phase execution."""
@@ -31,6 +39,10 @@ class PhaseResult:
     agent_name: Optional[str] = None
     output: Optional[Any] = None
     error: Optional[str] = None
+    error_type: Optional[str] = None
+    fallback_used: bool = False
+    effective_provider: Optional[str] = None
+    effective_model: Optional[str] = None
     retry_count: int = 0
     
     def to_dict(self) -> Dict[str, Any]:
@@ -43,6 +55,10 @@ class PhaseResult:
             'duration': self.duration,
             'agent_name': self.agent_name,
             'error': self.error,
+            'error_type': self.error_type,
+            'fallback_used': self.fallback_used,
+            'effective_provider': self.effective_provider,
+            'effective_model': self.effective_model,
             'retry_count': self.retry_count,
         }
 
@@ -80,6 +96,10 @@ class WorkflowState:
     
     # Metadata
     metadata: Dict[str, Any] = field(default_factory=dict)
+    operational_status: OperationalStatus = OperationalStatus.ACTIVE
+    pause_requested: bool = False
+    degradation_started_at: Optional[datetime] = None
+    last_cycle_at: Optional[datetime] = None
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert state to dictionary."""
@@ -97,6 +117,10 @@ class WorkflowState:
             'errors': self.errors,
             'warnings': self.warnings,
             'metadata': self.metadata,
+            'operational_status': self.operational_status.value,
+            'pause_requested': self.pause_requested,
+            'degradation_started_at': self.degradation_started_at.isoformat() if self.degradation_started_at else None,
+            'last_cycle_at': self.last_cycle_at.isoformat() if self.last_cycle_at else None,
         }
     
     def to_json(self, indent: int = 2) -> str:
@@ -124,7 +148,11 @@ class StateManager:
         self,
         phase_name: str,
         output: Any = None,
-        warning: Optional[str] = None
+        warning: Optional[str] = None,
+        error_type: Optional[str] = None,
+        fallback_used: bool = False,
+        effective_provider: Optional[str] = None,
+        effective_model: Optional[str] = None,
     ) -> None:
         """Mark a phase as completed."""
         if phase_name not in self.state.phases:
@@ -135,11 +163,21 @@ class StateManager:
         phase.end_time = datetime.now()
         phase.duration = (phase.end_time - phase.start_time).total_seconds()
         phase.output = output
+        phase.error_type = error_type
+        phase.fallback_used = fallback_used
+        phase.effective_provider = effective_provider
+        phase.effective_model = effective_model
         
         if warning:
             self.state.warnings.append(f"[{phase_name}] {warning}")
     
-    def fail_phase(self, phase_name: str, error: str, retry: bool = False) -> None:
+    def fail_phase(
+        self,
+        phase_name: str,
+        error: str,
+        retry: bool = False,
+        error_type: Optional[str] = None,
+    ) -> None:
         """Mark a phase as failed."""
         if phase_name not in self.state.phases:
             raise ValueError(f"Phase {phase_name} not started")
@@ -155,6 +193,7 @@ class StateManager:
             phase.duration = (phase.end_time - phase.start_time).total_seconds()
         
         phase.error = error
+        phase.error_type = error_type
         self.state.errors.append(f"[{phase_name}] {error}")
     
     def skip_phase(self, phase_name: str, reason: str) -> None:
@@ -173,6 +212,29 @@ class StateManager:
             self.state.end_time - self.state.start_time
         ).total_seconds()
         self.state.current_phase = None
+
+    def set_operational_status(self, status: OperationalStatus) -> None:
+        """Set operational status for continuous publishing mode."""
+        self.state.operational_status = status
+        if status == OperationalStatus.DEGRADED and not self.state.degradation_started_at:
+            self.state.degradation_started_at = datetime.now()
+        if status != OperationalStatus.DEGRADED:
+            self.state.degradation_started_at = None
+
+    def mark_cycle_completed(self) -> None:
+        """Track end of a continuous cycle."""
+        self.state.last_cycle_at = datetime.now()
+
+    def get_operational_snapshot(self) -> Dict[str, Any]:
+        """Expose a concise operational status snapshot."""
+        return {
+            "status": self.state.operational_status.value,
+            "pause_requested": self.state.pause_requested,
+            "last_cycle_at": self.state.last_cycle_at.isoformat() if self.state.last_cycle_at else None,
+            "degradation_started_at": self.state.degradation_started_at.isoformat() if self.state.degradation_started_at else None,
+            "errors": len(self.state.errors),
+            "warnings": len(self.state.warnings),
+        }
     
     def get_summary(self) -> Dict[str, Any]:
         """Get execution summary."""

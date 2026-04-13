@@ -6,14 +6,18 @@ for image placement in blog posts.
 """
 
 from typing import List, Dict, Any, Optional
-import os
 import re
+import json
+import logging
 
 try:
     from ..llm import create_llm_provider, LLMProvider
     LLM_AVAILABLE = True
 except ImportError:
     LLM_AVAILABLE = False
+
+
+logger = logging.getLogger(__name__)
 
 
 class ImageSelectorAgent:
@@ -55,7 +59,7 @@ class ImageSelectorAgent:
                     max_tokens=1000
                 )
             except Exception as e:
-                print(f"Warning: Failed to initialize LLM provider: {e}")
+                logger.warning("Failed to initialize LLM provider: %s", e)
                 self.llm = None
         else:
             self.llm = None
@@ -118,14 +122,78 @@ Return ONLY valid JSON array."""
             )
             
             response = self.llm.chat_completion(messages)
-            
-            import json
-            result = json.loads(response.content)
+
+            result = self._parse_llm_images(response.content, topic, num_images)
             return result
             
         except Exception as e:
-            print(f"Warning: Image selection failed: {e}. Using fallback.")
+            logger.warning("Image selection failed: %s. Using fallback.", e)
             return self._fallback_selection(content, topic, num_images)
+
+    def _parse_llm_images(self, raw_content: str, topic: str, num_images: int) -> List[Dict[str, str]]:
+        """Parse and normalize LLM JSON image payloads with markdown/noise tolerance."""
+        content = (raw_content or "").strip()
+        if not content:
+            raise ValueError("Empty image selection response")
+
+        # Remove markdown fences if present.
+        content = re.sub(r"^```(?:json)?\s*", "", content, flags=re.IGNORECASE)
+        content = re.sub(r"\s*```$", "", content)
+
+        parsed: Any
+        try:
+            parsed = json.loads(content)
+        except json.JSONDecodeError:
+            # Recover first JSON array in noisy responses.
+            match = re.search(r"\[(.|\n)*\]", content)
+            if not match:
+                raise
+            parsed = json.loads(match.group(0))
+
+        if isinstance(parsed, dict):
+            parsed = parsed.get("images") or parsed.get("data") or []
+
+        if not isinstance(parsed, list) or not parsed:
+            raise ValueError("Invalid image selection payload")
+
+        normalized: List[Dict[str, str]] = []
+        for i, item in enumerate(parsed[:num_images]):
+            if not isinstance(item, dict):
+                continue
+            position = str(item.get("position", f"section-{i}"))
+            prompt = str(item.get("prompt", "")).strip()
+            alt_text = str(item.get("alt_text", "")).strip()
+            context = str(item.get("context", "Additional visual content")).strip()
+
+            if not prompt:
+                prompt = f"Supporting image about {topic}, modern design, technology theme"
+            if not alt_text:
+                alt_text = f"Supporting image {i + 1} for {topic}"
+
+            normalized.append(
+                {
+                    "position": position,
+                    "prompt": prompt,
+                    "alt_text": alt_text,
+                    "context": context,
+                }
+            )
+
+        if not normalized:
+            raise ValueError("No valid image items found in payload")
+
+        while len(normalized) < num_images:
+            idx = len(normalized)
+            normalized.append(
+                {
+                    "position": f"section-{idx}",
+                    "prompt": f"Supporting image about {topic}, modern design, technology theme",
+                    "alt_text": f"Supporting image {idx + 1} for {topic}",
+                    "context": "Additional visual content",
+                }
+            )
+
+        return normalized[:num_images]
     
     def _fallback_selection(
         self,

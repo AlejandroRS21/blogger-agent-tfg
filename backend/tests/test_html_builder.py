@@ -1,6 +1,7 @@
 """Tests for HTMLBuilder agent."""
 
 import pytest
+import json
 from aphra_blogger.agents.html_builder import HTMLBuilder, HTMLOutput
 
 
@@ -317,23 +318,53 @@ class TestHTMLBuilderEdgeCases:
     def test_content_without_headings(self):
         """Test content without any headings."""
         builder = HTMLBuilder(api_key=None)
-        
         markdown = "Just plain content without any headings."
         output = builder.build(content=markdown, topic="Test")
-        
+
         assert isinstance(output.headings, list)
-        # May be empty list
-    
+
     def test_special_characters_in_content(self):
         """Test handling of special characters."""
         builder = HTMLBuilder(api_key=None)
-        
+
         markdown = "# Title with <special> & characters\n\nContent with © and ™"
         output = builder.build(content=markdown, topic="Test")
-        
+
         # Should handle gracefully
         assert output.html
         assert output.jsx
+
+
+class TestCanonicalArtifacts:
+    """Tests for docs canonical artifact generation."""
+
+    def test_write_canonical_artifacts_consistency(self, tmp_path):
+        builder = HTMLBuilder(api_key=None)
+        html_structure = {
+            "html": "<article><h1>Post</h1></article>",
+            "metadata": {
+                "slug": "post-test",
+                "title": "Post Test",
+                "description": "desc",
+            },
+        }
+        record = builder.write_canonical_artifacts(
+            html_structure=html_structure,
+            topic="Post Test",
+            docs_root=str(tmp_path),
+            content="contenido de prueba",
+        )
+
+        posts_index = tmp_path / "posts.json"
+        post_file = tmp_path / "posts" / "post-test.json"
+        assert posts_index.exists()
+        assert post_file.exists()
+
+        index_data = json.loads(posts_index.read_text(encoding="utf-8"))
+        post_data = json.loads(post_file.read_text(encoding="utf-8"))
+        assert index_data[0]["slug"] == "post-test"
+        assert post_data["slug"] == "post-test"
+        assert record["slug"] == "post-test"
 
 
 if __name__ == '__main__':

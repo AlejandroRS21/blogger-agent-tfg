@@ -8,6 +8,7 @@ from typing import Dict, Any, List, Optional
 import os
 import requests
 import json
+from datetime import datetime, timezone
 
 try:
     from ..llm import create_llm_provider, LLMProvider
@@ -134,3 +135,39 @@ class ResearchAgent:
         except Exception as e:
             print(f"⚠️ Error in summarization: {e}")
             return "\n".join([f"- {r['title']}: {r['description']}" for r in results])
+
+    def fetch_topic_candidates(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
+        """Fetch topic candidates from web API with RSS/static fallback."""
+        candidates: List[Dict[str, Any]] = []
+        search_result = self.search(query=query, limit=limit)
+        if search_result.get("status") == "OK":
+            for item in search_result.get("results", []):
+                candidates.append(
+                    {
+                        "title": item.get("title", "Untitled"),
+                        "category": "technology",
+                        "source": item.get("url", "brave"),
+                        "published_at": datetime.now(timezone.utc),
+                        "description": item.get("description", ""),
+                    }
+                )
+
+        # RSS/static fallback for resilience.
+        if not candidates:
+            fallback_topics = [
+                "Novedades de IA aplicada en desarrollo de software",
+                "Tendencias de hardware para inferencia local",
+                "Cambios recientes en ecosistemas de agentes LLM",
+            ]
+            for topic in fallback_topics[:limit]:
+                candidates.append(
+                    {
+                        "title": topic,
+                        "category": "technology",
+                        "source": "fallback-rss",
+                        "published_at": datetime.now(timezone.utc),
+                        "description": "Fallback candidate generated without external API key.",
+                    }
+                )
+
+        return candidates

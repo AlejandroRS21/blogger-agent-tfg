@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 from aphra_blogger.agents.content_generator import ContentGenerator
+from src.orchestrator.continuous.validation import DraftValidator
 
 class TestStructuralDiversity(unittest.TestCase):
     def setUp(self):
@@ -25,7 +26,7 @@ class TestStructuralDiversity(unittest.TestCase):
         user_prompt = call_args[1]['user_prompt']
         
         self.assertIn("TECHNICAL", user_prompt)
-        self.assertIn("HOOK STYLE:", user_prompt)
+        self.assertTrue("Hook Style:" in user_prompt or "HOOK STYLE:" in user_prompt)
         self.assertIn("PROHIBITION: Do NOT use a fixed", user_prompt)
 
     def test_random_mode_selection(self):
@@ -48,6 +49,17 @@ class TestStructuralDiversity(unittest.TestCase):
         
         # With 5 runs, we should likely see more than 1 mode if random is working
         self.assertGreater(len(modes_seen), 0)
+
+
+class TestRedundancyValidation(unittest.TestCase):
+    def test_redundancy_threshold_80_percent(self):
+        validator = DraftValidator(redundancy_threshold=0.8)
+        recent = [
+            "La IA está acelerando el desarrollo de software con asistentes de código.",
+            "Nuevos chips mejoran la inferencia local para modelos ligeros.",
+        ]
+        candidate = "La IA esta acelerando el desarrollo de software con asistentes de codigo."
+        self.assertTrue(validator.is_redundant(candidate, recent))
 
 if __name__ == "__main__":
     unittest.main()

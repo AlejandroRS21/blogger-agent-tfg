@@ -7,13 +7,16 @@ Supports dynamic structural diversity and varied opening hooks.
 
 from typing import Dict, Any, Optional, List
 import random
-import os
+import logging
 
 try:
     from ..llm import create_llm_provider, LLMProvider
     LLM_AVAILABLE = True
 except ImportError:
     LLM_AVAILABLE = False
+
+
+logger = logging.getLogger(__name__)
 
 
 class ContentGenerator:
@@ -58,7 +61,7 @@ class ContentGenerator:
                     max_tokens=3500
                 )
             except Exception as e:
-                print(f"Warning: Failed to initialize LLM provider: {e}")
+                logger.warning("Failed to initialize LLM provider: %s", e)
                 self.llm = None
         else:
             self.llm = None
@@ -128,7 +131,7 @@ Write a complete, organic, and spontaneous blog post. Use only markdown."""
             return response.content
             
         except Exception as e:
-            print(f"Warning: Content generation failed: {e}. Using fallback.")
+            logger.warning("Content generation failed: %s. Using fallback.", e)
             return self._fallback_draft(topic, keywords)
 
     def refine_content(
@@ -177,10 +180,39 @@ Provide the refined version in markdown format."""
             return response.content
             
         except Exception as e:
-            print(f"Warning: Refinement failed: {e}. Returning original draft.")
+            logger.warning("Refinement failed: %s. Returning original draft.", e)
             return draft
 
     def _fallback_draft(self, topic: str, keywords: list) -> str:
         """Generate a basic draft when LLM is not available."""
         keywords_str = ", ".join(keywords[:5]) if keywords else "tecnología, cacharreo"
-        return f"# {topic}\n\nA ver, que me habéis preguntado mucho por esto de {topic}. La verdad es que es un tema que me tiene enganchado..."
+        return (
+            f"# {topic}\n\n"
+            f"A ver, que me habéis preguntado mucho por esto de {topic}. "
+            "La verdad es que es un tema que me tiene enganchado, porque mezcla ilusión, "
+            "herramientas reales y ese punto de experimentación que tanto nos gusta.\n\n"
+            "Si me preguntas por una conclusión rápida, te diría que estamos en ese momento "
+            "en el que todavía se puede aprender muchísimo probando cosas pequeñas, sin montar "
+            "una infraestructura gigante. Lo importante no es solo el modelo, sino cómo encaja "
+            "en tu flujo de trabajo diario y qué problemas concretos te resuelve.\n\n"
+            f"En mi caso, cuando pienso en {topic}, siempre termino volviendo a lo mismo: "
+            f"{keywords_str}. Si consigues aterrizar eso en ejemplos prácticos, el salto de valor "
+            "es inmediato.\n\n"
+            "Y ahora te lanzo la pregunta: ¿cómo lo estás integrando tú en tu día a día? "
+            "Porque aquí es donde de verdad se separa el hype de lo que funciona."
+        )
+
+    def build_generation_record(
+        self,
+        topic: str,
+        content: str,
+        source_refs: Optional[List[str]] = None,
+        category: str = "technology",
+    ) -> Dict[str, Any]:
+        """Build a normalized metadata record for generated content."""
+        return {
+            "topic": topic,
+            "topic_category": category,
+            "source_summary": source_refs or [],
+            "word_count": len((content or "").split()),
+        }

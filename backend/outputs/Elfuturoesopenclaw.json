@@ -1,0 +1,200 @@
+{
+  "workflow_id": "355738e7",
+  "topic": "Prueba compatibilidad provider-model",
+  "blogger_urls": [
+    "https://javipas.com"
+  ],
+  "style_profile": {
+    "tone": "conversational, humorous, personal, enthusiastic",
+    "voice": "first person, close to reader",
+    "language_level": "colloquial",
+    "structure": "personal intro → experience → technical details → reflection",
+    "expressions": [
+      "me alucina",
+      "dicho y hecho",
+      "el caso es que",
+      "total, que",
+      "ciertamente",
+      "como digo",
+      "insisto",
+      "miniresort burgués",
+      "mis maravillosos niños"
+    ],
+    "avg_sentence_length": 15,
+    "paragraph_pattern": "3-5 lines, medium complexity",
+    "use_of_humor": "Subtle irony and self-deprecating humor",
+    "technical_depth": "Medium-high, explains complex topics accessibly",
+    "personality_traits": [
+      "curious",
+      "enthusiastic about technology",
+      "family-oriented",
+      "reflective",
+      "critical thinker"
+    ],
+    "engagement_style": "Invites reader comments, asks questions, shares personal experiences"
+  },
+  "keywords": [
+    "IA",
+    "inteligencia artificial",
+    "OpenClaw",
+    "Claude",
+    "ChatGPT",
+    "tecnología",
+    "Apple",
+    "Anthropic",
+    "innovación",
+    "desarrollo",
+    "software",
+    "hardware",
+    "futuro",
+    "educación",
+    "familia",
+    "experimento",
+    "prueba",
+    "análisis",
+    "opinión",
+    "crítica",
+    "nostalgia",
+    "retro",
+    "gaming",
+    "ordenadores",
+    "Internet"
+  ],
+  "content": "# ¿De verdad creíamos que íbamos a domar a la bestia con un simple adaptador universal?\n\n¿No os pasa que, a veces, sentís que estamos intentando meter un motor de Ferrari en un Seat 600 y pretendemos que el coche no solo corra, sino que además nos dé los buenos días con voz de terciopelo? Me lo pregunto cada vez que me siento aquí, en mi despacho del miniresort burgués, rodeado de cables que no sirven para nada y pantallas que escupen código que ayer funcionaba y hoy, por alguna razón mística relacionada con los astros o con un cambio menor en la API de Anthropic, ha decidido declararse en huelga. El caso es que llevamos meses obsesionados con la idea de la \"compatibilidad provider-model\", esa quimera tecnológica que promete que nos dará igual usar ChatGPT, Claude o el último modelo de Llama que haya salido de las forjas de Meta. Pero la realidad, amigos míos, es mucho más terca y, ciertamente, mucho más divertida si te gusta el cacharreo puro y duro.\n\nMe alucina ver cómo hemos pasado de pelearnos con los drivers de una impresora en Windows 95 a pelearnos con los \"wrappers\" de inteligencia artificial. Al final, la historia se repite: queremos una capa de abstracción que lo cubra todo, una suerte de anillo único para gobernarlos a todos, pero lo que acabamos teniendo es un lío de cojones (con perdón). El otro día, sin ir más lejos, me puse manos a la obra para probar cómo se comportaba un mismo script atacando a diferentes proveedores. Dicho y hecho: abrí el VS Code, me serví un café —demasiado caliente, como siempre— y empecé a tirar líneas.\n\nLa teoría suena fantástica. Tienes OpenClaw, o LangChain, o cualquier otra librería de esas que prometen que cambiar de `gpt-4o` a `claude-3-5-sonnet` es tan fácil como cambiar una línea de texto. Pero, ¡ay, amigo!, el diablo está en los detalles. Total, que te pones a probar la compatibilidad y te das cuenta de que el \"system prompt\" que en OpenAI funciona como un sargento de hierro, en Anthropic se lo toman como una sugerencia educada que pueden ignorar si el modelo se levanta con el pie izquierdo. Y no hablemos ya de los modelos de Google, que juegan en su propia liga de \"no entiendo qué me estás pidiendo pero aquí tienes un resumen de la Wikipedia\".\n\nInsisto en que no es un problema de las máquinas, sino de nuestra arrogancia como desarrolladores. Queremos homogeneizar la inteligencia, y eso es como intentar que todos mis maravillosos niños se comporten igual ante la misma orden; uno me hará caso a la primera, el otro negociará un tiempo extra de consola y el tercero me mirará como si hablara en arameo. Pues con la IA pasa lo mismo. La innovación va tan rápido que los estándares son, básicamente, un deseo de año nuevo que nadie cumple.\n\nCiertamente, hay algo de nostalgia en todo esto. Me recuerda a cuando intentábamos que una web se viera igual en Internet Explorer 6 y en Firefox. Aquellas noches de CSS imposibles han sido sustituidas por tardes de \"prompt engineering\" intentando que el JSON de salida no venga con texto explicativo no solicitado. Porque esa es otra: le pides a un modelo un formato estricto y el \"provider\" de turno decide que es buena idea añadir un \"¡Aquí tienes tu respuesta!\" al principio. Como digo, me alucina que sigamos en este punto tan rudimentario.\n\nMientras probaba estas compatibilidades, no podía dejar de pensar en Apple. Apple siempre llega tarde, o eso dicen los que no entienden cómo funciona Cupertino. Pero cuando llegan, suelen hacerlo con una integración que te hace olvidar el hardware. Apple Intelligence promete ser ese pegamento, pero me pregunto si realmente abrirán la puerta a otros \"providers\" de forma transparente o si viviremos en una cárcel de oro donde solo lo que pase por sus servidores será \"compatible\". El software es libertad, o debería serlo, pero el desarrollo actual parece ir más hacia silos muy bien decorados.\n\nEl otro día, mientras mis maravillosos niños correteaban por el jardín y yo intentaba entender por qué un modelo de hardware local (un pequeño servidor que tengo aquí montado, ya sabéis, por el puro placer de quemar vatios) no respondía igual que la API en la nube, me di cuenta de que la compatibilidad es, en realidad, un estado mental. Nos obsesionamos con que el código sea portable, pero lo que de verdad importa es si el resultado final le sirve al usuario. A veces perdemos horas configurando el \"provider-model\" perfecto cuando lo que necesitábamos era simplemente escribir un mejor prompt.\n\n¿Es frustrante? Un poco. ¿Es apasionante? Absolutamente. El cacharreo con la IA tiene ese punto de alquimia que me devuelve a mis años mozos, cuando montar un PC era una aventura y no sabías si al encenderlo verías la BIOS o saldría humo. Ahora el humo es digital, son errores 401 o límites de cuota alcanzados porque te has emocionado haciendo tests de compatibilidad sin mirar el panel de control de Anthropic.\n\nMe pregunto hacia dónde vamos. ¿Acabaremos con un protocolo estándar tipo HTTP para la inferencia de modelos? Sería lo lógico. Pero en tecnología la lógica a veces se toma vacaciones largas. De momento, seguiremos lidiando con estas capas intermedias, celebrando cuando un cambio de modelo no rompe todo el flujo de trabajo y maldiciendo cuando OpenAI decide cambiar el comportamiento de su API un martes por la mañana solo porque pueden.\n\nAl final, lo que queda es la curiosidad. Esa necesidad de ver qué pasa si aprieto este botón o si cambio este parámetro. La tecnología, despojada de su utilidad práctica, no es más que un juguete carísimo para adultos que nunca dejaron de preguntar \"¿por qué?\". Y aquí sigo yo, en mi miniresort, preguntándome por qué demonios Claude se empeña en ser tan educado cuando le pido que sea un borde de manual para una prueba de estrés.\n\nPor cierto, si alguno de vosotros ha conseguido una compatibilidad real y sin fisuras entre proveedores sin volverse loco en el intento, que me lo diga. Porque yo sigo pensando que estamos intentando domesticar nubes. Y las nubes, como todos sabemos, cambian de forma en cuanto dejas de mirarlas.\n\n¿Creéis que llegaremos a ver un estándar real en las APIs de IA antes de que la propia IA decida que ya no necesita que nosotros programemos sus interfaces?",
+  "html_structure": {
+    "html": "<article class=\"blog-post\">\n<h1 id=\"de-verdad-creiamos-que-ibamos-a-domar-a-la-bestia-con-un-simple-adaptador-universal\">¿De verdad creíamos que íbamos a domar a la bestia con un simple adaptador universal?</h1>\n<p>¿No os pasa que, a veces, sentís que estamos intentando meter un motor de Ferrari en un Seat 600 y pretendemos que el coche no solo corra, sino que además nos dé los buenos días con voz de terciopelo? Me lo pregunto cada vez que me siento aquí, en mi despacho del miniresort burgués, rodeado de cables que no sirven para nada y pantallas que escupen código que ayer funcionaba y hoy, por alguna razón mística relacionada con los astros o con un cambio menor en la API de Anthropic, ha decidido declararse en huelga. El caso es que llevamos meses obsesionados con la idea de la \"compatibilidad provider-model\", esa quimera tecnológica que promete que nos dará igual usar ChatGPT, Claude o el último modelo de Llama que haya salido de las forjas de Meta. Pero la realidad, amigos míos, es mucho más terca y, ciertamente, mucho más divertida si te gusta el cacharreo puro y duro.</p>\n<p>Me alucina ver cómo hemos pasado de pelearnos con los drivers de una impresora en Windows 95 a pelearnos con los \"wrappers\" de inteligencia artificial. Al final, la historia se repite: queremos una capa de abstracción que lo cubra todo, una suerte de anillo único para gobernarlos a todos, pero lo que acabamos teniendo es un lío de cojones (con perdón). El otro día, sin ir más lejos, me puse manos a la obra para probar cómo se comportaba un mismo script atacando a diferentes proveedores. Dicho y hecho: abrí el VS Code, me serví un café —demasiado caliente, como siempre— y empecé a tirar líneas.</p>\n<p>La teoría suena fantástica. Tienes OpenClaw, o LangChain, o cualquier otra librería de esas que prometen que cambiar de <code>gpt-4o</code> a <code>claude-3-5-sonnet</code> es tan fácil como cambiar una línea de texto. Pero, ¡ay, amigo!, el diablo está en los detalles. Total, que te pones a probar la compatibilidad y te das cuenta de que el \"system prompt\" que en OpenAI funciona como un sargento de hierro, en Anthropic se lo toman como una sugerencia educada que pueden ignorar si el modelo se levanta con el pie izquierdo. Y no hablemos ya de los modelos de Google, que juegan en su propia liga de \"no entiendo qué me estás pidiendo pero aquí tienes un resumen de la Wikipedia\".</p>\n<p>Insisto en que no es un problema de las máquinas, sino de nuestra arrogancia como desarrolladores. Queremos homogeneizar la inteligencia, y eso es como intentar que todos mis maravillosos niños se comporten igual ante la misma orden; uno me hará caso a la primera, el otro negociará un tiempo extra de consola y el tercero me mirará como si hablara en arameo. Pues con la IA pasa lo mismo. La innovación va tan rápido que los estándares son, básicamente, un deseo de año nuevo que nadie cumple.</p>\n<p>Ciertamente, hay algo de nostalgia en todo esto. Me recuerda a cuando intentábamos que una web se viera igual en Internet Explorer 6 y en Firefox. Aquellas noches de CSS imposibles han sido sustituidas por tardes de \"prompt engineering\" intentando que el JSON de salida no venga con texto explicativo no solicitado. Porque esa es otra: le pides a un modelo un formato estricto y el \"provider\" de turno decide que es buena idea añadir un \"¡Aquí tienes tu respuesta!\" al principio. Como digo, me alucina que sigamos en este punto tan rudimentario.</p>\n<p>Mientras probaba estas compatibilidades, no podía dejar de pensar en Apple. Apple siempre llega tarde, o eso dicen los que no entienden cómo funciona Cupertino. Pero cuando llegan, suelen hacerlo con una integración que te hace olvidar el hardware. Apple Intelligence promete ser ese pegamento, pero me pregunto si realmente abrirán la puerta a otros \"providers\" de forma transparente o si viviremos en una cárcel de oro donde solo lo que pase por sus servidores será \"compatible\". El software es libertad, o debería serlo, pero el desarrollo actual parece ir más hacia silos muy bien decorados.</p>\n<p>El otro día, mientras mis maravillosos niños correteaban por el jardín y yo intentaba entender por qué un modelo de hardware local (un pequeño servidor que tengo aquí montado, ya sabéis, por el puro placer de quemar vatios) no respondía igual que la API en la nube, me di cuenta de que la compatibilidad es, en realidad, un estado mental. Nos obsesionamos con que el código sea portable, pero lo que de verdad importa es si el resultado final le sirve al usuario. A veces perdemos horas configurando el \"provider-model\" perfecto cuando lo que necesitábamos era simplemente escribir un mejor prompt.</p>\n<p>¿Es frustrante? Un poco. ¿Es apasionante? Absolutamente. El cacharreo con la IA tiene ese punto de alquimia que me devuelve a mis años mozos, cuando montar un PC era una aventura y no sabías si al encenderlo verías la BIOS o saldría humo. Ahora el humo es digital, son errores 401 o límites de cuota alcanzados porque te has emocionado haciendo tests de compatibilidad sin mirar el panel de control de Anthropic.</p>\n<p>Me pregunto hacia dónde vamos. ¿Acabaremos con un protocolo estándar tipo HTTP para la inferencia de modelos? Sería lo lógico. Pero en tecnología la lógica a veces se toma vacaciones largas. De momento, seguiremos lidiando con estas capas intermedias, celebrando cuando un cambio de modelo no rompe todo el flujo de trabajo y maldiciendo cuando OpenAI decide cambiar el comportamiento de su API un martes por la mañana solo porque pueden.</p>\n<p>Al final, lo que queda es la curiosidad. Esa necesidad de ver qué pasa si aprieto este botón o si cambio este parámetro. La tecnología, despojada de su utilidad práctica, no es más que un juguete carísimo para adultos que nunca dejaron de preguntar \"¿por qué?\". Y aquí sigo yo, en mi miniresort, preguntándome por qué demonios Claude se empeña en ser tan educado cuando le pido que sea un borde de manual para una prueba de estrés.</p>\n<p>Por cierto, si alguno de vosotros ha conseguido una compatibilidad real y sin fisuras entre proveedores sin volverse loco en el intento, que me lo diga. Porque yo sigo pensando que estamos intentando domesticar nubes. Y las nubes, como todos sabemos, cambian de forma en cuanto dejas de mirarlas.</p>\n<p>¿Creéis que llegaremos a ver un estándar real en las APIs de IA antes de que la propia IA decida que ya no necesita que nosotros programemos sus interfaces?</p>\n</article>",
+    "jsx": "<article className=\"blog-post\">\n<h1 id=\"de-verdad-creiamos-que-ibamos-a-domar-a-la-bestia-con-un-simple-adaptador-universal\">¿De verdad creíamos que íbamos a domar a la bestia con un simple adaptador universal?</h1>\n<p>¿No os pasa que, a veces, sentís que estamos intentando meter un motor de Ferrari en un Seat 600 y pretendemos que el coche no solo corra, sino que además nos dé los buenos días con voz de terciopelo? Me lo pregunto cada vez que me siento aquí, en mi despacho del miniresort burgués, rodeado de cables que no sirven para nada y pantallas que escupen código que ayer funcionaba y hoy, por alguna razón mística relacionada con los astros o con un cambio menor en la API de Anthropic, ha decidido declararse en huelga. El caso es que llevamos meses obsesionados con la idea de la \"compatibilidad provider-model\", esa quimera tecnológica que promete que nos dará igual usar ChatGPT, Claude o el último modelo de Llama que haya salido de las forjas de Meta. Pero la realidad, amigos míos, es mucho más terca y, ciertamente, mucho más divertida si te gusta el cacharreo puro y duro.</p>\n<p>Me alucina ver cómo hemos pasado de pelearnos con los drivers de una impresora en Windows 95 a pelearnos con los \"wrappers\" de inteligencia artificial. Al final, la historia se repite: queremos una capa de abstracción que lo cubra todo, una suerte de anillo único para gobernarlos a todos, pero lo que acabamos teniendo es un lío de cojones (con perdón). El otro día, sin ir más lejos, me puse manos a la obra para probar cómo se comportaba un mismo script atacando a diferentes proveedores. Dicho y hecho: abrí el VS Code, me serví un café —demasiado caliente, como siempre— y empecé a tirar líneas.</p>\n<p>La teoría suena fantástica. Tienes OpenClaw, o LangChain, o cualquier otra librería de esas que prometen que cambiar de <code>gpt-4o</code> a <code>claude-3-5-sonnet</code> es tan fácil como cambiar una línea de texto. Pero, ¡ay, amigo!, el diablo está en los detalles. Total, que te pones a probar la compatibilidad y te das cuenta de que el \"system prompt\" que en OpenAI funciona como un sargento de hierro, en Anthropic se lo toman como una sugerencia educada que pueden ignorar si el modelo se levanta con el pie izquierdo. Y no hablemos ya de los modelos de Google, que juegan en su propia liga de \"no entiendo qué me estás pidiendo pero aquí tienes un resumen de la Wikipedia\".</p>\n<p>Insisto en que no es un problema de las máquinas, sino de nuestra arrogancia como desarrolladores. Queremos homogeneizar la inteligencia, y eso es como intentar que todos mis maravillosos niños se comporten igual ante la misma orden; uno me hará caso a la primera, el otro negociará un tiempo extra de consola y el tercero me mirará como si hablara en arameo. Pues con la IA pasa lo mismo. La innovación va tan rápido que los estándares son, básicamente, un deseo de año nuevo que nadie cumple.</p>\n<p>Ciertamente, hay algo de nostalgia en todo esto. Me recuerda a cuando intentábamos que una web se viera igual en Internet Explorer 6 y en Firefox. Aquellas noches de CSS imposibles han sido sustituidas por tardes de \"prompt engineering\" intentando que el JSON de salida no venga con texto explicativo no solicitado. Porque esa es otra: le pides a un modelo un formato estricto y el \"provider\" de turno decide que es buena idea añadir un \"¡Aquí tienes tu respuesta!\" al principio. Como digo, me alucina que sigamos en este punto tan rudimentario.</p>\n<p>Mientras probaba estas compatibilidades, no podía dejar de pensar en Apple. Apple siempre llega tarde, o eso dicen los que no entienden cómo funciona Cupertino. Pero cuando llegan, suelen hacerlo con una integración que te hace olvidar el hardware. Apple Intelligence promete ser ese pegamento, pero me pregunto si realmente abrirán la puerta a otros \"providers\" de forma transparente o si viviremos en una cárcel de oro donde solo lo que pase por sus servidores será \"compatible\". El software es libertad, o debería serlo, pero el desarrollo actual parece ir más hacia silos muy bien decorados.</p>\n<p>El otro día, mientras mis maravillosos niños correteaban por el jardín y yo intentaba entender por qué un modelo de hardware local (un pequeño servidor que tengo aquí montado, ya sabéis, por el puro placer de quemar vatios) no respondía igual que la API en la nube, me di cuenta de que la compatibilidad es, en realidad, un estado mental. Nos obsesionamos con que el código sea portable, pero lo que de verdad importa es si el resultado final le sirve al usuario. A veces perdemos horas configurando el \"provider-model\" perfecto cuando lo que necesitábamos era simplemente escribir un mejor prompt.</p>\n<p>¿Es frustrante? Un poco. ¿Es apasionante? Absolutamente. El cacharreo con la IA tiene ese punto de alquimia que me devuelve a mis años mozos, cuando montar un PC era una aventura y no sabías si al encenderlo verías la BIOS o saldría humo. Ahora el humo es digital, son errores 401 o límites de cuota alcanzados porque te has emocionado haciendo tests de compatibilidad sin mirar el panel de control de Anthropic.</p>\n<p>Me pregunto hacia dónde vamos. ¿Acabaremos con un protocolo estándar tipo HTTP para la inferencia de modelos? Sería lo lógico. Pero en tecnología la lógica a veces se toma vacaciones largas. De momento, seguiremos lidiando con estas capas intermedias, celebrando cuando un cambio de modelo no rompe todo el flujo de trabajo y maldiciendo cuando OpenAI decide cambiar el comportamiento de su API un martes por la mañana solo porque pueden.</p>\n<p>Al final, lo que queda es la curiosidad. Esa necesidad de ver qué pasa si aprieto este botón o si cambio este parámetro. La tecnología, despojada de su utilidad práctica, no es más que un juguete carísimo para adultos que nunca dejaron de preguntar \"¿por qué?\". Y aquí sigo yo, en mi miniresort, preguntándome por qué demonios Claude se empeña en ser tan educado cuando le pido que sea un borde de manual para una prueba de estrés.</p>\n<p>Por cierto, si alguno de vosotros ha conseguido una compatibilidad real y sin fisuras entre proveedores sin volverse loco en el intento, que me lo diga. Porque yo sigo pensando que estamos intentando domesticar nubes. Y las nubes, como todos sabemos, cambian de forma en cuanto dejas de mirarlas.</p>\n<p>¿Creéis que llegaremos a ver un estándar real en las APIs de IA antes de que la propia IA decida que ya no necesita que nosotros programemos sus interfaces?</p>\n</article>",
+    "metadata": {
+      "title": "¿De verdad creíamos que íbamos a domar a la bestia con un simple adaptador universal?",
+      "description": "¿No os pasa que, a veces, sentís que estamos intentando meter un motor de Ferrari en un Seat 600 y pretendemos que el coche no solo corra, sino que además no...",
+      "keywords": [
+        "cuando",
+        "modelo",
+        "igual",
+        "compatibilidad",
+        "porque",
+        "intentando",
+        "pregunto",
+        "cambio",
+        "tienes",
+        "cambiar"
+      ],
+      "reading_time": 5,
+      "word_count": 1072,
+      "slug": "prueba-compatibilidad-provider-model"
+    },
+    "headings": [],
+    "nextjs_component": "import React from 'react';\nimport Head from 'next/head';\n\nexport default function BlogPost() {\n  return (\n    <>\n      <Head>\n        <title>¿De verdad creíamos que íbamos a domar a la bestia con un simple adaptador universal?</title>\n        <meta name=\"description\" content=\"¿No os pasa que, a veces, sentís que estamos intentando meter un motor de Ferrari en un Seat 600 y pretendemos que el coche no solo corra, sino que además no...\" />\n        <meta name=\"keywords\" content=\"cuando, modelo, igual, compatibilidad, porque, intentando, pregunto, cambio, tienes, cambiar\" />\n        <meta property=\"og:title\" content=\"¿De verdad creíamos que íbamos a domar a la bestia con un simple adaptador universal?\" />\n        <meta property=\"og:description\" content=\"¿No os pasa que, a veces, sentís que estamos intentando meter un motor de Ferrari en un Seat 600 y pretendemos que el coche no solo corra, sino que además no...\" />\n        <meta property=\"og:type\" content=\"article\" />\n        <meta name=\"twitter:card\" content=\"summary_large_image\" />\n      </Head>\n      \n      <div className=\"container mx-auto px-4 py-8\">\n        <div className=\"max-w-4xl mx-auto\">\n          <div className=\"mb-4 text-sm text-gray-600\">\n            5 min lectura • 1072 palabras\n          </div>\n          \n          <article className=\"blog-post\">\n<h1 id=\"de-verdad-creiamos-que-ibamos-a-domar-a-la-bestia-con-un-simple-adaptador-universal\">¿De verdad creíamos que íbamos a domar a la bestia con un simple adaptador universal?</h1>\n<p>¿No os pasa que, a veces, sentís que estamos intentando meter un motor de Ferrari en un Seat 600 y pretendemos que el coche no solo corra, sino que además nos dé los buenos días con voz de terciopelo? Me lo pregunto cada vez que me siento aquí, en mi despacho del miniresort burgués, rodeado de cables que no sirven para nada y pantallas que escupen código que ayer funcionaba y hoy, por alguna razón mística relacionada con los astros o con un cambio menor en la API de Anthropic, ha decidido declararse en huelga. El caso es que llevamos meses obsesionados con la idea de la \"compatibilidad provider-model\", esa quimera tecnológica que promete que nos dará igual usar ChatGPT, Claude o el último modelo de Llama que haya salido de las forjas de Meta. Pero la realidad, amigos míos, es mucho más terca y, ciertamente, mucho más divertida si te gusta el cacharreo puro y duro.</p>\n<p>Me alucina ver cómo hemos pasado de pelearnos con los drivers de una impresora en Windows 95 a pelearnos con los \"wrappers\" de inteligencia artificial. Al final, la historia se repite: queremos una capa de abstracción que lo cubra todo, una suerte de anillo único para gobernarlos a todos, pero lo que acabamos teniendo es un lío de cojones (con perdón). El otro día, sin ir más lejos, me puse manos a la obra para probar cómo se comportaba un mismo script atacando a diferentes proveedores. Dicho y hecho: abrí el VS Code, me serví un café —demasiado caliente, como siempre— y empecé a tirar líneas.</p>\n<p>La teoría suena fantástica. Tienes OpenClaw, o LangChain, o cualquier otra librería de esas que prometen que cambiar de <code>gpt-4o</code> a <code>claude-3-5-sonnet</code> es tan fácil como cambiar una línea de texto. Pero, ¡ay, amigo!, el diablo está en los detalles. Total, que te pones a probar la compatibilidad y te das cuenta de que el \"system prompt\" que en OpenAI funciona como un sargento de hierro, en Anthropic se lo toman como una sugerencia educada que pueden ignorar si el modelo se levanta con el pie izquierdo. Y no hablemos ya de los modelos de Google, que juegan en su propia liga de \"no entiendo qué me estás pidiendo pero aquí tienes un resumen de la Wikipedia\".</p>\n<p>Insisto en que no es un problema de las máquinas, sino de nuestra arrogancia como desarrolladores. Queremos homogeneizar la inteligencia, y eso es como intentar que todos mis maravillosos niños se comporten igual ante la misma orden; uno me hará caso a la primera, el otro negociará un tiempo extra de consola y el tercero me mirará como si hablara en arameo. Pues con la IA pasa lo mismo. La innovación va tan rápido que los estándares son, básicamente, un deseo de año nuevo que nadie cumple.</p>\n<p>Ciertamente, hay algo de nostalgia en todo esto. Me recuerda a cuando intentábamos que una web se viera igual en Internet Explorer 6 y en Firefox. Aquellas noches de CSS imposibles han sido sustituidas por tardes de \"prompt engineering\" intentando que el JSON de salida no venga con texto explicativo no solicitado. Porque esa es otra: le pides a un modelo un formato estricto y el \"provider\" de turno decide que es buena idea añadir un \"¡Aquí tienes tu respuesta!\" al principio. Como digo, me alucina que sigamos en este punto tan rudimentario.</p>\n<p>Mientras probaba estas compatibilidades, no podía dejar de pensar en Apple. Apple siempre llega tarde, o eso dicen los que no entienden cómo funciona Cupertino. Pero cuando llegan, suelen hacerlo con una integración que te hace olvidar el hardware. Apple Intelligence promete ser ese pegamento, pero me pregunto si realmente abrirán la puerta a otros \"providers\" de forma transparente o si viviremos en una cárcel de oro donde solo lo que pase por sus servidores será \"compatible\". El software es libertad, o debería serlo, pero el desarrollo actual parece ir más hacia silos muy bien decorados.</p>\n<p>El otro día, mientras mis maravillosos niños correteaban por el jardín y yo intentaba entender por qué un modelo de hardware local (un pequeño servidor que tengo aquí montado, ya sabéis, por el puro placer de quemar vatios) no respondía igual que la API en la nube, me di cuenta de que la compatibilidad es, en realidad, un estado mental. Nos obsesionamos con que el código sea portable, pero lo que de verdad importa es si el resultado final le sirve al usuario. A veces perdemos horas configurando el \"provider-model\" perfecto cuando lo que necesitábamos era simplemente escribir un mejor prompt.</p>\n<p>¿Es frustrante? Un poco. ¿Es apasionante? Absolutamente. El cacharreo con la IA tiene ese punto de alquimia que me devuelve a mis años mozos, cuando montar un PC era una aventura y no sabías si al encenderlo verías la BIOS o saldría humo. Ahora el humo es digital, son errores 401 o límites de cuota alcanzados porque te has emocionado haciendo tests de compatibilidad sin mirar el panel de control de Anthropic.</p>\n<p>Me pregunto hacia dónde vamos. ¿Acabaremos con un protocolo estándar tipo HTTP para la inferencia de modelos? Sería lo lógico. Pero en tecnología la lógica a veces se toma vacaciones largas. De momento, seguiremos lidiando con estas capas intermedias, celebrando cuando un cambio de modelo no rompe todo el flujo de trabajo y maldiciendo cuando OpenAI decide cambiar el comportamiento de su API un martes por la mañana solo porque pueden.</p>\n<p>Al final, lo que queda es la curiosidad. Esa necesidad de ver qué pasa si aprieto este botón o si cambio este parámetro. La tecnología, despojada de su utilidad práctica, no es más que un juguete carísimo para adultos que nunca dejaron de preguntar \"¿por qué?\". Y aquí sigo yo, en mi miniresort, preguntándome por qué demonios Claude se empeña en ser tan educado cuando le pido que sea un borde de manual para una prueba de estrés.</p>\n<p>Por cierto, si alguno de vosotros ha conseguido una compatibilidad real y sin fisuras entre proveedores sin volverse loco en el intento, que me lo diga. Porque yo sigo pensando que estamos intentando domesticar nubes. Y las nubes, como todos sabemos, cambian de forma en cuanto dejas de mirarlas.</p>\n<p>¿Creéis que llegaremos a ver un estándar real en las APIs de IA antes de que la propia IA decida que ya no necesita que nosotros programemos sus interfaces?</p>\n</article>\n        </div>\n      </div>\n    </>\n  );\n}\n"
+  },
+  "image_prompts": [
+    {
+      "position": "header",
+      "prompt": "Professional, modern hero image representing Prueba compatibilidad provider-model. Clean design, technology theme, high quality, 16:9 aspect ratio",
+      "alt_text": "Hero image about Prueba compatibilidad provider-model",
+      "context": "Main visual to grab attention"
+    },
+    {
+      "position": "section-1",
+      "prompt": "Supporting image about Prueba compatibilidad provider-model, modern design, technology theme",
+      "alt_text": "Supporting image 1 for Prueba compatibilidad provider-model",
+      "context": "Additional visual content"
+    },
+    {
+      "position": "section-2",
+      "prompt": "Supporting image about Prueba compatibilidad provider-model, modern design, technology theme",
+      "alt_text": "Supporting image 2 for Prueba compatibilidad provider-model",
+      "context": "Additional visual content"
+    }
+  ],
+  "metadata": {
+    "duration": 48.886373,
+    "phases": {
+      "style_analysis": {
+        "phase_name": "style_analysis",
+        "status": "completed",
+        "start_time": "2026-04-04T20:19:11.231248",
+        "end_time": "2026-04-04T20:19:17.642663",
+        "duration": 6.411415,
+        "agent_name": "StyleAnalyzer",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "keyword_extraction": {
+        "phase_name": "keyword_extraction",
+        "status": "completed",
+        "start_time": "2026-04-04T20:19:17.642673",
+        "end_time": "2026-04-04T20:19:24.096585",
+        "duration": 6.453912,
+        "agent_name": "KeywordExtractor",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "content_generation": {
+        "phase_name": "content_generation",
+        "status": "completed",
+        "start_time": "2026-04-04T20:19:24.096599",
+        "end_time": "2026-04-04T20:19:44.931417",
+        "duration": 20.834818,
+        "agent_name": "ContentGenerator",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "critique": {
+        "phase_name": "critique",
+        "status": "completed",
+        "start_time": "2026-04-04T20:19:44.931430",
+        "end_time": "2026-04-04T20:19:52.121190",
+        "duration": 7.18976,
+        "agent_name": "CriticAgent",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      },
+      "html_building": {
+        "phase_name": "html_building",
+        "status": "completed",
+        "start_time": "2026-04-04T20:19:52.121202",
+        "end_time": "2026-04-04T20:19:52.668961",
+        "duration": 0.547759,
+        "agent_name": "HTMLBuilder",
+        "error": null,
+        "error_type": null,
+        "fallback_used": false,
+        "effective_provider": "gemini",
+        "effective_model": "gpt-4-turbo-preview",
+        "retry_count": 0
+      },
+      "image_selection": {
+        "phase_name": "image_selection",
+        "status": "completed",
+        "start_time": "2026-04-04T20:19:52.668974",
+        "end_time": "2026-04-04T20:20:00.117519",
+        "duration": 7.448545,
+        "agent_name": "ImageSelectorAgent",
+        "error": null,
+        "error_type": null,
+        "fallback_used": true,
+        "effective_provider": "gemini",
+        "effective_model": "gemini-flash-latest",
+        "retry_count": 0
+      }
+    },
+    "errors": [],
+    "warnings": []
+  }
+}

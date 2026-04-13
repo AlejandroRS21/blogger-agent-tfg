@@ -2,8 +2,14 @@
 
 import pytest
 import json
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from unittest.mock import Mock
+import requests
 from tools.scraper import BlogScraper, BlogPost, scrape_javipas
+from src.orchestrator.continuous.topic_selector import TopicCandidate, TopicSelector
+from src.orchestrator.continuous.source_guard import SourceGuard
+from aphra_blogger.agents.research_agent import ResearchAgent
 
 # Mock data for testing
 MOCK_HTML = """
@@ -264,6 +270,94 @@ class TestIntegration:
             assert post.title
             assert post.content
             assert post.word_count > 0
+
+
+class TestTopicSelection:
+    """Tests for recency and diversity in topic selection."""
+
+    def test_select_prefers_recent_candidate(self):
+        selector = TopicSelector(recency_window_hours=72)
+        now = datetime.now(timezone.utc)
+        candidates = [
+            TopicCandidate("old", "ai", "x", published_at=now - timedelta(hours=70)),
+            TopicCandidate("new", "ai", "x", published_at=now - timedelta(hours=2)),
+        ]
+        selected = selector.select(candidates)
+        assert selected is not None
+        assert selected.title == "new"
+
+    def test_select_applies_diversity_boost(self):
+        selector = TopicSelector(recency_window_hours=72, category_cooldown=1)
+        now = datetime.now(timezone.utc)
+        first = selector.select([TopicCandidate("a", "ai", "x", published_at=now)])
+        assert first is not None
+        second = selector.select(
+            [
+                TopicCandidate("same", "ai", "x", published_at=now),
+                TopicCandidate("different", "cloud", "x", published_at=now - timedelta(hours=1)),
+            ]
+        )
+        assert second is not None
+        assert second.category == "cloud"
+
+
+class TestSourceFallback:
+    """Tests for multi-source fallback and source exhaustion handling."""
+
+    def test_research_agent_fallback_without_api_key(self):
+        agent = ResearchAgent(brave_api_key=None)
+        topics = agent.fetch_topic_candidates(query="novedades ia", limit=3)
+        assert len(topics) > 0
+        assert topics[0]["source"] in {"fallback-rss", "brave"}
+
+    def test_source_guard_detects_source_exhausted(self):
+        guard = SourceGuard(allowed_domains=("api.search.brave.com", "fallback-rss"))
+        sanitized = guard.sanitize_candidates(
+            [
+                {"title": "x", "source": "https://unknown.example", "description": "d"},
+                {"title": "y", "source": "https://another.bad", "description": "d"},
+            ]
+        )
+        assert sanitized == []
+
+    def test_research_search_handles_timeout(self, monkeypatch):
+        agent = ResearchAgent(brave_api_key="token")
+
+        def _raise_timeout(*args, **kwargs):
+            raise requests.Timeout("timeout")
+
+        monkeypatch.setattr("aphra_blogger.agents.research_agent.requests.get", _raise_timeout)
+        result = agent.search("novedades ia", limit=3)
+        assert result["status"] == "Error"
+
+    def test_research_search_handles_http_429(self, monkeypatch):
+        agent = ResearchAgent(brave_api_key="token")
+        response = Mock()
+        response.raise_for_status.side_effect = requests.HTTPError("429 Too Many Requests")
+        monkeypatch.setattr("aphra_blogger.agents.research_agent.requests.get", lambda *args, **kwargs: response)
+        result = agent.search("novedades ia", limit=3)
+        assert result["status"] == "Error"
+        assert "429" in result["summary"]
+
+    def test_research_search_handles_http_5xx(self, monkeypatch):
+        agent = ResearchAgent(brave_api_key="token")
+        response = Mock()
+        response.raise_for_status.side_effect = requests.HTTPError("503 Service Unavailable")
+        monkeypatch.setattr("aphra_blogger.agents.research_agent.requests.get", lambda *args, **kwargs: response)
+        result = agent.search("novedades ia", limit=3)
+        assert result["status"] == "Error"
+        assert "503" in result["summary"]
+
+    def test_fetch_topic_candidates_fallback_on_malformed_payload(self, monkeypatch):
+        agent = ResearchAgent(brave_api_key="token")
+        monkeypatch.setattr(
+            agent,
+            "search",
+            lambda query, limit=10: {"status": "OK", "results": [], "summary": "malformed"},
+        )
+        candidates = agent.fetch_topic_candidates(query="ai", limit=3)
+        assert len(candidates) > 0
+        assert all(c["source"] == "fallback-rss" for c in candidates)
 
 
 if __name__ == '__main__':

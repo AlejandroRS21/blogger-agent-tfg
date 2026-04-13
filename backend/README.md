@@ -57,6 +57,35 @@ backend/
 
 ## 🚀 Setup Local
 
+## 🔁 Publicacion Continua (Feature 009)
+
+El orquestador ahora incluye modo continuo para ejecutar ciclos de publicacion en cadencia fija.
+
+### Ejecucion continua local (acotada)
+
+```bash
+cd backend
+python -m src.orchestrator.runner \
+  --topic "Novedades de IA para desarrollo" \
+  --blog-url "https://javipas.com" \
+  --continuous \
+  --cycles 2 \
+  --interval-seconds 0
+```
+
+### Estado operativo
+
+El modo continuo mantiene estados `active`, `paused` y `degraded`, con historial de ciclos/incidentes en:
+
+- `backend/outputs/continuous_history.json`
+
+### Publicacion canonica en `docs/`
+
+Cuando `write_canonical_docs=true` en configuracion, cada ciclo exitoso actualiza:
+
+- `docs/posts.json`
+- `docs/posts/<slug>.json`
+
 ### Requisitos Previos
 
 - Python 3.11+

@@ -7,9 +7,12 @@ to clean, semantic HTML/JSX ready for Next.js integration.
 
 import re
 import os
-from typing import Dict, List, Optional
+import json
+from typing import Any, Dict, List, Optional
 from dataclasses import dataclass
 import logging
+from datetime import datetime, timezone
+from pathlib import Path
 
 try:
     import markdown
@@ -121,6 +124,9 @@ class HTMLBuilder:
         
         # Extract headings for TOC
         headings = self._extract_headings(html)
+        
+        # Ensure HTML tag balance
+        html = self._balance_html_tags(html)
         
         # Generate JSX version
         jsx = self._html_to_jsx(html)
@@ -307,6 +313,32 @@ class HTMLBuilder:
         
         return headings
     
+    def _balance_html_tags(self, html: str) -> str:
+        """
+        Ensures all opening tags have corresponding closing tags.
+        Basic implementation to prevent layout breakage from unbalanced tags.
+        """
+        # List of tags to check (only those commonly nested or multi-line)
+        tags_to_check = ['p', 'div', 'article', 'section', 'ul', 'ol', 'li', 
+                         'table', 'blockquote', 'strong', 'em', 'code', 'pre']
+        
+        balanced_html = html
+        for tag in tags_to_check:
+            # Simple count approach for common tags
+            opening_count = len(re.findall(f'<{tag}[^>]*>', balanced_html, re.IGNORECASE))
+            closing_count = len(re.findall(f'</{tag}>', balanced_html, re.IGNORECASE))
+            
+            if opening_count > closing_count:
+                missing = opening_count - closing_count
+                suffix = f'</{tag}>' * missing
+                # Append before article closure if present
+                if '</article>' in balanced_html:
+                    balanced_html = balanced_html.replace('</article>', f'{suffix}</article>')
+                else:
+                    balanced_html += suffix
+                    
+        return balanced_html
+
     def _slugify(self, text: str) -> str:
         """Convert text to slug for IDs."""
         # Remove HTML tags
@@ -442,6 +474,61 @@ export default function BlogPost() {{
 '''
         
         return component
+
+    def write_canonical_artifacts(
+        self,
+        html_structure: Dict[str, Any],
+        topic: str,
+        docs_root: str = "docs",
+        content: str = "",
+    ) -> Dict[str, Any]:
+        """Write publication artifacts in docs/posts.json and docs/posts/<slug>.json."""
+        root = Path(docs_root)
+        posts_dir = root / "posts"
+        posts_dir.mkdir(parents=True, exist_ok=True)
+
+        slug = html_structure.get("metadata", {}).get("slug") or self._slugify(topic)
+        published_at = datetime.now(timezone.utc).isoformat()
+        post_record = {
+            "id": slug,
+            "slug": slug,
+            "title": html_structure.get("metadata", {}).get("title", topic),
+            "description": html_structure.get("metadata", {}).get("description", ""),
+            "published_at": published_at,
+            "content": content,
+            "html": html_structure.get("html", ""),
+            "metadata": html_structure.get("metadata", {}),
+            "output_paths": {
+                "posts_json": str(root / "posts.json"),
+                "post_file": str(posts_dir / f"{slug}.json"),
+            },
+        }
+
+        post_file = posts_dir / f"{slug}.json"
+        post_file.write_text(json.dumps(post_record, indent=2, ensure_ascii=False), encoding="utf-8")
+
+        index_file = root / "posts.json"
+        if index_file.exists():
+            try:
+                catalog = json.loads(index_file.read_text(encoding="utf-8"))
+            except Exception:
+                catalog = []
+        else:
+            catalog = []
+
+        catalog = [item for item in catalog if item.get("slug") != slug]
+        catalog.insert(
+            0,
+            {
+                "slug": slug,
+                "title": post_record["title"],
+                "description": post_record["description"],
+                "published_at": published_at,
+                "path": f"posts/{slug}.json",
+            },
+        )
+        index_file.write_text(json.dumps(catalog, indent=2, ensure_ascii=False), encoding="utf-8")
+        return post_record
 
 
 if __name__ == '__main__':

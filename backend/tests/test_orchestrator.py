@@ -2,10 +2,16 @@
 
 import pytest
 import json
+import os
 from pathlib import Path
+from unittest.mock import patch
+from datetime import datetime, timedelta, timezone
 from src.orchestrator.main import BloggerOrchestrator
 from src.orchestrator.config import OrchestratorConfig
 from src.orchestrator.state import StateManager, WorkflowState, PhaseStatus
+from aphra_blogger.llm.factory import resolve_model_for_provider
+from aphra_blogger.llm.base import LLMConfig
+from aphra_blogger.llm.gemini_provider import GeminiProvider, GEMINI_AVAILABLE
 
 
 class TestOrchestratorConfig:
@@ -20,12 +26,13 @@ class TestOrchestratorConfig:
     
     def test_config_validation_missing_keys(self):
         """Test validation fails without API keys."""
-        config = OrchestratorConfig(
-            openai_api_key=None,
-            anthropic_api_key=None
-        )
-        with pytest.raises(ValueError, match="At least one API key"):
-            config.validate()
+        with patch.dict(os.environ, {}, clear=True):
+            config = OrchestratorConfig(
+                openai_api_key=None,
+                anthropic_api_key=None
+            )
+            with pytest.raises(ValueError, match="At least one API key"):
+                config.validate()
     
     def test_config_validation_invalid_retries(self):
         """Test validation fails with negative retries."""
@@ -234,6 +241,135 @@ class TestBloggerOrchestrator:
         state = orchestrator.get_state()
         assert state is not None
         assert state.topic == "Test"
+
+    def test_resolve_model_for_gemini_rewrites_incompatible_model(self):
+        """Gemini provider must not keep HuggingFace model ids."""
+        model = resolve_model_for_provider("gemini", "meta-llama/Meta-Llama-3.1-8B-Instruct")
+        assert model == "gemini-2.0-flash"
+
+    def test_orchestrator_fails_on_empty_effective_content(self, config, monkeypatch):
+        """Workflow must not report success if effective content is empty."""
+        orchestrator = BloggerOrchestrator(config=config, verbose=False)
+
+        monkeypatch.setattr(orchestrator.content_generator, "generate_draft", lambda **kwargs: "")
+        monkeypatch.setattr(orchestrator.image_selector, "select_images", lambda **kwargs: [])
+
+        with pytest.raises(RuntimeError, match="empty content"):
+            orchestrator.run(topic="Test", blogger_urls=["https://example.com"])
+
+    def test_gemini_provider_rejects_incompatible_model(self):
+        """Gemini provider should reject explicit non-Gemini model ids."""
+        if not GEMINI_AVAILABLE:
+            pytest.skip("google-genai not installed")
+
+        with pytest.raises(ValueError, match="incompatible with provider 'gemini'"):
+            GeminiProvider(LLMConfig(api_key="dummy", model="meta-llama/Meta-Llama-3.1-8B-Instruct"))
+
+    def test_pause_and_resume_continuous_publishing(self, config):
+        """Continuous mode must expose pause/resume transitions."""
+        orchestrator = BloggerOrchestrator(config=config, verbose=False)
+        orchestrator.state_manager = StateManager(
+            WorkflowState(workflow_id="w1", topic="continuous", blogger_urls=["https://example.com"])
+        )
+
+        paused = orchestrator.pause_continuous_publishing()
+        assert paused["status"] == "paused"
+        resumed = orchestrator.resume_continuous_publishing()
+        assert resumed["status"] == "active"
+
+    def test_continuous_publishing_single_cycle(self, config, monkeypatch):
+        """Continuous bounded run should publish one successful cycle."""
+        config.max_retries = 0
+        orchestrator = BloggerOrchestrator(config=config, verbose=False)
+
+        monkeypatch.setattr(orchestrator, "run", lambda **kwargs: {"workflow_id": "wf-1", "content": "ok"})
+        result = orchestrator.start_continuous_publishing(
+            blogger_urls=["https://example.com"],
+            topic_candidates=[{"title": "AI", "category": "technology", "source": "test", "published_at": None}],
+            cycles=1,
+            interval_seconds=0,
+        )
+
+        assert result["summary"]["published"] == 1
+        assert result["summary"]["failed"] == 0
+
+    def test_continuous_publishing_skips_when_no_topic_candidate(self, config):
+        """No valid topic should close cycle as skipped_with_reason."""
+        orchestrator = BloggerOrchestrator(config=config, verbose=False)
+        result = orchestrator.start_continuous_publishing(
+            blogger_urls=["https://example.com"],
+            topic_candidates=[],
+            cycles=1,
+            interval_seconds=0,
+        )
+
+        assert result["history"]["last_cycle"]["status"] == "source_exhausted"
+
+    def test_continuous_publishing_marks_source_exhausted(self, config):
+        """Untrusted-only sources should trigger source_exhausted."""
+        orchestrator = BloggerOrchestrator(config=config, verbose=False)
+        result = orchestrator.start_continuous_publishing(
+            blogger_urls=["https://example.com"],
+            topic_candidates=[{"title": "x", "category": "ai", "source": "https://evil.example"}],
+            cycles=1,
+            interval_seconds=0,
+        )
+        assert result["history"]["last_cycle"]["status"] == "source_exhausted"
+        assert result["summary"]["failed"] == 1
+
+    def test_retry_policy_backoff_sequence(self, config):
+        """Retry schedule should keep 5m/15m/30m defaults."""
+        config.max_retries = 3
+        orchestrator = BloggerOrchestrator(config=config, verbose=False)
+        assert list(orchestrator.retry_policy.iter_backoff_schedule()) == [300.0, 900.0, 1800.0]
+
+    def test_operational_monitor_emits_alerts(self, config):
+        """Monitor should alert when SLO thresholds are breached."""
+        orchestrator = BloggerOrchestrator(config=config, verbose=False)
+        orchestrator.history_store._state = {"cycles": [], "incidents": [], "published": []}
+        now = datetime.now(timezone.utc)
+        # Two failed cycles increase lag and reduce success rate.
+        orchestrator.history_store.add_cycle(
+            orchestrator._cycle_record(
+                cycle_id="c1",
+                topic="t1",
+                status="failed",
+                scheduled_at=(now - timedelta(hours=1)).isoformat(),
+                started_at=(now - timedelta(hours=1)).isoformat(),
+                ended_at=now.isoformat(),
+                retry_count=3,
+                reason="err",
+                reason_code="provider_error",
+                lag_minutes=120.0,
+                trace={},
+            )
+        )
+        orchestrator.history_store.add_cycle(
+            orchestrator._cycle_record(
+                cycle_id="c2",
+                topic="t2",
+                status="failed",
+                scheduled_at=(now - timedelta(hours=2)).isoformat(),
+                started_at=(now - timedelta(hours=2)).isoformat(),
+                ended_at=now.isoformat(),
+                retry_count=3,
+                reason="err",
+                reason_code="provider_error",
+                lag_minutes=120.0,
+                trace={},
+            )
+        )
+        snapshot = orchestrator.monitor.evaluate()
+        codes = {a["code"] for a in snapshot["alerts"]}
+        assert "SLI_SUCCESS_RATE_BREACH" in codes
+        assert "SLI_CYCLE_LAG_BREACH" in codes
+
+    def test_get_operational_status_has_history(self, config):
+        """Operational status endpoint should include history snapshot."""
+        orchestrator = BloggerOrchestrator(config=config, verbose=False)
+        status = orchestrator.get_operational_status()
+        assert "operational" in status
+        assert "history" in status
 
 
 if __name__ == '__main__':

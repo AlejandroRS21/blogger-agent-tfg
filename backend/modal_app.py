@@ -107,6 +107,44 @@ def generate_blog_post(
         modal.Secret.from_name("openai-secret"),
         modal.Secret.from_name("hf-secret"),
     ],
+    timeout=900,
+    memory=2048,
+)
+def run_continuous_publishing(
+    blogger_urls: List[str],
+    topic_candidates: List[Dict[str, Any]],
+    cycles: int = 2,
+    interval_seconds: float = 0.0,
+    provider: str = "auto",
+) -> Dict[str, Any]:
+    """Run bounded continuous publishing cycles in Modal."""
+    from src.orchestrator.main import BloggerOrchestrator
+    from src.orchestrator.config import OrchestratorConfig
+
+    config = OrchestratorConfig(
+        openai_api_key=os.environ.get("OPENAI_API_KEY"),
+        huggingface_token=os.environ.get("HF_TOKEN"),
+        provider=provider,
+        enable_continuous_publishing=True,
+        write_canonical_docs=True,
+        verbose=True,
+    )
+
+    orchestrator = BloggerOrchestrator(config=config, verbose=True)
+    return orchestrator.start_continuous_publishing(
+        blogger_urls=blogger_urls,
+        topic_candidates=topic_candidates,
+        cycles=cycles,
+        interval_seconds=interval_seconds,
+    )
+
+
+@app.function(
+    image=image,
+    secrets=[
+        modal.Secret.from_name("openai-secret"),
+        modal.Secret.from_name("hf-secret"),
+    ],
 )
 @modal.web_endpoint(method="POST")
 def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
@@ -202,6 +240,36 @@ def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
             "data": None,
             "error": str(e)
         }
+
+
+@app.function(
+    image=image,
+    secrets=[
+        modal.Secret.from_name("openai-secret"),
+        modal.Secret.from_name("hf-secret"),
+    ],
+)
+@modal.web_endpoint(method="POST")
+def continuous_webhook(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Webhook endpoint for bounded continuous publishing operations."""
+    try:
+        blogger_urls = data.get("blogger_urls")
+        topic_candidates = data.get("topic_candidates")
+        if not isinstance(blogger_urls, list) or not blogger_urls:
+            return {"success": False, "data": None, "error": "blogger_urls must be a non-empty list"}
+        if not isinstance(topic_candidates, list) or not topic_candidates:
+            return {"success": False, "data": None, "error": "topic_candidates must be a non-empty list"}
+
+        result = run_continuous_publishing.remote(
+            blogger_urls=blogger_urls,
+            topic_candidates=topic_candidates,
+            cycles=int(data.get("cycles", 2)),
+            interval_seconds=float(data.get("interval_seconds", 0.0)),
+            provider=data.get("provider", "auto"),
+        )
+        return {"success": True, "data": result, "error": None}
+    except Exception as e:  # noqa: BLE001
+        return {"success": False, "data": None, "error": str(e)}
 
 
 @app.function(

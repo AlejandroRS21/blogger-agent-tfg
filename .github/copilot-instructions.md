@@ -294,6 +294,14 @@ Antes de hacer commit, verifica:
 - Python 3.11+ + `pytest`, `pytest-asyncio` (002-unify-testing-docs)
 - Python 3.11+ + `daggr`, `pytest`, OpenAI/Anthropic SDK, `beautifulsoup4` (003-analyze-style-mimicry)
 - Local JSON and Markdown/HTML files in `docs/posts/` (003-analyze-style-mimicry)
+- Python 3.11+ + `google-generativeai`, `aphra`, `pydantic` (006-fix-gemini-api-key)
+- N/A (Configuración en memoria y .env) (006-fix-gemini-api-key)
+- Python 3.11+ + `google-genai`, `pytest`, `python-dotenv`, agentes `aphra_blogger` (006-fix-gemini-api-key)
+- Archivos locales JSON en `backend/outputs/` y estado en memoria del workflow (006-fix-gemini-api-key)
+- Python 3.11+ + `daggr`, `pydantic`, `python-dotenv`, `pytest`, agentes `aphra_blogger`, serialización JSON estándar (007-fix-enye-text)
+- Archivos locales JSON/HTML en `docs/`, salidas de workflow en `backend/outputs/` (007-fix-enye-text)
+- Python 3.11+ + daggr, pydantic, python-dotenv, httpx, beautifulsoup4, lxml, tenacity, modal, gradio (009-continuous-tech-publishing)
+- Archivos locales JSON y HTML en docs y backend/outputs, estado de ejecucion en memoria con persistencia de historico operativo en artefactos (009-continuous-tech-publishing)
 
 ## Recent Changes
 - 002-unify-testing-docs: Added Python 3.11+ + `pytest`, `pytest-asyncio`

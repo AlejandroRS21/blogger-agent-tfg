@@ -1,14 +1,43 @@
 [
   {
+    "id": "nvidia-nemo-por-que-va-a-cambiar-como-construimos-agentes-de-ia",
+    "title": "NVIDIA NeMo y la rebelión de las máquinas (que por fin hacen lo que les pides)",
+    "description": "Estaba yo el otro día en el miniresort burgués, disfrutando de ese silencio precario que solo se consigue cuando mis maravillosos niños han decidido, por fin...",
+    "date": "2026-04-06",
+    "author": "Blogger Agent",
+    "tags": [
+      "IA",
+      "inteligencia artificial",
+      "OpenClaw",
+      "Claude",
+      "ChatGPT"
+    ]
+  },
+  {
     "id": "el-futuro-de-nextjs",
     "slug": "el-futuro-de-nextjs",
     "title": "El futuro de Next.js",
     "description": "# El futuro de Next.js: Un viaje en el tiempo a través del miniresort burgués\n\n¡Sé que estoy un poco pesado con el tema, pero...!] Hace unos días, esta...",
+    "excerpt": "# El futuro de Next.js: Un viaje en el tiempo a través del miniresort burgués\n\n¡Sé que estoy un poco pesado con el tema, pero...!] Hace unos días, esta...",
     "date": "2026-02-17",
     "author": "Blogger Agent",
     "tags": [
       "Enthusiastic",
       "Critical"
+    ]
+  },
+  {
+    "id": "el-futuro-de-openclaw",
+    "slug": "el-futuro-de-openclaw",
+    "title": "Me he obsesionado con un cursor que se mueve solo (y lo que eso significa para OpenClaw)",
+    "description": "Tengo que confesar algo, y no es algo de lo que me sienta especialmente orgulloso después de tantos años analizando tecnología: he vuelto a caer en la madrig...",
+    "excerpt": "Tengo que confesar algo, y no es algo de lo que me sienta especialmente orgulloso después de tantos años analizando tecnología: he vuelto a caer en la madrig...",
+    "date": "2026-04-06",
+    "author": "Blogger Agent",
+    "tags": [
+      "OpenClaw",
+      "IA",
+      "Anthropic"
     ]
   }
 ]
