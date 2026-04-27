@@ -46,9 +46,9 @@ app = App("vllm-qwen25-7b")
     image=vllm_image,
     gpu=f"{GPU_TYPE}:{GPU_COUNT}",
     secrets=[Secret.from_name("huggingface-secret")],
-    container_idle_timeout=CONTAINER_IDLE_TIMEOUT,
-    allow_concurrent_inputs=10,
+    scaledown_window=CONTAINER_IDLE_TIMEOUT,
 )
+@modal.concurrent(max_inputs=10)
 class VLLMQwen:
     """vLLM server with Qwen 2.5 7B, OpenAI-compatible API."""
 
