@@ -26,7 +26,11 @@ app = modal.App("blogger-agent-tfg")
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install_from_requirements("requirements.txt")
-    .apt_install("git")  # For potential git operations
+    .add_local_dir("src", "/src", copy=True)
+    .add_local_dir("aphra_blogger", "/aphra_blogger", copy=True)
+    .add_local_dir("tools", "/tools", copy=True)
+    .apt_install("git")
+    .env({"PYTHONPATH": "/"})
 )
 
 # Define secrets (will need to be configured in Modal dashboard)
@@ -37,8 +41,7 @@ image = (
 @app.function(
     image=image,
     secrets=[
-        modal.Secret.from_name("openai-secret"),
-        modal.Secret.from_name("hf-secret"),
+        modal.Secret.from_name("blogger-agent-secrets"),
     ],
     timeout=600,  # 10 minutes max
     memory=2048,  # 2GB RAM
@@ -104,8 +107,7 @@ def generate_blog_post(
 @app.function(
     image=image,
     secrets=[
-        modal.Secret.from_name("openai-secret"),
-        modal.Secret.from_name("hf-secret"),
+        modal.Secret.from_name("blogger-agent-secrets"),
     ],
     timeout=900,
     memory=2048,
@@ -142,11 +144,10 @@ def run_continuous_publishing(
 @app.function(
     image=image,
     secrets=[
-        modal.Secret.from_name("openai-secret"),
-        modal.Secret.from_name("hf-secret"),
+        modal.Secret.from_name("blogger-agent-secrets"),
     ],
 )
-@modal.web_endpoint(method="POST")
+@modal.fastapi_endpoint(method="POST")
 def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Webhook endpoint for generating blog posts.
@@ -245,11 +246,10 @@ def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
 @app.function(
     image=image,
     secrets=[
-        modal.Secret.from_name("openai-secret"),
-        modal.Secret.from_name("hf-secret"),
+        modal.Secret.from_name("blogger-agent-secrets"),
     ],
 )
-@modal.web_endpoint(method="POST")
+@modal.fastapi_endpoint(method="POST")
 def continuous_webhook(data: Dict[str, Any]) -> Dict[str, Any]:
     """Webhook endpoint for bounded continuous publishing operations."""
     try:
@@ -274,7 +274,7 @@ def continuous_webhook(data: Dict[str, Any]) -> Dict[str, Any]:
 
 @app.function(
     image=image,
-    secrets=[modal.Secret.from_name("openai-secret")],
+    secrets=[modal.Secret.from_name("blogger-agent-secrets")],
 )
 def scrape_blogger_corpus(
     blog_url: str,
