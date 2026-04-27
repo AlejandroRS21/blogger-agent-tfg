@@ -15,9 +15,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY aphra_blogger/ ./aphra_blogger/
+COPY src/ ./src/
+COPY tools/ ./tools/
 
 # Set Python path
 ENV PYTHONPATH=/app
 
 # Default command (can be overridden)
-CMD ["python", "-m", "aphra_blogger.workflows.blogger_style"]
+CMD ["python", "-m", "src.orchestrator.runner"]

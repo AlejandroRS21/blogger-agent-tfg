@@ -1,5 +1,7 @@
 # Próximos Pasos - Blogger Agent TFG
 
+> ⚠️ **Documento histórico de planificación** (Feb 2026). Muchas de estas tareas ya están completadas. Para el roadmap actual, consultá [PROJECT_STATUS.md](../PROJECT_STATUS.md).
+
 > Guía de implementación por fases con tareas pendientes
 
 ## ✅ Completado

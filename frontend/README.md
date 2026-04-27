@@ -1,6 +1,6 @@
 # Frontend - Blogger Agent TFG
 
-Frontend de Next.js para el sistema multi-agente de generación de contenido de blog.
+Frontend estático de Next.js 16 para el sistema multi-agente de generación de contenido de blog.
 
 ## 🚀 Quick Start
 
@@ -17,108 +17,73 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 ```
 frontend/
 ├── app/
-│   ├── api/
-│   │   └── generate-post/
-│   │       └── route.ts          # API endpoint para generar posts
 │   ├── components/
-│   │   ├── BlogLayout.tsx        # Layout principal (header/footer)
-│   │   ├── PostHeader.tsx        # Encabezado de posts con metadata
-│   │   ├── PostBody.tsx          # Renderizado de contenido HTML
-│   │   └── GenerateForm.tsx      # Formulario de generación
-│   ├── generate/
-│   │   └── page.tsx              # Página del formulario
+│   │   ├── HTMLRenderer.tsx       # Renderizado de contenido HTML con sanitización
+│   │   ├── PostCard.tsx           # Tarjeta de post para listados (homepage)
+│   │   └── PostMeta.tsx           # Metadata de posts (fecha, etiquetas, autor)
 │   ├── posts/
 │   │   └── [slug]/
-│   │       └── page.tsx          # Página dinámica de posts
+│   │       └── page.tsx           # Página dinámica de post individual
+│   ├── lib/
+│   │   ├── api.ts                 # Data fetching layer
+│   │   └── postAudit.ts           # Post integrity checks
 │   ├── types/
-│   │   └── post.ts               # TypeScript types
-│   ├── layout.tsx                # Root layout
-│   ├── page.tsx                  # Homepage
-│   └── globals.css               # Estilos globales
-├── public/                       # Assets estáticos
-├── .env.local                    # Variables de entorno
+│   │   └── post.ts                # Zod schemas + TypeScript types
+│   ├── layout.tsx                 # Root layout con nav y footer
+│   ├── page.tsx                   # Homepage (grid de PostCards)
+│   ├── not-found.tsx              # 404 page
+│   └── globals.css                # Estilos globales Tailwind v4
+├── __tests__/                     # Tests con Jest + Testing Library
+│   ├── api.test.ts
+│   ├── HTMLRenderer.test.tsx
+│   ├── PostCard.test.tsx
+│   ├── integrity.test.ts
+│   └── seo.test.ts
+├── public/                        # Assets estáticos
 ├── package.json
-└── tailwind.config.ts
+├── next.config.ts                 # Static export + React Compiler
+├── jest.config.ts
+├── jest.setup.ts
+└── tsconfig.json
 ```
 
 ## 🎨 Componentes
 
-### `BlogLayout`
-Layout principal con navegación y footer.
+### `HTMLRenderer`
+Renderiza contenido HTML sanitizado con estilos prose de Tailwind.
 
-**Props:** `children: React.ReactNode`
+**Props:** `htmlContent: string`
 
-### `PostHeader`
+### `PostCard`
+Tarjeta de presentación para listados de posts en la homepage.
+
+**Props:** `post: PostListItem`
+
+### `PostMeta`
 Muestra título, descripción y metadata del post.
 
 **Props:**
 - `title: string`
-- `description: string`
+- `description?: string`
 - `date: string`
-- `readingTime: number`
-- `wordCount: number`
-- `author?: string`
 - `tags?: string[]`
-
-### `PostBody`
-Renderiza el contenido HTML del post con estilos prose de Tailwind.
-
-**Props:** `htmlContent: string`
-
-### `GenerateForm`
-Formulario para generar posts. Envía datos al endpoint `/api/generate-post`.
-
-**Campos:**
-- Nombre del blogger
-- Biografía
-- Posts de ejemplo (URLs)
-- Tema del post
-- Palabras clave (opcional)
-
-## 🔌 API Routes
-
-### `POST /api/generate-post`
-
-Genera un post usando el backend Python.
-
-**Request Body:**
-```typescript
-{
-  blogger_name: string;
-  blogger_bio: string;
-  blogger_sample_posts: string[];
-  topic: string;
-  keywords?: string[];
-}
-```
-
-**Response:**
-```typescript
-{
-  success: boolean;
-  post?: BlogPost;
-  error?: string;
-  execution_time?: number;
-}
-```
 
 ## 🌐 Páginas
 
 ### `/` - Homepage
-Página principal con hero, features y tech stack.
-
-### `/generate` - Generación
-Formulario para crear nuevos posts.
+Página principal con hero section y grid de posts usando `PostCard`.
 
 ### `/posts/[slug]` - Post dinámico
-Muestra un post generado.
+Muestra un post individual con su contenido HTML renderizado.
 
 ## ⚙️ Configuración
 
 ### Variables de Entorno (`.env.local`)
 
+Crea este archivo si no existe:
+
 ```bash
-# Backend URL (local o Modal webhook)
+# Backend URL (Modal webhook)
 BACKEND_URL=http://localhost:8000
 
 # Modo mock (true para desarrollo sin backend)
@@ -132,79 +97,61 @@ NEXT_PUBLIC_APP_DESCRIPTION=Sistema multi-agente para generar contenido
 ## 🔧 Scripts
 
 - `npm run dev` - Servidor de desarrollo (port 3000)
-- `npm run build` - Build de producción
+- `npm run build` - Build de producción (static export a `out/`)
 - `npm run start` - Servidor de producción
 - `npm run lint` - ESLint
-
-## 🎯 Modo Mock vs Modo Real
-
-### Modo Mock (desarrollo)
-```bash
-USE_MOCK=true
-```
-- No requiere backend corriendo
-- Genera posts de ejemplo
-- Delay simulado de 2 segundos
-
-### Modo Real (producción)
-```bash
-USE_MOCK=false
-BACKEND_URL=http://localhost:8000  # o Modal webhook
-```
-- Conecta con el backend Python
-- Usa agentes de IA reales
-- Tiempo de ejecución variable
+- `npm test` - Jest + Testing Library
 
 ## 🧪 Testing
 
-Para probar el flujo completo:
+Tests implementados con Jest + Testing Library:
 
-1. **Iniciar frontend:**
-   ```bash
-   npm run dev
-   ```
+```bash
+# Ejecutar todos los tests
+npm test
 
-2. **Modo Mock (sin backend):**
-   - Abre http://localhost:3000
-   - Navega a "Generar Post"
-   - Llena el formulario
-   - Observa el post generado
+# Con coverage
+npm test -- --coverage
+```
 
-3. **Modo Real (con backend):**
-   ```bash
-   # Terminal 1: Backend
-   cd ../backend
-   uv run uvicorn aphra_blogger.api:app --reload
-
-   # Terminal 2: Frontend
-   npm run dev
-   ```
+Archivos de test:
+- `api.test.ts` — Tests de la capa de datos
+- `HTMLRenderer.test.tsx` — Tests del renderizador HTML
+- `PostCard.test.tsx` — Tests de la tarjeta de posts
+- `integrity.test.ts` — Tests de integridad de datos
+- `seo.test.ts` — Tests de SEO y metadata
 
 ## 📦 Dependencias Principales
 
-- **Next.js 16.1.6** - React framework
-- **React 19.2.3** - UI library
-- **TypeScript 5** - Type safety
-- **Tailwind CSS 4** - Styling
+- **Next.js 16.1.6** — React framework con App Router
+- **React 19.2.3** — UI library
+- **TypeScript 5** — Type safety
+- **Tailwind CSS 4** — Utility-first styling
+- **isomorphic-dompurify** — Sanitización HTML
+- **Zod 4** — Validación de schemas
 
 ## 🚢 Deploy
 
-### Vercel (recomendado)
+### Static Export
+
+El proyecto usa `output: 'export'` para generar un sitio completamente estático en `out/`.
 
 ```bash
-# Instalar Vercel CLI
-npm i -g vercel
+npm run build
+# La salida está en out/
+```
 
-# Deploy
+### Vercel
+
+```bash
+npm i -g vercel
 vercel
 ```
 
-### Variables de entorno en Vercel:
-- `BACKEND_URL`: URL del backend en Modal
-- `USE_MOCK`: `false` para producción
+Configuración en `vercel.json` (raíz del proyecto).
 
 ## 📚 Recursos
 
 - [Next.js Docs](https://nextjs.org/docs)
-- [Tailwind CSS](https://tailwindcss.com)
+- [Tailwind CSS v4](https://tailwindcss.com)
 - [TypeScript](https://www.typescriptlang.org)

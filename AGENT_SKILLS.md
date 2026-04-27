@@ -9,7 +9,7 @@ Este documento define las **skills (habilidades/capacidades)** necesarias para c
 #### Skills Principales:
 - **aphra-workflows**: Diseño y desarrollo de workflows con Aphra para orquestación de agentes
 - **modal-deployment**: Configuración y despliegue de aplicaciones en Modal.com
-- **python-backend**: Desarrollo de backend en Python con FastAPI/Flask
+- **python-backend**: Desarrollo de backend en Python con FastAPI
 - **docker-containerization**: Containerización de aplicaciones con Docker
 - **api-design**: Diseño de APIs RESTful para comunicación entre servicios
 - **database-management**: Gestión de bases de datos (PostgreSQL, MongoDB)
@@ -45,7 +45,7 @@ docker-compose up -d
 - **nlp-analysis**: Análisis de lenguaje natural (NLP) con spaCy, NLTK, Transformers
 - **web-scraping**: Extracción de contenido web con BeautifulSoup, Scrapy, Playwright
 - **content-mimicry**: Técnicas de imitación de estilo de escritura
-- **llm-prompting**: Ingeniería de prompts para LLMs (GPT, Claude, Llama)
+- **llm-prompting**: Ingeniería de prompts para LLMs (HuggingFace, GPT, Gemini)
 - **style-transfer**: Transfer learning para adaptación de estilo
 - **sentiment-analysis**: Análisis de sentimiento y tono
 - **text-generation**: Generación de texto con modelos de lenguaje
@@ -57,56 +57,73 @@ docker-compose up -d
 - 📄 Issue #6: Desarrollar agentes de análisis de contenido
 - 📄 Issue #7: Implementar agentes de generación de contenido
 
-#### Agentes a Implementar:
+#### Agentes Implementados:
 
-**1. Agente de Análisis de Tono y Estilo**
+**1. StyleAnalyzer**
 ```python
+# Fichero: style_analyzer.py
 # Skill: tone-style-analysis
-# Analiza el tono, formalidad, humor y estilo narrativo
-# Tecnologías: spaCy, Transformers, custom classifiers
+# Analiza tono, voz, estructura narrativa y expresiones características
+# Tecnologías: spaCy, Transformers, LLM prompts
 ```
 
-**2. Agente de Análisis de Temáticas**
+**2. KeywordExtractor**
 ```python
-# Skill: topic-modeling
-# Extrae temáticas principales usando LDA, NMF, BERTopic
-# Tecnologías: gensim, scikit-learn, BERTopic
+# Fichero: keyword_extractor.py
+# Skill: keyword-extraction
+# Extrae palabras clave, expresiones y temáticas del contenido analizado
+# Tecnologías: NLTK, TF-IDF, RAKE, LLM
 ```
 
-**3. Agente de Palabras Frecuentes**
+**3. ContentGenerator**
 ```python
-# Skill: frequency-analysis
-# Identifica palabras, expresiones y muletillas características
-# Tecnologías: NLTK, collections.Counter, TF-IDF
+# Fichero: content_generator.py
+# Skill: content-generation
+# Genera borradores, refina contenido y aplica mimicry de estilo
+# Soporta modos: REFLECTIVE, TECHNICAL, QUICK_FLASH, CURATED_LINKS, RANT
+# Tecnologías: HuggingFace, OpenAI, Gemini, Modal
 ```
 
-**4. Agente Generador de Texto Base**
+**4. CriticAgent**
 ```python
-# Skill: base-text-generation
-# Genera borrador inicial del artículo
-# Tecnologías: GPT-4, Claude, Llama
-```
-
-**5. Agente de Mimesis**
-```python
-# Skill: style-mimicry
-# Adapta el texto al estilo del blogger objetivo
-# Tecnologías: Fine-tuned LLM, prompt engineering
-```
-
-**6. Agente Crítico**
-```python
+# Fichero: critic.py
 # Skill: content-critique
-# Revisa y sugiere mejoras al texto generado
-# Tecnologías: GPT-4, quality metrics, readability scores
+# Evalúa coherencia, ajuste de estilo y engagement del texto generado
+# Tecnologías: LLM prompts, readability scores, quality metrics
 ```
 
-**7. Agente de Selección de Imágenes**
+**5. ImageSelectorAgent**
 ```python
+# Fichero: image_selector.py
 # Skill: image-selection
-# Selecciona imágenes relevantes para el artículo
-# Tecnologías: CLIP, Unsplash API, stable-diffusion
+# Selecciona imágenes relevantes y genera prompts para el artículo
+# Tecnologías: Brave Search API, perception model, prompt templates
 ```
+
+**6. HTMLBuilder**
+```python
+# Fichero: html_builder.py
+# Skill: html-building
+# Convierte Markdown → HTML, genera TOC, meta tags y estructura JSX
+# Tecnologías: HTML parsing, meta tag generation, JSX conversion
+```
+
+**7. ResearchAgent**
+```python
+# Fichero: research_agent.py
+# Skill: research-topic
+# Busca información actualizada y contexto para los artículos
+# Tecnologías: Brave Search API, web scraping, LLM summarization
+```
+
+#### Proveedores LLM:
+
+| Proveedor | Fichero | Prioridad | Modelo por Defecto |
+|-----------|---------|-----------|-------------------|
+| HuggingFace | `huggingface_provider.py` | Primario (gratuito) | `meta-llama/Meta-Llama-3.1-8B-Instruct` |
+| OpenAI | `openai_provider.py` | Fallback | `gpt-4-turbo-preview` |
+| Gemini | `gemini_provider.py` | Alternativa | `gemini-2.0-flash` |
+| Modal | `modal_provider.py` | Hosting propio | `blogger-agent-models/LlamaModel.generate` |
 
 #### Bibliotecas Python Clave:
 ```python
@@ -114,10 +131,10 @@ import spacy
 import nltk
 from transformers import pipeline, AutoTokenizer, AutoModel
 from bs4 import BeautifulSoup
-import scrapy
-from langchain import LLMChain, PromptTemplate
-import openai
-import anthropic
+from huggingface_hub import InferenceClient
+from openai import OpenAI
+from google import genai
+import modal
 ```
 
 ---
@@ -125,9 +142,9 @@ import anthropic
 ### **Persona 3: Frontend & Next.js Lead (P3)**
 
 #### Skills Principales:
-- **nextjs-development**: Desarrollo de aplicaciones con Next.js 14+ (App Router)
-- **react-components**: Creación de componentes React reutilizables
-- **tailwindcss-styling**: Estilizado con Tailwind CSS
+- **nextjs-development**: Desarrollo de aplicaciones con Next.js 16+ (App Router)
+- **react-components**: Creación de componentes React 19 reutilizables
+- **tailwindcss-styling**: Estilizado con Tailwind CSS 4
 - **html-css-extraction**: Extracción y adaptación de HTML/CSS de sitios web
 - **responsive-design**: Diseño responsive y mobile-first
 - **seo-optimization**: Optimización para motores de búsqueda
@@ -148,8 +165,11 @@ npm run dev
 npm run build
 npm run start
 
-# Tailwind CSS
-npx tailwindcss init -p
+# Tailwind CSS 4
+npx @tailwindcss/cli init
+
+# Testing
+npm run test
 
 # Deployment
 vercel deploy
@@ -159,33 +179,42 @@ vercel deploy
 ```typescript
 // Skills: component-architecture, typescript
 
-components/
-├── layout/
-│   ├── Header.tsx
-│   ├── Footer.tsx
-│   └── Layout.tsx
-├── blog/
-│   ├── PostCard.tsx
-│   ├── PostContent.tsx
-│   ├── PostMeta.tsx
-│   └── PostList.tsx
-└── ui/
-    ├── Button.tsx
-    ├── Image.tsx
-    └── Link.tsx
+app/
+├── components/
+│   ├── HTMLRenderer.tsx      # Renderiza HTML sanitizado con DOMPurify
+│   ├── PostCard.tsx           # Tarjetas de post para la lista
+│   └── PostMeta.tsx           # Metadatos del post (tags, fechas, etc.)
+├── posts/
+│   └── [slug]/
+│       └── page.tsx           # Página de detalle del post
+├── types/
+│   └── post.ts                # Tipos PostMetadata, PostListItem
+├── layout.tsx                 # Layout raíz con Header/Footer + SEO
+├── not-found.tsx              # Página 404 personalizada
+└── page.tsx                   # Home con listado de posts
 ```
 
 #### Bibliotecas y Paquetes:
 ```json
 {
   "dependencies": {
-    "next": "^14.0.0",
-    "react": "^18.2.0",
-    "tailwindcss": "^3.4.0",
-    "gray-matter": "^4.0.3",
-    "remark": "^15.0.0",
-    "remark-html": "^16.0.0",
-    "date-fns": "^3.0.0"
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "zod": "^4.3.6",
+    "isomorphic-dompurify": "^3.7.1",
+    "@tailwindcss/typography": "^0.5.19"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "jest": "^30.3.0",
+    "@testing-library/react": "^16.3.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6"
   }
 }
 ```
@@ -211,24 +240,27 @@ Focus on:
 
 #### Para P2 (Content Analysis Lead):
 ```
-I'm developing NLP agents for content analysis and text generation.
+I'm developing NLP agents for content analysis and text generation using multiple LLM providers.
 Focus on:
 - NLP tasks with spaCy, NLTK, Transformers
-- LLM prompt engineering
-- Web scraping with BeautifulSoup/Scrapy
-- Style mimicry and text generation
+- LLM prompt engineering (HuggingFace, OpenAI, Gemini, Modal)
+- Web scraping with BeautifulSoup
+- Style mimicry and structured content generation
 - Aphra agent definitions
+- DO NOT use Anthropic/Claude — we use HuggingFace (primary), OpenAI (fallback), Gemini, or Modal providers
 ```
 
 #### Para P3 (Frontend Lead):
 ```
-I'm building a Next.js 14 blog with App Router and Tailwind CSS.
+I'm building a Next.js 16 blog with App Router and Tailwind CSS 4.
 Focus on:
-- Next.js App Router patterns
-- React Server Components
-- Tailwind CSS styling
-- TypeScript type safety
-- Responsive design
+- Next.js 16 App Router patterns
+- React 19 Server Components and Server Actions
+- Tailwind CSS 4 styling (no @apply, use CSS variables via @theme)
+- TypeScript 5 type safety
+- DOMPurify for HTML sanitization
+- Responsive design with Geist font
+- Jest + React Testing Library for tests
 ```
 
 ---
@@ -243,6 +275,7 @@ fastapi>=0.104.0
 uvicorn>=0.24.0
 pydantic>=2.5.0
 python-dotenv>=1.0.0
+toml>=0.10.0
 ```
 
 ### Agents (P2)
@@ -251,18 +284,20 @@ spacy>=3.7.0
 nltk>=3.8.0
 transformers>=4.35.0
 beautifulsoup4>=4.12.0
-scrapy>=2.11.0
+huggingface-hub>=0.20.0
 openai>=1.3.0
-anthropic>=0.7.0
-langchain>=0.1.0
+google-genai>=1.0.0
+modal>=0.55.0
+requests>=2.31.0
 ```
 
 ### Frontend (P3)
 ```json
 {
-  "next": "^14.0.0",
-  "react": "^18.2.0",
-  "tailwindcss": "^3.4.0"
+  "next": "16.1.6",
+  "react": "19.2.3",
+  "tailwindcss": "^4",
+  "typescript": "^5"
 }
 ```
 
@@ -294,6 +329,7 @@ langchain>=0.1.0
 - **Next.js Docs**: https://nextjs.org/docs
 - **Tailwind CSS**: https://tailwindcss.com/docs
 - **Blog Objetivo**: https://javipas.com/
+- **Geist Font**: https://vercel.com/font
 
 ---
 
@@ -302,10 +338,10 @@ langchain>=0.1.0
 1. **Análisis completo** del estilo de escritura de javipas.com
 2. **Sistema multi-agente** funcional con Aphra
 3. **Generación automática** de artículos que imiten el estilo
-4. **Blog Next.js** con diseño similar al original
-5. **Deployment funcional** en Modal
+4. **Blog Next.js 16** con diseño similar al original
+5. **Deployment funcional** en Modal y Vercel
 6. **Documentación completa** del TFG
 
 ---
 
-**Última actualización**: 10 de febrero de 2026
+**Última actualización**: 27 de abril de 2026

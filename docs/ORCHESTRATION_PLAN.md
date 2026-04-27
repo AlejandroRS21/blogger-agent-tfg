@@ -1,5 +1,7 @@
 # Plan de Orquestación - Blogger Agent TFG
 
+> ⚠️ **Documento histórico de planificación** (Feb 2026). La estructura real del proyecto puede diferir. Para el estado actual, consultá [PROJECT_STATUS.md](../PROJECT_STATUS.md) y [README.md](../README.md).
+
 > Organización de issues, asignación a agentes, y plan de ejecución
 
 ## 📊 Estado Actual

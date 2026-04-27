@@ -22,12 +22,11 @@ This package contains specialized AI agents that work together to analyze a blog
 **Usage:**
 ```python
 from aphra_blogger.agents.style_analyzer import StyleAnalyzer
+from aphra_blogger.llm.factory import LLMFactory
 
-analyzer = StyleAnalyzer(api_key="your-openai-key")
+provider = LLMFactory.create("huggingface", token="hf_...")
+analyzer = StyleAnalyzer(provider=provider)
 style = analyzer.analyze(blogger_urls=["https://javipas.com"])
-
-print(style['tone'])          # "conversational, humorous, personal"
-print(style['expressions'])   # ["me alucina", "dicho y hecho", ...]
 ```
 
 **Output Structure:**
@@ -63,12 +62,9 @@ print(style['expressions'])   # ["me alucina", "dicho y hecho", ...]
 ```python
 from aphra_blogger.agents.keyword_extractor import KeywordExtractor
 
-extractor = KeywordExtractor(api_key="your-openai-key")
+provider = LLMFactory.create("huggingface", token="hf_...")
+extractor = KeywordExtractor(provider=provider)
 result = extractor.extract(blogger_urls=["https://javipas.com"])
-
-print(result['keywords'])        # ["IA", "OpenClaw", "tecnología", ...]
-print(result['expressions'])     # ["me alucina", "brutal", ...]
-print(result['themes'])          # ["Inteligencia Artificial", ...]
 ```
 
 **Output Structure:**
@@ -97,7 +93,8 @@ print(result['themes'])          # ["Inteligencia Artificial", ...]
 ```python
 from aphra_blogger.agents.content_generator import ContentGenerator
 
-generator = ContentGenerator(api_key="your-openai-key")
+provider = LLMFactory.create("huggingface", token="hf_...")
+generator = ContentGenerator(provider=provider)
 
 # Generate draft
 draft = generator.generate_draft(
@@ -140,16 +137,13 @@ refined = generator.refine_content(
 ```python
 from aphra_blogger.agents.critic import CriticAgent
 
-critic = CriticAgent(api_key="your-openai-key")
+provider = LLMFactory.create("huggingface", token="hf_...")
+critic = CriticAgent(provider=provider)
 critique = critic.critique(
     content=draft,
     style_profile=style,
     topic="Test Topic"
 )
-
-print(f"Overall: {critique['overall_score']}/10")
-print(f"Needs revision: {critique['needs_revision']}")
-print(f"Suggestions: {critique['suggestions']}")
 ```
 
 **Output Structure:**
@@ -173,6 +167,27 @@ print(f"Suggestions: {critique['suggestions']}")
 **File:** `image_selector.py`  
 **Purpose:** Selects image placements and generates prompts
 
+### 6. HTMLBuilder 🏗️
+**File:** `html_builder.py`
+**Purpose:** Converts Markdown to HTML/JSX with SEO metadata
+
+**Capabilities:**
+- Markdown → HTML conversion (python-markdown)
+- JSX generation for React/Next.js components
+- Heading extraction for table of contents (TOC)
+- Meta tag generation (title, description, keywords)
+- Reading time and word count calculation
+- Complete Next.js component generation
+
+### 7. ResearchAgent 🔬
+**File:** `research_agent.py`
+**Purpose:** Topic research and context exploration
+
+**Capabilities:**
+- Topic background research
+- Context gathering for content generation
+- Supplementary information retrieval
+
 **Capabilities:**
 - Strategic image placement
 - AI image generation prompts
@@ -183,15 +198,13 @@ print(f"Suggestions: {critique['suggestions']}")
 ```python
 from aphra_blogger.agents.image_selector import ImageSelectorAgent
 
-selector = ImageSelectorAgent(api_key="your-openai-key")
+provider = LLMFactory.create("huggingface", token="hf_...")
+selector = ImageSelectorAgent(provider=provider)
 images = selector.select_images(
     content=final_content,
     topic="AI in Education",
     num_images=3
 )
-
-for img in images:
-    print(f"{img['position']}: {img['prompt']}")
 ```
 
 **Output Structure:**
@@ -231,13 +244,15 @@ Agents work together in a coordinated pipeline:
 
 ## 🛡️ Fallback Behavior
 
-All agents implement fallback behavior when OpenAI API is unavailable:
+All agents implement fallback behavior when LLM APIs are unavailable:
 
 - **StyleAnalyzer**: Returns predefined Javi Pas style profile
 - **KeywordExtractor**: Returns known keywords and expressions
 - **ContentGenerator**: Template-based generation
 - **CriticAgent**: Rule-based heuristic evaluation
 - **ImageSelectorAgent**: Position-based default prompts
+- **HTMLBuilder**: Local Markdown→HTML conversion without LLM
+- **ResearchAgent**: Returns cached/predefined context
 
 This ensures the system works even without API access.
 
@@ -260,39 +275,48 @@ pytest tests/test_agents.py --cov=aphra_blogger.agents
 
 Set environment variables:
 ```bash
-export OPENAI_API_KEY="sk-..."
-```
+# Primary provider (free)
+export HF_TOKEN="hf_..."
 
-Or pass directly:
-```python
-agent = StyleAnalyzer(api_key="sk-...")
+# Optional fallback providers
+export OPENAI_API_KEY="sk-..."
+export GEMINI_API_KEY="..."
 ```
 
 ### Model Selection
 
 ```python
-# Use different models
-style_analyzer = StyleAnalyzer(model="gpt-4-turbo-preview")
-keyword_extractor = KeywordExtractor(model="gpt-3.5-turbo")  # Cheaper
+# Use different providers
+from aphra_blogger.llm.factory import LLMFactory
+
+# HuggingFace (free, primary)
+provider = LLMFactory.create("huggingface", token=os.environ["HF_TOKEN"])
+
+# OpenAI (paid fallback)
+provider = LLMFactory.create("openai", api_key=os.environ["OPENAI_API_KEY"])
+
+# Gemini (Google)
+provider = LLMFactory.create("gemini", api_key=os.environ["GEMINI_API_KEY"])
 ```
 
 ## 📊 Example: Complete Pipeline
 
 ```python
 from aphra_blogger.agents import (
-    StyleAnalyzer,
-    KeywordExtractor,
-    ContentGenerator,
-    CriticAgent,
-    ImageSelectorAgent
+    StyleAnalyzer, KeywordExtractor, ContentGenerator,
+    CriticAgent, ImageSelectorAgent
 )
+from aphra_blogger.llm.factory import LLMFactory
+
+# Initialize LLM provider
+provider = LLMFactory.create("huggingface", token="hf_...")
 
 # Initialize all agents
-style_analyzer = StyleAnalyzer()
-keyword_extractor = KeywordExtractor()
-content_generator = ContentGenerator()
-critic = CriticAgent()
-image_selector = ImageSelectorAgent()
+style_analyzer = StyleAnalyzer(provider=provider)
+keyword_extractor = KeywordExtractor(provider=provider)
+content_generator = ContentGenerator(provider=provider)
+critic = CriticAgent(provider=provider)
+image_selector = ImageSelectorAgent(provider=provider)
 
 # Run pipeline
 urls = ["https://javipas.com"]
@@ -336,7 +360,6 @@ Each agent can be extended with custom prompts:
 class CustomContentGenerator(ContentGenerator):
     def generate_draft(self, topic, style_profile, keywords, **kwargs):
         # Add custom prompt engineering
-        # Call parent with modified parameters
         return super().generate_draft(topic, style_profile, keywords, **kwargs)
 ```
 
@@ -350,45 +373,58 @@ class CustomCritic(CriticAgent):
         return {...}
 ```
 
+### Custom Provider
+
+```python
+from aphra_blogger.llm.base import BaseLLMProvider
+
+class CustomProvider(BaseLLMProvider):
+    def generate(self, prompt: str, **kwargs) -> str:
+        # Custom implementation
+        ...
+```
+
 ## 📝 Best Practices
 
 1. **Always handle missing API keys**: All agents support fallback mode
-2. **Cache style profiles**: StyleAnalyzer results can be reused
-3. **Batch keyword extraction**: Extract once, use multiple times
-4. **Monitor costs**: GPT-4 calls are expensive, use GPT-3.5 where possible
-5. **Test fallbacks**: Ensure system works without API
+2. **Use HuggingFace as primary**: Free Inference API with good quality
+3. **Cache style profiles**: StyleAnalyzer results can be reused
+4. **Batch keyword extraction**: Extract once, use multiple times
+5. **Monitor costs**: Only use paid providers (OpenAI, Gemini) as fallback
+6. **Test fallbacks**: Ensure system works without any API
 
 ## 🚀 Performance Tips
 
-- Use `gpt-3.5-turbo` for KeywordExtractor and ImageSelector
-- Use `gpt-4-turbo-preview` for ContentGenerator and Critic
+- Use HuggingFace (free) as primary provider for all agents
+- Use OpenAI/Gemini only as fallback when HF is unavailable
 - Cache StyleAnalyzer results (they don't change often)
 - Implement rate limiting for API calls
 - Use async calls for parallel agent execution
 
 ## 🐛 Troubleshooting
 
-### Error: "OpenAI API key not found"
+### Error: "HuggingFace token not found"
 
 ```bash
-export OPENAI_API_KEY="sk-..."
+export HF_TOKEN="hf_..."
 ```
+Get your free token at: https://huggingface.co/settings/tokens
 
 ### Error: "Rate limit exceeded"
 
-Implement exponential backoff or reduce request frequency.
+Implement exponential backoff or switch to a paid provider (OpenAI/Gemini) as fallback.
 
 ### Poor content quality
 
+- Use a larger model via HF (e.g., Llama 3.1 70B instead of 8B)
 - Increase `temperature` for more creative content
-- Use `gpt-4-turbo-preview` instead of `gpt-3.5-turbo`
 - Provide more detailed style profiles
 
 ## 📚 References
 
-- [OpenAI API Docs](https://platform.openai.com/docs)
+- [HuggingFace Inference API Docs](https://huggingface.co/docs/api-inference)
 - [Orchestrator README](../src/orchestrator/README.md)
-- [Architecture Docs](../../docs/ORCHESTRATION_PLAN.md)
+- [Orchestration Plan](../../docs/ORCHESTRATION_PLAN.md)
 
 ---
 

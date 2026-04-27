@@ -1,5 +1,7 @@
 # Frontend Development Summary - Blogger Agent TFG
 
+> ⚠️ **Documento histórico** (Ene 2026). Los componentes y páginas descritos aquí corresponden a la versión inicial y han evolucionado. Los componentes actuales son: `HTMLRenderer`, `PostCard`, `PostMeta`. Consultá [README.md](../README.md) para la estructura actual.
+
 **Fecha**: 2024-01-15  
 **Fase**: Frontend Next.js Implementation  
 **Estado**: ✅ Completado

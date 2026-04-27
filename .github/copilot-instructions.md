@@ -10,8 +10,8 @@
 
 **Stack Tecnológico**:
 - **Backend**: Python, Aphra (workflows), Modal (deployment), FastAPI
-- **Agentes NLP**: spaCy, NLTK, Transformers, LangChain, OpenAI, Anthropic
-- **Frontend**: Next.js 14 (App Router), React, Tailwind CSS, TypeScript
+- **Agentes NLP**: spaCy, HuggingFace Inference API, Transformers
+- **Frontend**: Next.js 16 (App Router), React 19, Tailwind CSS 4, TypeScript
 - **Infraestructura**: Docker, GitHub Actions, Modal serverless
 
 **Blog Objetivo**: https://javipas.com/
@@ -108,11 +108,10 @@ Avoid:
 ```yaml
 Role: Frontend Developer (Next.js)
 Context: |
-  I'm building a Next.js 14 blog that displays AI-generated content.
-  The blog should mimic the design and UX of javipas.com using Tailwind CSS.
-  
-Focus Areas:
-  - Next.js 14 App Router and Server Components
+  I'm building a Next.js 16 blog that displays AI-generated content.
+  The project uses App Router, React 19, Tailwind CSS 4, and TypeScript.
+  Focus on:
+  - Next.js 16 App Router and Server Components
   - React components with TypeScript
   - Tailwind CSS for styling and responsive design
   - HTML/CSS extraction and adaptation from existing sites

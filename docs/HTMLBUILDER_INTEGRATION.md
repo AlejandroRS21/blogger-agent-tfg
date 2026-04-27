@@ -1,5 +1,7 @@
 # HTMLBuilder Integration - Implementation Summary
 
+> ⚠️ **Documento histórico** (2024). La integración del HTMLBuilder está completada y en producción. Para la estructura actual del orquestador, consultá [README.md](../README.md).
+
 **Date:** 2024
 **Issue:** #3 (HTMLBuilder Agent) integrated into orchestrator
 **Status:** ✅ **COMPLETED**

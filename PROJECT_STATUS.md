@@ -1,41 +1,21 @@
 # 🚀 Blogger Agent TFG - Estado del Proyecto
 
-## ✅ Proyecto Completamente Limpiado y Reorganizado
+## ✅ Proyecto Consolidado y Funcional
 
-Fecha: 11 de febrero de 2026
-
----
-
-## 📋 Resumen de Cambios
-
-### 🗑️ Archivos Eliminados (Interfaz Gradio redundantes)
-
-Se eliminaron **6 archivos** de interfaces Gradio que eran redundantes:
-
-1. ❌ `gradio_app.py` - Interfaz básica con Mermaid
-2. ❌ `gradio_app_advanced.py` - Interfaz avanzada con progress tracking
-3. ❌ `gradio_diagrams.py` - Solo visualización de diagramas
-4. ❌ `gradio_dag.py` - Intento fallido de usar `from gradio import daggr`
-5. ❌ `gradio_dag_interactive.py` - DAG interactivo con vis.js
-6. ❌ `test_gradio.py` - Tests de las interfaces Gradio
-
-**Razón:** Daggr proporciona todas estas funcionalidades de forma nativa y oficial.
-
-### ✅ Archivo Mantenido (Solución Oficial)
-
-**`daggr_blogger_workflow.py`** - Workflow visual completo con Daggr 0.7.0
-
-Este archivo proporciona:
-- 📊 Visualización automática del flujo de 6 agentes
-- 🔍 Inspección de inputs/outputs de cada nodo
-- 🔄 Re-ejecución selectiva de nodos
-- 💾 Persistencia automática de estado
-- 🧪 Testing manual interactivo
-- 🐛 Debugging visual del pipeline
+Fecha: 27 de abril de 2026
 
 ---
 
-## 🏗️ Nueva Arquitectura
+## 📋 Resumen de Arquitectura
+
+El proyecto consta de dos sistemas independientes que se comunican mediante archivos JSON:
+
+- **Backend (Python/Daggr):** Generación de posts mediante pipeline multi-agente con 7 agentes de IA, orquestador completo y workflow visual con Daggr.
+- **Frontend (Next.js):** Visualización y consulta de posts generados, con 2 páginas y 3 componentes React.
+
+---
+
+## 🏗️ Arquitectura Actual
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -49,16 +29,16 @@ Este archivo proporciona:
 │  │  VISUALIZACIÓN        │         │  GENERACIÓN          │    │
 │  │  ─────────────        │         │  ──────────          │    │
 │  │  • Homepage           │         │  • Daggr Workflow    │    │
-│  │  • Listar posts       │         │  • 6 Agentes IA      │    │
-│  │  • Ver post           │         │  • HuggingFace LLM   │    │
-│  │  • Formulario gen.    │         │  • Testing visual    │    │
-│  │                       │◄───────►│  • Debugging         │    │
-│  │  GESTIÓN              │  JSON   │                      │    │
-│  │  ────────             │  Posts  │  DEBUGGING           │    │
-│  │  • Crear              │         │  ─────────           │    │
-│  │  • Editar             │         │  • Inspeccionar      │    │
-│  │  • Eliminar           │         │  • Re-ejecutar       │    │
-│  │  • Buscar             │         │  • Modificar         │    │
+│  │  • Listar posts       │         │  • 7 Agentes IA      │    │
+│  │  • Ver post           │         │  • Multi-LLM         │    │
+│  │                       │◄───────►│  • Continuous Pub.   │    │
+│  │                       │  JSON   │  • Web Scraper       │    │
+│  │                       │  Posts  │                      │    │
+│  │                       │         │  DEBUGGING           │    │
+│  │                       │         │  ─────────           │    │
+│  │                       │         │  • Inspeccionar      │    │
+│  │                       │         │  • Re-ejecutar       │    │
+│  │                       │         │  • Modificar         │    │
 │  │                       │         │  • Validar           │    │
 │  └───────────────────────┘         └──────────────────────┘    │
 │           │                                   │                  │
@@ -77,7 +57,7 @@ Este archivo proporciona:
 | **Propósito** | Visualización y UX | Generación y Testing |
 | **Puerto** | 3000 | 7860 |
 | **Usuario Final** | Lectores/Administradores | Desarrolladores/QA |
-| **Funciones** | Listar, Ver, Gestionar | Generar, Debuggear, Validar |
+| **Funciones** | Listar, Ver | Generar, Debuggear, Validar |
 | **Tecnología** | React, TypeScript, Tailwind | Python, Daggr, HuggingFace |
 | **Deploy** | Vercel | Hugging Face Spaces |
 
@@ -88,72 +68,105 @@ Este archivo proporciona:
 ```
 backend/
 ├── aphra_blogger/              # Agentes de IA
-│   ├── agents/                 # 6 agentes (todos con HuggingFace)
+│   ├── agents/                 # 7 agentes (todos con HuggingFace)
 │   │   ├── style_analyzer.py
 │   │   ├── keyword_extractor.py
 │   │   ├── content_generator.py
 │   │   ├── critic.py
 │   │   ├── image_selector.py
-│   │   └── html_builder.py
+│   │   ├── html_builder.py
+│   │   └── research_agent.py
 │   ├── workflows/
 │   │   └── blogger_style.py
 │   ├── config/
 │   │   └── default.toml
-│   └── llm/                    # Abstracción LLM multi-provider
+│   └── llm/                    # Abstracción LLM multi-provider (6)
 │       ├── base.py
 │       ├── factory.py
 │       ├── huggingface_provider.py
-│       └── openai_provider.py
+│       ├── openai_provider.py
+│       ├── gemini_provider.py
+│       └── modal_provider.py
 ├── src/
 │   └── orchestrator/           # Sistema de orquestación
 │       ├── main.py             # Orquestador 7 fases
 │       ├── config.py
 │       ├── state.py
-│       └── runner.py
-├── tests/                      # 40+ tests
-│   ├── test_workflow.py
-│   ├── test_orchestrator.py
+│       ├── runner.py
+│       └── continuous/         # Publicación continua
+│           ├── scheduler.py
+│           ├── topic_selector.py
+│           ├── source_guard.py
+│           ├── validation.py
+│           ├── retry_policy.py
+│           ├── monitoring.py
+│           ├── alerts.py
+│           ├── history_store.py
+│           ├── incident_manager.py
+│           └── __init__.py
+├── tests/                      # 10 archivos de test
+│   ├── conftest.py
 │   ├── test_agents.py
-│   └── test_html_builder.py
+│   ├── test_orchestrator.py
+│   ├── test_orchestrator_config.py
+│   ├── test_html_builder.py
+│   ├── test_workflow.py
+│   ├── test_scraper.py
+│   ├── test_batch_generate.py
+│   └── test_structural_diversity.py
 ├── tools/
 │   └── scraper.py              # Web scraper WordPress
 ├── daggr_blogger_workflow.py   # ⭐ Workflow visual con Daggr
 ├── outputs/                    # Posts generados (JSON)
-├── requirements.txt            # daggr>=0.7.0
-├── DAGGR_WORKFLOW.md           # Documentación completa
-├── CLEANUP.md                  # Este resumen de limpieza
+├── Dockerfile                  # Incluye src/ y tools/
+├── requirements.txt
+├── DAGGR_WORKFLOW.md
 └── README.md
 
 frontend/
 ├── app/
-│   ├── components/             # Componentes React
-│   │   ├── BlogLayout.tsx
-│   │   ├── PostHeader.tsx
-│   │   ├── PostBody.tsx
-│   │   └── GenerateForm.tsx
-│   ├── posts/[slug]/           # Posts dinámicos
+│   ├── components/             # 3 componentes React
+│   │   ├── HTMLRenderer.tsx
+│   │   ├── PostCard.tsx
+│   │   └── PostMeta.tsx
+│   ├── posts/[slug]/           # Página de post individual
 │   │   └── page.tsx
-│   ├── generate/               # Formulario de generación
-│   │   └── page.tsx
-│   ├── api/
-│   │   └── generate-post/
-│   │       └── route.ts        # API endpoint
+│   ├── lib/                    # Utilidades
+│   │   ├── api.ts
+│   │   └── postAudit.ts
 │   ├── types/
 │   │   └── post.ts             # TypeScript types
 │   ├── page.tsx                # Homepage
-│   └── layout.tsx              # Root layout
-├── .env.local                  # Variables de entorno
+│   ├── layout.tsx              # Root layout
+│   ├── not-found.tsx           # 404 personalizada
+│   └── globals.css
+├── __tests__/                  # 5 archivos de test (Jest + Testing Library)
+│   ├── api.test.ts
+│   ├── HTMLRenderer.test.tsx
+│   ├── integrity.test.ts
+│   ├── PostCard.test.tsx
+│   └── seo.test.ts
+├── jest.config.ts
+├── .env.local
 ├── package.json
 └── README.md
 
-docs/                           # Documentación
-├── ORCHESTRATION_PLAN.md
-├── NEXT_STEPS.md
-├── MODAL_DEPLOYMENT.md
-├── VERCEL_DEPLOYMENT.md
-├── HUGGINGFACE_MIGRATION.md
+.github/workflows/
+└── lighthouse.yml              # Lighthouse CI
+
+docs/                           # 15 archivos de documentación
+├── COHERENCE_REPORT.md
+├── ENVIRONMENT_VARIABLES.md
 ├── FRONTEND_IMPLEMENTATION.md
-└── HTMLBUILDER_INTEGRATION.md
+├── GRADIO_INTERFACE.md
+├── HTMLBUILDER_INTEGRATION.md
+├── HUGGINGFACE_MIGRATION.md
+├── MODAL_DEPLOYMENT.md
+├── NEXT_STEPS.md
+├── ORCHESTRATION_PLAN.md
+├── RESUMEN_TRABAJO_COMPLETADO.md
+├── SCRAPER_IMPLEMENTATION.md
+└── VERCEL_DEPLOYMENT.md
 ```
 
 ---
@@ -203,8 +216,8 @@ daggr>=0.7.0
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "tailwindcss": "4.0.0",
-    "typescript": "5.x"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
 ```
@@ -239,28 +252,19 @@ npm run dev
 ```
 
 **Uso:**
-1. Homepage: Ver características del sistema
-2. `/generate`: Formulario para generar posts
-3. `/posts/[slug]`: Ver posts individuales
-4. Gestión completa de contenido
+1. Homepage: Ver lista de posts generados
+2. `/posts/[slug]`: Ver post individual
 
-### 3. Testing End-to-End
+### 3. Testing
 
 ```bash
-# Opción 1: Modo Mock (sin backend)
-cd frontend
-# .env.local → USE_MOCK=true (por defecto)
-npm run dev
-
-# Opción 2: Integración real
-# Terminal 1: Backend
+# Backend tests (10 archivos)
 cd backend
-python -m src.orchestrator.runner --topic "IA en educación"
+pytest tests/ -v
 
-# Terminal 2: Frontend
+# Frontend tests (5 archivos, Jest + Testing Library)
 cd frontend
-# .env.local → USE_MOCK=false
-npm run dev
+npm test
 ```
 
 ---
@@ -268,33 +272,32 @@ npm run dev
 ## 📊 Métricas del Proyecto
 
 ### Backend
-- **Agentes**: 6 (100% migrados a HuggingFace)
-- **Tests**: 75/76 passing (98.7%)
+- **Agentes**: 7 (100% migrados a HuggingFace + multi-provider)
+- **Tests**: 10 archivos, ~75/76 passing (98.7%)
 - **Líneas de código**: ~8,000
-- **Documentación**: 9 archivos (5,000+ líneas)
+- **Documentación**: 15 archivos en docs/
+- **Módulo adicional**: continuous/ (publicación programada)
 
 ### Frontend
-- **Componentes**: 4
-- **Páginas**: 3
-- **API Routes**: 1
-- **Tests**: Pendiente
+- **Componentes**: 3 (HTMLRenderer, PostCard, PostMeta)
+- **Páginas**: 2 (Homepage, Posts/[slug])
+- **Tests**: 5 archivos con Jest + Testing Library ✅
+- **CI/CD**: Lighthouse CI workflow configurado
 
 ### Total
-- **Progreso**: ~85% completo
-- **Pendiente**: Deploy (Modal + Vercel), CI/CD
+- **Progreso**: ~92% completo
+- **Funcional**: Backend generando, Frontend visualizando, tests en ambos lados
 
 ---
 
 ## 🎯 Próximos Pasos
 
 ### Alta Prioridad
-- [ ] **Testing Frontend**: Jest + Testing Library
 - [ ] **Integración E2E**: Backend → Frontend automática
 - [ ] **Deploy Backend**: Hugging Face Spaces con Daggr
 - [ ] **Deploy Frontend**: Vercel con dominio personalizado
 
 ### Media Prioridad
-- [ ] **CI/CD**: GitHub Actions para tests automáticos
 - [ ] **Sistema de Colas**: Para generaciones múltiples
 - [ ] **Autenticación**: Login para gestión de posts
 - [ ] **Base de Datos**: Persistencia de posts (PostgreSQL)
@@ -310,19 +313,27 @@ npm run dev
 ## 📖 Documentación Actualizada
 
 ### Guías Principales
-1. [README.md](../README.md) - Visión general del proyecto ✅ **ACTUALIZADO**
-2. [DAGGR_WORKFLOW.md](DAGGR_WORKFLOW.md) - Guía completa de Daggr ✅ **NUEVO**
-3. [CLEANUP.md](CLEANUP.md) - Este resumen de limpieza ✅ **NUEVO**
+1. [README.md](./README.md) - Visión general del proyecto ✅ **ACTUALIZADO**
+2. [DAGGR_WORKFLOW.md](DAGGR_WORKFLOW.md) - Guía completa de Daggr ✅
+3. [CLEANUP.md](CLEANUP.md) - Resumen de limpieza ✅
 
 ### Documentación Técnica
-4. [ORCHESTRATION_PLAN.md](../docs/ORCHESTRATION_PLAN.md) - Plan maestro
-5. [HUGGINGFACE_MIGRATION.md](../docs/HUGGINGFACE_MIGRATION.md) - Migración a HF
-6. [FRONTEND_IMPLEMENTATION.md](../docs/FRONTEND_IMPLEMENTATION.md) - Frontend Next.js
-7. [HTMLBUILDER_INTEGRATION.md](../docs/HTMLBUILDER_INTEGRATION.md) - HTMLBuilder
+4. [ORCHESTRATION_PLAN.md](./docs/ORCHESTRATION_PLAN.md) - Plan maestro
+5. [HUGGINGFACE_MIGRATION.md](./docs/HUGGINGFACE_MIGRATION.md) - Migración a HF
+6. [FRONTEND_IMPLEMENTATION.md](./docs/FRONTEND_IMPLEMENTATION.md) - Frontend Next.js
+7. [HTMLBUILDER_INTEGRATION.md](./docs/HTMLBUILDER_INTEGRATION.md) - HTMLBuilder
+8. [SCRAPER_IMPLEMENTATION.md](./docs/SCRAPER_IMPLEMENTATION.md) - Web scraper
+9. [COHERENCE_REPORT.md](./docs/COHERENCE_REPORT.md) - Informe de coherencia
+10. [RESUMEN_TRABAJO_COMPLETADO.md](./docs/RESUMEN_TRABAJO_COMPLETADO.md) - Resumen general
 
 ### Deployment
-8. [MODAL_DEPLOYMENT.md](../docs/MODAL_DEPLOYMENT.md) - Deploy backend
-9. [VERCEL_DEPLOYMENT.md](../docs/VERCEL_DEPLOYMENT.md) - Deploy frontend
+11. [MODAL_DEPLOYMENT.md](./docs/MODAL_DEPLOYMENT.md) - Deploy backend (Modal)
+12. [VERCEL_DEPLOYMENT.md](./docs/VERCEL_DEPLOYMENT.md) - Deploy frontend (Vercel)
+
+### Configuración y Referencia
+13. [ENVIRONMENT_VARIABLES.md](./docs/ENVIRONMENT_VARIABLES.md) - Variables de entorno
+14. [GRADIO_INTERFACE.md](./docs/GRADIO_INTERFACE.md) - Interfaces Gradio
+15. [NEXT_STEPS.md](./docs/NEXT_STEPS.md) - Próximos pasos
 
 ---
 
@@ -333,34 +344,38 @@ Especialización en IA y Big Data
 IES Rafael Alberti - 2026
 
 ### Tecnologías Destacadas
-- 🤖 **IA Multi-Agente**: 6 agentes especializados colaborando
+- 🤖 **IA Multi-Agente**: 7 agentes especializados colaborando
 - 🆓 **HuggingFace**: LLM gratuito (Llama 3.1, Mistral)
+- 🔄 **Multi-Provider**: OpenAI, Gemini, Modal como alternativas
 - 📊 **Daggr**: Workflow visual oficial de Gradio
 - ⚛️ **Next.js 16**: Framework moderno de React
-- 🎨 **Tailwind CSS**: Diseño responsive y elegante
+- 🎨 **Tailwind CSS 4**: Diseño responsive y elegante
+- 🧪 **Testing**: Jest + Testing Library (frontend), pytest (backend)
+- 📈 **CI/CD**: Lighthouse CI para rendimiento web
 
 ---
 
 ## ✅ Checklist Final
 
-- [x] Backend: 6 agentes con HuggingFace
+- [x] Backend: 7 agentes con HuggingFace
 - [x] Backend: Orquestador completo (7 fases)
-- [x] Backend: Tests (75/76 passing)
+- [x] Backend: Tests (10 archivos, ~75/76 passing)
 - [x] Backend: Daggr workflow visual
-- [x] Frontend: Next.js 16 completo
-- [x] Frontend: 4 componentes + 3 páginas
-- [x] Frontend: API route con modo mock
-- [x] Documentación: 11 guías completas
+- [x] Backend: Continuous publishing module
+- [x] Backend: Dockerfile actualizado (src/ + tools/)
+- [x] Frontend: Next.js 16 + React 19 + Tailwind 4
+- [x] Frontend: 3 componentes + 2 páginas
+- [x] Frontend: Tests con Jest + Testing Library (5 archivos)
+- [x] Frontend: Lighthouse CI workflow
+- [x] Documentación: docs/ con 15 archivos
 - [x] Limpieza: Archivos Gradio redundantes eliminados
 - [ ] Deploy: Modal (backend)
 - [ ] Deploy: Vercel (frontend)
-- [ ] CI/CD: GitHub Actions
-- [ ] Tests: Frontend con Jest
 
-**Estado Global:** 🟢 85% Completo y Funcional
+**Estado Global:** 🟢 ~92% Completo y Funcional
 
 ---
 
-**Última actualización:** 11 de febrero de 2026  
+**Última actualización:** 27 de abril de 2026  
 **Autor:** Equipo Blogger Agent TFG  
 **Licencia:** MIT

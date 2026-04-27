@@ -1,5 +1,7 @@
 # Vercel Deployment - Frontend Next.js
 
+> ✅ **Actualizado**: El proyecto usa Next.js 16.1.6 con static export. La configuración de Vercel está en `vercel.json` (raíz del proyecto).
+
 Guía completa para desplegar el frontend de Next.js en Vercel.
 
 ## 📋 Índice
@@ -32,7 +34,7 @@ Vercel es la plataforma oficial de Next.js y ofrece:
    - Conecta tu cuenta de GitHub
 
 2. **Proyecto Next.js preparado**
-   - Estructura `frontend/` con Next.js 14+
+   - Estructura `frontend/` con Next.js 16 (App Router + Static Export)
    - `package.json` configurado
    - Build exitoso localmente: `npm run build`
 

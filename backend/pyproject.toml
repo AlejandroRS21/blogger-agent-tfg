@@ -3,10 +3,20 @@ name = "blogger-agent-tfg"
 version = "0.1.0"
 description = "Multi-agent AI system for mimicking blogger writing style"
 dependencies = [
+    # LLM Providers
+    "huggingface-hub>=0.20.0",  # Primary LLM provider (free)
+    # Core
     "daggr>=0.7.0",
     "gradio>=6.5.1",
     "httpx>=0.28.1",
     "python-dotenv>=1.2.1",
+    "toml>=0.10.2",
+    "pydantic>=2.6.1",
+    "Markdown>=3.5.0",
+    "Pygments>=2.17.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=4.9.0",
+    "requests>=2.31.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -28,17 +38,6 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-]
-
-dependencies = [
-    "huggingface-hub>=0.20.0",  # Primary LLM provider
-    "toml>=0.10.2",
-    "pydantic>=2.6.1",
-    "Markdown>=3.5.0",
-    "Pygments>=2.17.0",
-    "beautifulsoup4>=4.12.0",
-    "lxml>=4.9.0",
-    "requests>=2.31.0",
 ]
 
 [project.optional-dependencies]

@@ -24,106 +24,91 @@ El Orquestador sigue este flujo secuencial utilizando **Aphra Workflows**:
 ### **Fase 1: Análisis (Research Phase)**
 1. **Input**: URL del blog o tema específico.
 2. **Orquestador llama a**:
-   - `Agente de Análisis de Tono` -> Devuelve perfil estilístico.
-   - `Agente de Análisis de Temáticas` -> Devuelve conceptos clave.
-   - `Agente de Palabras Frecuentes` -> Devuelve lista de términos.
+   - `StyleAnalyzer` → Devuelve perfil estilístico (tono, voz, estructura).
+   - `KeywordExtractor` → Devuelve keywords, expresiones y temáticas.
+   - `ResearchAgent` → Contexto adicional y exploración del tema.
 3. **Orquestador consolida**: Crea un "Contexto de Estilo" unificado.
 
 ### **Fase 2: Generación (Creation Phase)**
 1. **Input**: Contexto de Estilo + Tema.
 2. **Orquestador llama a**:
-   - `Agente Generador de Texto Base` -> Devuelve borrador inicial.
-   - `Agente de Mimesis` (Input: Texto Base + Contexto Estilo) -> Devuelve texto mimetizado.
-   - `Agente de Selección de Imágenes` -> Devuelve URLs de imágenes.
+   - `ContentGenerator.generate_draft()` → Borrador inicial con estilo mimetizado.
+   - `ImageSelectorAgent` → Prompts y ubicaciones para imágenes.
 
 ### **Fase 3: Refinamiento (Review Phase)**
-1. **Input**: Texto Mimetizado + Imágenes.
+1. **Input**: Texto generado.
 2. **Orquestador llama a**:
-   - `Agente Crítico` -> Devuelve feedback o aprobación.
-3. **Decisión**: 
+   - `CriticAgent` → Feedback o aprobación.
+3. **Decisión**:
    - SI (Aprobado): Pasa a Fase 4.
-   - NO (Feedback): Re-ejecuta `Agente de Mimesis` con el feedback.
+   - NO (Feedback): Re-ejecuta `ContentGenerator.refine_content()` con el feedback.
 
 ### **Fase 4: Publicación (Output Phase)**
 1. **Orquestador llama a**:
-   - `Agente de Estructura Next.js` -> Devuelve HTML/JSX final.
-2. **Finalización**: Notifica éxito y guarda el resultado.
+   - `HTMLBuilder` → Convierte Markdown a HTML/JSX con TOC y meta tags.
+2. **Finalización**: Guarda resultado en `outputs/` y notifica éxito.
 
 ---
 
-## 🛠️ Implementación con Aphra
+## 🛠️ Implementación
 
-El orquestador se implementa como un **Workflow** de Aphra que conecta los agentes.
-
-### **Estructura del Código (Conceptual)**
+El orquestador se implementa en `src/orchestrator/main.py` como `BloggerOrchestrator`:
 
 ```python
-# orchestrator/main.py
-from aphra import Workflow, Agent, State
+# src/orchestrator/main.py
+from src.orchestrator.config import OrchestratorConfig
+from src.orchestrator.state import OrchestratorState
 
-class BloggerOrchestrator(Workflow):
-    def __init__(self):
-        super().__init__("blogger-agent-orchestrator")
+class BloggerOrchestrator:
+    def __init__(self, config: OrchestratorConfig, verbose: bool = False):
+        self.config = config
+        self.state = OrchestratorState()
+    
+    def run(self, topic: str, blogger_urls: list[str]) -> dict:
+        # 1. Análisis de estilo
+        style = self._analyze_style(blogger_urls)
         
-        # Registro de Agentes
-        self.researchers = [
-            Agent("tone-analyzer"),
-            Agent("topic-extractor"),
-            Agent("frequency-analyser")
-        ]
-        self.creators = [
-            Agent("base-writer"),
-            Agent("mimicry-expert"),
-            Agent("image-selector")
-        ]
-        self.reviewer = Agent("critic-agent")
-        self.builder = Agent("nextjs-builder")
-
-    async def run(self, topic: str):
-        # 1. Investigación
-        style_context = await self.run_agents_parallel(self.researchers)
+        # 2. Extracción de keywords
+        keywords = self._extract_keywords(blogger_urls)
         
-        # 2. Generación
-        draft = await self.creators[0].execute(topic)
-        final_text = await self.creators[1].execute(draft, style_context)
-        images = await self.creators[2].execute(final_text)
+        # 3. Generación de contenido
+        content = self._generate_content(topic, style, keywords)
         
-        # 3. Revisión (Bucle de feedback)
-        is_approved = False
-        while not is_approved:
-            feedback = await self.reviewer.execute(final_text)
-            if feedback.status == "approved":
-                is_approved = True
-            else:
-                final_text = await self.creators[1].execute(final_text, feedback.suggestions)
+        # 4. Crítica y refinamiento (bucle de feedback)
+        content = self._critique_and_refine(content, style)
         
-        # 4. Construcción Final
-        final_page = await self.builder.execute(final_text, images)
+        # 5. Construcción HTML/JSX
+        html_output = self._build_html(content)
         
-        return final_page
+        # 6. Selección de imágenes
+        images = self._select_images(content, topic)
+        
+        return {
+            "content": content,
+            "html_structure": html_output,
+            "images": images,
+            "style_profile": style,
+            "keywords": keywords,
+        }
 ```
 
----
+### Agentes del Sistema
 
-## 🤖 Skills del Orquestador (para Copilot)
-
-Para que Copilot ayude a construir el Orquestador:
-
-```yaml
-Skill: Agent Orchestration
-Focus:
-  - Aphra Workflow state management
-  - Parallel vs Sequential agent execution
-  - Data mapping between agents
-  - Conditional logic and feedback loops
-  - Error handling and retries in distributed systems
-```
+| Nombre en Documentación | Archivo | Rol |
+|------------------------|---------|-----|
+| StyleAnalyzer | `style_analyzer.py` | Análisis de tono, voz y estilo |
+| KeywordExtractor | `keyword_extractor.py` | Extracción de keywords y patrones |
+| ContentGenerator | `content_generator.py` | Generación de draft + refinamiento |
+| CriticAgent | `critic.py` | Revisión y feedback de calidad |
+| ImageSelectorAgent | `image_selector.py` | Selección de imágenes y prompts |
+| HTMLBuilder | `html_builder.py` | Conversión Markdown→HTML/JSX |
+| ResearchAgent | `research_agent.py` | Investigación de temas y contexto |
 
 ---
 
 ## 📈 Dashboard de Monitoreo
 
-El Orquestador debe proporcionar información de estado para el frontend:
+El Orquestador proporciona información de estado para el frontend:
 
 - **Progreso**: % completado del workflow.
 - **Estado de Agentes**: Idle, Running, Success, Failed.
@@ -132,4 +117,20 @@ El Orquestador debe proporcionar información de estado para el frontend:
 
 ---
 
-**Última actualización**: 10 de febrero de 2026
+## 🔧 Ejecución
+
+```bash
+# Orquestador completo (7 fases)
+cd backend
+python -m src.orchestrator.runner \
+  --topic "Las mejores prácticas para desarrollar APIs REST con Python" \
+  --blog-url "https://javipas.com" \
+  --output "post.json"
+
+# Publicación continua
+python -m src.orchestrator.runner --continuous --cycles 5
+```
+
+---
+
+**Última actualización**: Abril 2026

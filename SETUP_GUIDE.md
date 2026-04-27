@@ -103,20 +103,18 @@ class BloggerOrchestrator:
     
     def _setup_agents(self):
         # Fase 1: Análisis
-        self.tone_analyzer = Agent("tone-analyzer")
-        self.topic_extractor = Agent("topic-extractor")
-        self.frequency_analyzer = Agent("frequency-analyzer")
+        self.style_analyzer = Agent("style-analyzer")
+        self.keyword_extractor = Agent("keyword-extractor")
         
         # Fase 2: Generación
-        self.base_writer = Agent("base-writer")
-        self.mimicry_expert = Agent("mimicry-expert")
+        self.content_generator = Agent("content-generator")
         self.image_selector = Agent("image-selector")
         
         # Fase 3: Revisión
-        self.critic = Agent("critic-agent")
+        self.critic = Agent("critic")
         
         # Fase 4: Construcción
-        self.nextjs_builder = Agent("nextjs-builder")
+        self.html_builder = Agent("html-builder")
     
     async def run(self, topic: str) -> Dict:
         print("[INFO] 🚀 Iniciando orquestador...")
@@ -143,19 +141,17 @@ class BloggerOrchestrator:
     async def _run_analysis_phase(self) -> Dict:
         # TODO: Implementar ejecución paralela de agentes
         tasks = [
-            self.tone_analyzer.execute(),
-            self.topic_extractor.execute(),
-            self.frequency_analyzer.execute()
+            self.style_analyzer.execute(),
+            self.keyword_extractor.execute()
         ]
         results = await asyncio.gather(*tasks)
-        return {"tone": results[0], "topics": results[1], "keywords": results[2]}
+        return {"style": results[0], "keywords": results[1]}
     
     async def _run_generation_phase(self, topic: str, analysis: Dict) -> Dict:
         # TODO: Implementar generación secuencial
-        draft = await self.base_writer.execute(topic)
-        mimicked = await self.mimicry_expert.execute(draft, analysis)
-        images = await self.image_selector.execute(mimicked)
-        return {"text": mimicked, "images": images}
+        draft = await self.content_generator.execute(topic)
+        images = await self.image_selector.execute(draft)
+        return {"text": draft, "images": images}
     
     async def _run_review_phase(self, content: Dict) -> Dict:
         # TODO: Implementar bucle de feedback
@@ -165,12 +161,12 @@ class BloggerOrchestrator:
             if feedback["status"] == "approved":
                 is_approved = True
             else:
-                content = await self.mimicry_expert.execute(content, feedback)
+                content = await self.content_generator.execute(content, feedback)
         return content
     
     async def _run_build_phase(self, content: Dict) -> Dict:
         # TODO: Construir output final
-        output = await self.nextjs_builder.execute(content)
+        output = await self.html_builder.execute(content)
         return output
 
 # Ejemplo de uso

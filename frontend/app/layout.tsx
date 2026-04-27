@@ -72,7 +72,7 @@ export default function RootLayout({
           <div className="container mx-auto px-4 text-center text-stone-500 dark:text-stone-400 text-sm">
             <p className="font-mono mb-4">© 2026 Blog Javi Pas - Generado con IA & Aphra</p>
             <div className="flex justify-center gap-4">
-              <span>Next.js 15</span>
+              <span>Next.js 16</span>
               <span>•</span>
               <span>Tailwind CSS v4</span>
               <span>•</span>

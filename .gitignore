@@ -234,3 +234,6 @@ Thumbs.db
 *.tmp
 *.swp
 .idea/
+
+# Playwright MCP temp files
+.playwright-mcp/
