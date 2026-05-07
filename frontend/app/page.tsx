@@ -1,62 +1,57 @@
 import Link from "next/link";
 import PostCard from "@/components/PostCard";
 import { getSamplePosts } from "@/lib/api";
+import type { BlogPost } from "@/types/post";
 
-const features = [
-  {
-    title: "Analisis Inteligente",
-    description:
-      "El sistema analiza el estilo de escritura de un blog de referencia usando modelos de lenguaje avanzados de HuggingFace.",
-    icon: (
-      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605" />
-      </svg>
-    ),
-  },
-  {
-    title: "Generacion de Contenido",
-    description:
-      "Crea posts completos en HTML/JSX optimizados para SEO, con titulo, descripcion, palabras clave y estructura semantica.",
-    icon: (
-      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-      </svg>
-    ),
-  },
-  {
-    title: "HTML/JSX Optimizado",
-    description:
-      "El contenido generado incluye estructura HTML semantica, meta tags, encabezados jerarquicos y formato listo para publicar.",
-    icon: (
-      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
-      </svg>
-    ),
-  },
-];
+const posts = getSamplePosts();
+const featuredPost: BlogPost | undefined = posts[0];
+const remainingPosts = posts.slice(1, 5);
 
-const techStack = [
-  { name: "HuggingFace", description: "Modelos de lenguaje de ultima generacion" },
-  { name: "Next.js 16", description: "Framework React con App Router" },
-  { name: "Python Backend", description: "Sistema multi-agente asincrono" },
-  { name: "Modal", description: "Despliegue serverless en la nube" },
+const steps = [
+  {
+    number: "01",
+    title: "Ingresa tu referencia",
+    desc: "Proporciona la URL del blog que quieres emular y el tema sobre el que deseas escribir.",
+    color: "bg-blue-500",
+  },
+  {
+    number: "02",
+    title: "Analizamos el estilo",
+    desc: "El Scraper Agent extrae el contenido y el Style Analyzer captura la voz, el tono y la estructura del autor original.",
+    color: "bg-indigo-500",
+  },
+  {
+    number: "03",
+    title: "Generamos el contenido",
+    desc: "El Writer Agent redacta el post completo en HTML semántico. El Critic Agent lo revisa y mejora.",
+    color: "bg-violet-500",
+  },
+  {
+    number: "04",
+    title: "Optimizamos y entregamos",
+    desc: "El SEO Agent ajusta keywords y meta tags. Recibes el post listo para publicar en tu blog.",
+    color: "bg-purple-500",
+  },
 ];
 
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section className="relative overflow-hidden border-b border-gray-200 bg-gradient-to-b from-white to-gray-50">
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 lg:py-36">
+        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 lg:py-32">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+            <span className="inline-block rounded-full bg-blue-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-blue-700">
+              Trabajo de Fin de Grado
+            </span>
+            <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
               Blogger Agent{" "}
               <span className="text-blue-600">TFG</span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-gray-600 sm:text-xl">
-              Sistema multi-agente de inteligencia artificial capaz de analizar
-              y mimetizar estilos de escritura. Genera contenido de blog con la
-              voz y el tono de tu escritor favorito.
+              Sistema multi-agente de inteligencia artificial que analiza y
+              replica estilos de escritura. Genera contenido de blog con la voz
+              y el tono de tu escritor favorito.
             </p>
             <div className="mt-10 flex items-center justify-center gap-4">
               <Link
@@ -78,59 +73,130 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* ── Cómo funciona (workflow paso a paso) ── */}
       <section className="border-b border-gray-200 bg-white py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Como funciona
+              Cómo funciona
             </h2>
             <p className="mt-4 text-gray-600">
-              El sistema utiliza un pipeline de agentes especializados para
-              generar contenido de alta calidad.
+              Un pipeline de agentes de IA orquestados que transforman una URL
+              y un tema en un post listo para publicar.
             </p>
           </div>
 
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="group rounded-xl border border-gray-200 bg-white p-8 transition-shadow hover:shadow-md"
-              >
-                <div className="mb-4 inline-flex rounded-lg bg-blue-50 p-3 text-blue-600">
-                  {feature.icon}
+          <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {steps.map((step, i) => (
+              <div key={step.number} className="relative">
+                {/* Connector line (except last) */}
+                {i < steps.length - 1 && (
+                  <div className="absolute left-8 top-12 hidden h-[calc(100%+2rem)] w-0.5 bg-gradient-to-b from-blue-200 to-purple-200 lg:block" />
+                )}
+                <div className="flex items-start gap-4 lg:flex-col lg:items-center lg:text-center">
+                  <div
+                    className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl text-lg font-bold text-white shadow-md ${step.color}`}
+                  >
+                    {step.number}
+                  </div>
+                  <div className="min-w-0 lg:mt-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {step.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                      {step.desc}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  {feature.description}
-                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Sample Posts */}
+      {/* ── Posts Recientes (blog-style inicio) ── */}
       <section className="border-b border-gray-200 bg-gray-50 py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Posts Recientes
+              Posts generados
             </h2>
             <p className="mt-4 text-gray-600">
-              Ejemplos del contenido generado por nuestro sistema multi-agente.
+              Ejemplos del contenido que nuestro sistema es capaz de producir.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {getSamplePosts().slice(0, 6).map((post) => (
+          {/* Featured post */}
+          {featuredPost && (
+            <div className="group mt-12">
+              <Link
+                href={`/posts/${featuredPost.slug}`}
+                className="relative block overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-lg"
+              >
+                <div className="grid md:grid-cols-5">
+                  <div className="flex flex-col justify-center p-8 md:col-span-3">
+                    <span className="mb-3 inline-block w-fit rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                      Destacado
+                    </span>
+                    <h3 className="text-2xl font-bold text-gray-900 transition-colors group-hover:text-blue-600 md:text-3xl">
+                      {featuredPost.title}
+                    </h3>
+                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-600">
+                      {featuredPost.description}
+                    </p>
+                    <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                      <span className="flex items-center gap-1.5">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                        </svg>
+                        {featuredPost.date}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        {featuredPost.reading_time} min
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        {featuredPost.word_count} palabras
+                      </span>
+                    </div>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {featuredPost.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="hidden items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-8 md:col-span-2 md:flex">
+                    <div className="text-center">
+                      <div className="text-6xl">📝</div>
+                      <p className="mt-3 text-sm font-medium text-blue-600">
+                        Leer post completo →
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          )}
+
+          {/* Remaining posts grid */}
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {remainingPosts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </div>
 
-          <div className="mt-10 text-center">
+          <div className="mt-12 text-center">
             <Link
               href="/generate"
               className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
@@ -144,26 +210,32 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Tech Stack */}
+      {/* ── Tech Stack ── */}
       <section className="border-b border-gray-200 bg-white py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Stack Tecnologico
+              Stack Tecnológico
             </h2>
             <p className="mt-4 text-gray-600">
-              Tecnologias modernas para un sistema robusto y escalable.
+              Tecnologías modernas para un sistema robusto y escalable.
             </p>
           </div>
 
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {techStack.map((tech) => (
+            {[
+              { name: "HuggingFace", description: "Modelos de lenguaje de última generación", icon: "🤗", bg: "bg-yellow-50 border-yellow-200" },
+              { name: "Next.js 16", description: "Framework React con App Router y Server Components", icon: "▲", bg: "bg-gray-50 border-gray-200" },
+              { name: "Python Backend", description: "Sistema multi-agente asíncrono con Daggr", icon: "🐍", bg: "bg-blue-50 border-blue-200" },
+              { name: "Modal", description: "Despliegue serverless en la nube con auto-escalado", icon: "☁️", bg: "bg-green-50 border-green-200" },
+            ].map((tech) => (
               <div
                 key={tech.name}
-                className="rounded-lg border border-gray-200 bg-white p-6 text-center"
+                className={`rounded-xl border p-6 text-center ${tech.bg}`}
               >
-                <h3 className="font-semibold text-gray-900">{tech.name}</h3>
-                <p className="mt-1 text-xs text-gray-500">
+                <div className="text-3xl">{tech.icon}</div>
+                <h3 className="mt-3 font-semibold text-gray-900">{tech.name}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-gray-500">
                   {tech.description}
                 </p>
               </div>
@@ -172,103 +244,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Daggr / HuggingFace Workflow */}
-      <section className="border-b border-gray-200 bg-gray-50 py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Pipeline Multi-Agente con <span className="text-yellow-600">Daggr</span>
-            </h2>
-            <p className="mt-4 text-gray-600">
-              El sistema orquesta agentes especializados en un pipeline secuencial
-              impulsado por modelos de HuggingFace.
-            </p>
-          </div>
-
-          <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                step: "1",
-                title: "Scraper Agent",
-                desc: "Extrae y analiza el contenido del blog de referencia para capturar el estilo y tono del escritor.",
-              },
-              {
-                step: "2",
-                title: "Writer Agent",
-                desc: "Genera el post completo en HTML semántico respetando la voz del autor original.",
-              },
-              {
-                step: "3",
-                title: "Critic Agent",
-                desc: "Revisa y mejora el contenido evaluando calidad, coherencia y estructura.",
-              },
-              {
-                step: "4",
-                title: "SEO Agent",
-                desc: "Optimiza keywords, meta tags y estructura para posicionamiento en buscadores.",
-              },
-            ].map((agent) => (
-              <div
-                key={agent.step}
-                className="relative rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm"
-              >
-                <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100 text-sm font-bold text-yellow-700">
-                  {agent.step}
-                </div>
-                <h3 className="font-semibold text-gray-900">{agent.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  {agent.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 rounded-xl border border-yellow-200 bg-yellow-50 p-6 sm:p-8">
-            <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-              <div className="flex-shrink-0 text-3xl">🤗</div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">
-                  Impulsado por HuggingFace
-                </h3>
-                <p className="mt-1 text-sm text-gray-600">
-                  Todos los agentes utilizan modelos open-source de HuggingFace
-                  desplegados en Modal. El pipeline completo está disponible como
-                  HuggingFace Space para ejecución interactiva.
-                </p>
-              </div>
-              <a
-                href="https://huggingface.co/spaces"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-shrink-0 rounded-lg bg-yellow-400 px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-yellow-500"
-              >
-                Explorar en HF Spaces
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="bg-white py-20 sm:py-28">
+      {/* ── CTA ── */}
+      <section className="bg-gradient-to-b from-gray-50 to-white py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Listo para probarlo?
+            ¿Listo para probarlo?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-gray-600">
             Ingresa un tema y el blog de referencia, y deja que los agentes de
             IA hagan el resto.
           </p>
-          <div className="mt-8">
+          <div className="mt-10 flex items-center justify-center gap-4">
             <Link
               href="/generate"
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
             >
               Generar Post Ahora
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
             </Link>
+            <a
+              href="https://huggingface.co/spaces"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-gray-300 bg-white px-8 py-3.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+            >
+              Explorar en HF Spaces
+            </a>
           </div>
         </div>
       </section>
