@@ -1,0 +1,73 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #3b82f6;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom prose overrides for blog content */
+.prose h2 {
+  @apply mt-10 mb-4 text-2xl font-bold text-gray-900;
+}
+
+.prose h3 {
+  @apply mt-8 mb-3 text-xl font-semibold text-gray-800;
+}
+
+.prose p {
+  @apply mb-4 leading-relaxed text-gray-700;
+}
+
+.prose ul {
+  @apply mb-4 list-disc pl-6 text-gray-700;
+}
+
+.prose ol {
+  @apply mb-4 list-decimal pl-6 text-gray-700;
+}
+
+.prose li {
+  @apply mb-1;
+}
+
+.prose strong {
+  @apply font-semibold text-gray-900;
+}
+
+.prose a {
+  @apply text-blue-600 underline decoration-blue-300 underline-offset-2 hover:text-blue-800;
+}
+
+.prose blockquote {
+  @apply my-6 border-l-4 border-blue-500 pl-4 italic text-gray-600;
+}
+
+.prose code {
+  @apply rounded bg-gray-100 px-1.5 py-0.5 text-sm font-mono text-gray-800;
+}
+
+.prose pre {
+  @apply my-6 overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

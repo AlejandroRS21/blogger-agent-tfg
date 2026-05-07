@@ -1,45 +1,59 @@
-Coherence Report for Blogger Agent TFG
+# Coherence Report — Blogger Agent TFG
 
-Resumen general
-- Proyecto: sistema multiagente para mimetizar estilo de bloggers, con generación de posts y despliegue estático.
-- Stack principal: backend en Python (Aphra + Daggr), LLMs multi-provider (HuggingFace HF como primario, OpenAI como fallback), frontend Next.js, despliegue con Daggr y posibilidad de Modal/Vercel.
-- Estructura clave: backend/aphra_blogger (llm providers, agentes, workflows), backend/src/orchestrator (orquestador), tools scraper, tests; frontend app, posts, api/generate-post; docs y deploys.
+> Última revisión: mayo 2026
 
-Coherencia de la arquitectura
-- La arquitectura descrita en README root y en backend/README.md se alinea: 6 agentes (StyleAnalyzer, KeywordExtractor, ContentGenerator, Critic, ImageSelector, HTMLBuilder) y 7 fases en el orquestador; HTMLBuilder está marcado como nuevo y aparece en el código y en la docs.
-- La abstracción LLM multi-provider está documentada y reflejada en aphra_blogger/llm (base, factory, huggingface_provider, openai_provider) y en la configuración del orquestador.
-- La integración entre backend y frontend (API /api/generate-post y ruta de generación en backend) es coherente con la estructura de la app y las secciones de documentación.
-- Daggr para visualización de workflow y tests para HTMLBuilder están mencionados en docs y presentes en el código.
+## Resumen General
 
-Inconsistencias y puntos a alinear
-- Conteo de tests documented en múltiples lugares no es consistente:
-  • README root menciona “Tests completos (40+ tests)” y luego referencias a “Tests: 76 tests (75 passing, 1 skipped)” en otros docs.
-  • project_docs y READMEs también citan números diferentes (40+, 75/76, etc.).
-- Despliegue Modal: hay secciones que dicen “Pendiente” para Modal deployment, pero también existen archivos y ejemplos de deployment con modal_app.py; conviene consolidar el estado real (pendiente vs listo) y actualizar la guía de Deployment.
-- Algunas secciones difieren en si HTMLBuilder es “agente” o parte de una fase; la nota actual es coherente, pero podría ser confusa para nuevos contribuyentes.
+- **Proyecto**: Sistema multi-agente para mimetizar estilo de bloggers, con generación de posts y despliegue estático.
+- **Stack principal**: Backend Python (orquestador + Daggr), LLMs multi-provider (HuggingFace primario, OpenAI/Gemini/Modal alternativos), web estática HTML + Tailwind CDN en GitHub Pages.
+- **Estructura clave**: `backend/aphra_blogger` (llm providers, agentes, workflows), `backend/src/orchestrator` (orquestador 7 fases), `tools/scraper`, `tests/` (~80 tests), `docs/` (web estática), `project_docs/` (documentación técnica).
 
-Recomendaciones de coherencia (acciones sugeridas)
-- Unificar el recuento de tests en todos los docs y referencias abiertas a un solo número, p. ej.:
-  - “76 tests totales; 75 passing, 1 skipped” (o el recuento exacto vigente) y actualizar todas las referencias en root README, backend/README.md y project_docs.
-- Alinear la sección de despliegue Modal: especificar claramente si está en desarrollo, en uso o pendiente, y reflejar el estado real con enlaces a la guía correspondiente.
-- Añadir una sección de coherencia en un único lugar (p. ej. docs/COHERENCE_REPORT.md) y enlazarla desde el README principal para facilitar revisiones futuras.
-- Mantener actualizadas las versiones de frontend/backend en una sola fuente de verdad (README/Docs) para evitar desincronización.
+## Coherencia Resuelta (mayo 2026)
 
-Siguientes pasos propuestos
-- Crear o actualizar un archivo de coherencia central (ya creado: docs/COHERENCE_REPORT.md) con un checklist ejecutable para nuevos contribuidores.
-- Actualizar el recuento de tests en todos los docs para reflejar el estado real; ajustar README root como fuente única para lectura rápida.
-- Revisar y fijar el estado de Modal deployment en NEXT_STEPS y/o MODAL_DEPLOYMENT.md; si ya existe código real, mover de Pendiente a “Implementado” con guía de uso.
-- Añadir una pequeña sección de verificación rápida (how-to) para nuevos colaboradores: cómo levantar backend/frontend en modo mock, y cómo correr tests.
+### ✅ Unificado: conteo de tests
+- **Valor único**: ~80 tests (79 funciones test en 6 archivos)
+- Actualizado en: README.md, backend/README.md, PROJECT_STATUS.md
 
-Notas finales
-- Este informe no modifica código; se centra en coherencia de documentación y estado de proyecto. Si quieres, puedo generar parches para unificar textos directamente en los archivos de docs y README.
+### ✅ Unificado: número de agentes
+- **Orquestador**: 6 agentes principales (StyleAnalyzer, KeywordExtractor, ContentGenerator, Critic, HTMLBuilder, ImageSelector)
+- **Pipeline simplificado**: 3 agentes (StyleExtractor, NewsResearchAgent, ContentGenerator)
+- **Total en código**: 8 agentes (incluye AnonymousBloggerEmulator y StyleExtractor legacy)
+- Actualizado en todos los READMEs
 
-## 🧭 Maintenance Checklist (Future Checks)
-- [ ] Verificar que los alias anónimos ( BloggerAnon, TravelAnon ) se apliquen correctamente y que el disclaimer aparezca en los posts generados.
-- [ ] Verificar que los recuentos de tests estén unificados en todos los docs (ej. 76 tests totales; 75 passing, 1 skipped) y actualizar si cambia.
-- [ ] Confirmar el estado de despliegue de Modal y Vercel; actualizar MODAL_DEPLOYMENT.md y NEXT_STEPS en consecuencia.
-- [ ] Alinear referencias de tests en root README, backend/README.md y project_docs para evitar duplicidades o inconsistencias.
-- [ ] Validar coherencia de la arquitectura (7 fases vs 6 agentes) y mantener documentos claros para nuevos contribuyentes.
-- [ ] Actualizar versiones de dependencias en docs cuando haya cambios en package.json/requirements.txt y reflejarlo en la documentación.
-- [ ] Establecer una cadencia de revisión (p. ej. por cada release) para ejecutar tests, limpiar documentos y actualizar el informe de coherencia.
-- [ ] Opcional: añadir un mini script de verificación que detecte discrepancias entre números de tests en diferentes archivos y alerte en PR.
+### ✅ Unificado: URLs del repositorio
+- **URL canónica**: `https://github.com/AlejandroRS21/blogger-agent-tfg`
+- Actualizado en: README.md, pyproject.toml, AGENTS_GUIDE.md, deploy.ps1
+
+### ✅ Resuelto: estado de Modal
+- **Estado real**: Código listo (`modal_app.py` + `llm_modal_host.py`), pendiente de pruebas en producción
+- Actualizado en: README.md, backend/README.md, PROJECT_STATUS.md
+
+### ✅ Resuelto: estructura de docs
+- **`project_docs/`**: Documentación técnica (guías, planes)
+- **`docs/`**: Web estática + COHERENCE_REPORT.md
+- Todos los enlaces corregidos
+
+### ✅ Resuelto: frontend Next.js
+- Eliminado en febrero 2026 (commit `18e9e2a`)
+- READMEs actualizados para reflejar web estática HTML + Tailwind CDN
+- `FRONTEND_IMPLEMENTATION.md` conservado como referencia histórica
+
+### ✅ Resuelto: archivos de configuración
+- `requirements.txt`: eliminado `daggr` duplicado
+- `pyproject.toml`: fusionado bloque `dependencies` duplicado
+- `.env.example`: completado con todas las variables necesarias
+- `deploy.ps1`: eliminado path hardcodeado, ahora detecta root automáticamente
+
+## 🧭 Maintenance Checklist
+
+- [ ] Verificar conteo de tests después de cada release y actualizar docs si cambia
+- [ ] Validar que los enlaces a `project_docs/` sigan siendo correctos
+- [ ] Confirmar estado de Modal después de pruebas en producción
+- [ ] Mantener `.env.example` sincronizado con nuevas variables de entorno
+- [ ] Revisar coherencia entre `requirements.txt` y `pyproject.toml` al agregar dependencias
+- [ ] Ejecutar `pytest --collect-only -q` para verificar conteo real de tests
+- [ ] Actualizar AGENTS_GUIDE.md si cambia el pipeline
+
+---
+
+**Nota**: Este informe se actualiza después de cada revisión de coherencia documental. La última corrección mayor fue en mayo 2026, resolviendo 12+ incoherencias identificadas.

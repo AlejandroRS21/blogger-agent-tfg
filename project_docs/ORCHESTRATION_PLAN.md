@@ -302,7 +302,7 @@ frontend/
 vercel deploy --prod
 ```
 
-✅ **Documentación ya creada:** `docs/VERCEL_DEPLOYMENT.md`
+✅ **Documentación ya creada:** `project_docs/VERCEL_DEPLOYMENT.md`
 
 ---
 

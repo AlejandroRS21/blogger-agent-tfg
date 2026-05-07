@@ -1,0 +1,84 @@
+import type { BlogPost } from "@/types/post";
+
+interface PostContentProps {
+  post: BlogPost;
+}
+
+export default function PostContent({ post }: PostContentProps) {
+  const hasHeadings =
+    post.html_structure?.headings &&
+    post.html_structure.headings.length > 0;
+
+  return (
+    <div className="mx-auto max-w-3xl">
+      {/* Header info */}
+      <div className="mb-8 border-b border-gray-200 pb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          {post.title}
+        </h1>
+
+        <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+          <span className="font-medium text-gray-700">{post.author}</span>
+          <span className="text-gray-300">|</span>
+          <span>{post.date}</span>
+          <span className="text-gray-300">|</span>
+          <span>{post.reading_time} min de lectura</span>
+          <span className="text-gray-300">|</span>
+          <span>{post.word_count} palabras</span>
+        </div>
+
+        {post.tags.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {post.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Table of contents */}
+      {hasHeadings && (
+        <div className="mb-8 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <h3 className="mb-2 text-sm font-semibold text-gray-900">
+            Tabla de contenidos
+          </h3>
+          <nav>
+            <ul className="space-y-1">
+              {post.html_structure!.headings.map((heading, index) => (
+                <li key={index}>
+                  <a
+                    href={`#heading-${index}`}
+                    className="text-sm text-blue-600 underline decoration-blue-200 underline-offset-2 hover:text-blue-800"
+                  >
+                    {heading}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      )}
+
+      {/* Blog content with prose styles */}
+      <div
+        className="prose max-w-none"
+        dangerouslySetInnerHTML={{ __html: post.content }}
+      />
+
+      {/* Meta keywords */}
+      {post.keywords.length > 0 && (
+        <div className="mt-10 border-t border-gray-200 pt-6">
+          <p className="text-xs text-gray-500">
+            Palabras clave:{" "}
+            <span className="text-gray-700">{post.keywords.join(", ")}</span>
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
