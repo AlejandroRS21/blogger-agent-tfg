@@ -1,79 +1,67 @@
-/**
- * Dynamic Post Page
- * 
- * Muestra un post generado por el sistema.
- */
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { fetchPost } from "@/lib/api";
+import PostContent from "@/components/PostContent";
 
-import { notFound } from 'next/navigation';
-import fs from 'fs';
-import path from 'path';
-import BlogLayout from '../../components/BlogLayout';
-import PostHeader from '../../components/PostHeader';
-import PostBody from '../../components/PostBody';
-import type { BlogPost } from '../../types/post';
-
-// Función para obtener posts desde los archivos generados por el backend
-async function getPost(slug: string): Promise<BlogPost | null> {
-  try {
-    const filePath = path.join(process.cwd(), 'public', 'posts', `${slug}.json`);
-    
-    if (!fs.existsSync(filePath)) {
-      return null;
-    }
-
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(fileContents);
-  } catch (error) {
-    console.error('Error loading post:', error);
-    return null;
-  }
+interface PostPageProps {
+  params: Promise<{ slug: string }>;
 }
 
-export default async function PostPage({ 
-  params 
-}: { 
-  params: Promise<{ slug: string }> 
-}) {
+export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const post = await fetchPost(slug);
 
   if (!post) {
     notFound();
   }
 
   return (
-    <BlogLayout>
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <PostHeader
-          title={post.title}
-          description={post.description}
-          date={post.metadata.date}
-          readingTime={post.metadata.reading_time}
-          wordCount={post.metadata.word_count}
-          author={post.metadata.author}
-          tags={post.metadata.tags}
-        />
-        
-        <PostBody htmlContent={post.html_code} />
-        
-        {/* Navigation */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <div className="flex justify-between">
-            <a
-              href="/"
-              className="text-blue-600 hover:text-blue-700 font-medium"
-            >
-              ← Volver al inicio
-            </a>
-            <a
-              href="/generate"
-              className="text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Generar otro post →
-            </a>
-          </div>
-        </div>
-      </article>
-    </BlogLayout>
+    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      {/* Navigation */}
+      <div className="mb-10 flex items-center justify-between">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          Volver al inicio
+        </Link>
+
+        <Link
+          href="/generate"
+          className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+        >
+          Generar otro
+        </Link>
+      </div>
+
+      {/* Post content */}
+      <PostContent post={post} />
+
+      {/* Bottom navigation */}
+      <div className="mt-12 flex items-center justify-between border-t border-gray-200 pt-8">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          Volver al inicio
+        </Link>
+
+        <Link
+          href="/generate"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-800"
+        >
+          Generar nuevo post
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        </Link>
+      </div>
+    </div>
   );
 }

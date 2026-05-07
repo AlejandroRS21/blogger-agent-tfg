@@ -184,11 +184,11 @@ pytest tests/ -v
 - ✅ `README.md` (raíz) - Actualizado con estado del proyecto
 
 ### Docs
-- ✅ `docs/ORCHESTRATION_PLAN.md` - Plan maestro de orquestación
-- ✅ `docs/NEXT_STEPS.md` - Roadmap actualizado con progreso
-- ✅ `docs/SCRAPER_IMPLEMENTATION.md` - Implementación del scraper
-- ✅ `docs/VERCEL_DEPLOYMENT.md` - Guía completa de Vercel
-- ✅ `docs/ENVIRONMENT_VARIABLES.md` - Configuración de env vars
+- ✅ `project_docs/ORCHESTRATION_PLAN.md` - Plan maestro de orquestación
+- ✅ `project_docs/NEXT_STEPS.md` - Roadmap actualizado con progreso
+- ✅ `project_docs/SCRAPER_IMPLEMENTATION.md` - Implementación del scraper
+- ✅ `project_docs/VERCEL_DEPLOYMENT.md` - Guía completa de Vercel
+- ✅ `project_docs/ENVIRONMENT_VARIABLES.md` - Configuración de env vars
 - ✅ `vercel.json` - Configuración de Vercel
 
 ---

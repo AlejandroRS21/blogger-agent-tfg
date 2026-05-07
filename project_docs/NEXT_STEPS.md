@@ -2,12 +2,6 @@
 
 > Guía de implementación por fases con tareas pendientes
 
-> :information_source: **NOTA SOBRE EL FRONTEND**  
-> Algunas referencias en este documento mencionan deployment en Vercel con Next.js.  
-> El proyecto ahora usa **GitHub Pages** con HTML estático. Ver: [https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)
-
----
-
 ## ✅ Completado
 
 ### Fase 0: Setup Inicial ✅
@@ -129,7 +123,7 @@ Completado:
 #### Modal Deployment Infrastructure ✅
 **Completado:**
 - [x] Crear `backend/modal_app.py` con webhook endpoint
-- [x] Documentación completa `docs/MODAL_DEPLOYMENT.md`
+- [x] Documentación completa `project_docs/MODAL_DEPLOYMENT.md`
 - [x] Documentar objetivo de migración a HuggingFace models
 - [x] Función `generate_blog_post()` con timeout 10min
 - [x] Helper `scrape_blogger_corpus()`
@@ -228,7 +222,7 @@ Completado:
 - [x] Cálculo de tiempo de lectura y conteo de palabras
 - [x] Generación automática de slug
 
-**Documentación:** `docs/HTMLBUILDER_INTEGRATION.md`
+**Documentación:** `project_docs/HTMLBUILDER_INTEGRATION.md`
 
 ---
 
@@ -343,7 +337,7 @@ Tareas:
 - [ ] Configurar dominio personalizado (opcional)
 - [ ] Configurar Analytics
 
-**Documentación:** Ya completada en `docs/VERCEL_DEPLOYMENT.md` ✅
+**Documentación:** Ya completada en `project_docs/VERCEL_DEPLOYMENT.md` ✅
 
 **Comando:**
 ```bash
@@ -455,7 +449,7 @@ ruff check .
 - [Plan de Orquestación](ORCHESTRATION_PLAN.md) - Plan detallado
 - [README Orquestador](../backend/src/orchestrator/README.md) - Docs del orquestador
 - [Vercel Deployment](VERCEL_DEPLOYMENT.md) - Guía de deployment (pendiente)
-- [Issues GitHub](https://github.com/IES-Rafael-Alberti/blogger-agent-tfg/issues) - Issues tracker
+- [Issues GitHub](https://github.com/AlejandroRS21/blogger-agent-tfg/issues) - Issues tracker
 
 ---
 

@@ -172,7 +172,7 @@ Workflow Metadata:
 1. `backend/aphra_blogger/agents/html_builder.py` (489 lines)
 2. `backend/tests/test_html_builder.py` (300+ lines)
 3. `backend/test_full_pipeline.py` (212 lines)
-4. `docs/HTMLBUILDER_INTEGRATION.md` (this file)
+4. `project_docs/HTMLBUILDER_INTEGRATION.md` (this file)
 
 ### Modified Files
 1. `backend/src/orchestrator/main.py` - Added HTMLBuilder integration

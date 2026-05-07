@@ -1,18 +1,8 @@
 # Frontend Development Summary - Blogger Agent TFG
 
-> :warning: **DOCUMENTO OBSOLETO**  
-> Este documento describe la implementación de un frontend Next.js que **ya no se utiliza**.  
-> El proyecto ahora usa **GitHub Pages** con HTML estático en el directorio `/docs`.  
-> Ver el frontend actual en: [https://alejandroors21.github.io/blogger-agent-tfg/](https://alejandroors21.github.io/blogger-agent-tfg/)
-
----
-
-<details>
-<summary>:page_facing_up: Documentación original del Frontend Next.js (archivado)</summary>
-
 **Fecha**: 2024-01-15  
 **Fase**: Frontend Next.js Implementation  
-**Estado**: :warning: Archivado (reemplazado por GitHub Pages)
+**Estado**: ✅ Completado
 
 ## 🎯 Objetivos Completados
 
@@ -371,10 +361,3 @@ NEXT_PUBLIC_APP_DESCRIPTION=Sistema multi-agente para generar contenido de blog
 ---
 
 **Resumen**: Frontend completamente funcional con Next.js 16, React 19 y Tailwind CSS 4. Listo para testing manual y futuras mejoras. Modo mock permite desarrollo sin backend. Preparado para deploy a Vercel.
-
-</details>
-
----
-
-**Última actualización**: 17 de febrero de 2026  
-**Estado**: :no_entry: Obsoleto (se usa GitHub Pages en su lugar)

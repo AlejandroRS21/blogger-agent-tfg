@@ -1,4 +1,4 @@
-# Backend - Blogger Agent
+# Backend - Blogger Agent TFG
 
 Backend Python del sistema multi-agente para mimetizar el estilo de escritura de bloggers.
 
@@ -7,52 +7,62 @@ Backend Python del sistema multi-agente para mimetizar el estilo de escritura de
 ```
 backend/
 ├── aphra_blogger/
-│   ├── llm/                       # Abstracción LLM multi-provider [✅ NUEVO]
+│   ├── llm/                          # Abstracción LLM multi-provider
 │   │   ├── __init__.py
-│   │   ├── base.py                # Clases abstractas
-│   │   ├── factory.py             # Factory para proveedores
-│   │   ├── huggingface_provider.py# HuggingFace (primario)
-│   │   └── openai_provider.py     # OpenAI (fallback)
-│   ├── agents/                    # Agentes especializados [✅ COMPLETADO]
+│   │   ├── base.py                   # Clases abstractas
+│   │   ├── factory.py                # Factory para proveedores
+│   │   ├── huggingface_provider.py   # HuggingFace (primario, gratis)
+│   │   ├── openai_provider.py        # OpenAI (fallback)
+│   │   ├── gemini_provider.py        # Google Gemini (alternativo)
+│   │   └── modal_provider.py         # Modal GPU (producción)
+│   ├── agents/                       # Agentes especializados
 │   │   ├── __init__.py
-│   │   ├── style_analyzer.py      # Análisis de estilo → HF/OpenAI
-│   │   ├── keyword_extractor.py   # Extracción de keywords → HF/OpenAI
-│   │   ├── content_generator.py   # Generación de contenido → HF/OpenAI
-│   │   ├── critic.py              # Crítica y evaluación → HF/OpenAI
-│   │   ├── image_selector.py      # Selección de imágenes → HF/OpenAI
-│   │   ├── html_builder.py        # Conversión Markdown→HTML/JSX → HF/OpenAI
-│   │   └── README.md              # Documentación de agentes
+│   │   ├── style_analyzer.py         # Análisis de estilo → HF/OpenAI
+│   │   ├── keyword_extractor.py      # Extracción de keywords → HF/OpenAI
+│   │   ├── content_generator.py      # Generación de contenido → HF/OpenAI
+│   │   ├── critic.py                 # Crítica y evaluación → HF/OpenAI
+│   │   ├── image_selector.py         # Selección de imágenes → HF/OpenAI
+│   │   ├── html_builder.py           # Markdown → HTML/JSX → HF/OpenAI
+│   │   ├── anonymous_blogger.py      # Emulación de blogueros anónimos
+│   │   ├── style_extractor.py        # Extracción legacy de estilo
+│   │   └── README.md                 # Documentación de agentes
 │   ├── workflows/
 │   │   ├── __init__.py
-│   │   └── blogger_style.py       # Workflow principal
+│   │   └── blogger_style.py          # Workflow principal
 │   ├── config/
 │   │   ├── __init__.py
-│   │   └── default.toml           # Configuración LLM (HF primario)
+│   │   └── default.toml              # Configuración LLM
 │   ├── __init__.py
-│   └── context.py                 # Contexto compartido
+│   └── context.py                    # Contexto compartido
 ├── src/
-│   └── orchestrator/              # Sistema de orquestación [✅ COMPLETADO]
+│   └── orchestrator/                 # Sistema de orquestación
 │       ├── __init__.py
-│       ├── main.py                # BloggerOrchestrator principal (7 fases)
-│       ├── config.py              # OrchestratorConfig
-│       ├── state.py               # StateManager y WorkflowState
-│       ├── runner.py              # CLI interface
-│       └── README.md              # Documentación del orquestador
-├── tools/                         # Herramientas [✅ COMPLETADO]
+│       ├── main.py                   # BloggerOrchestrator (7 fases)
+│       ├── config.py                 # OrchestratorConfig
+│       ├── state.py                  # StateManager y WorkflowState
+│       ├── runner.py                 # CLI interface
+│       └── README.md                 # Documentación del orquestador
+├── tools/                            # Herramientas
 │   ├── __init__.py
-│   ├── scraper.py                 # Web scraper para corpus
-│   └── README.md                  # Documentación del scraper
-├── tests/                         # Tests unitarios (40+ tests)
-│   ├── test_workflow.py
-│   ├── test_orchestrator.py       # Tests del orquestador [✅]
-│   ├── test_agents.py             # Tests de agentes [✅]
-│   ├── test_scraper.py            # Tests del scraper [✅]
-│   └── test_html_builder.py       # Tests del HTMLBuilder [✅ NUEVO]
-├── modal_app.py                   # Deployment Modal [✅ NUEVO]
-├── test_full_pipeline.py          # Test end-to-end [✅ NUEVO]
-├── requirements.txt               # Dependencias Python
-├── Dockerfile                     # Imagen Docker
-└── README.md                      # Este archivo
+│   ├── scraper.py                    # Web scraper WordPress
+│   └── README.md                     # Documentación del scraper
+├── tests/                            # ~80 tests
+│   ├── test_agents.py                # Tests de agentes
+│   ├── test_orchestrator.py          # Tests del orquestador
+│   ├── test_html_builder.py          # Tests del HTMLBuilder (23 tests)
+│   ├── test_scraper.py               # Tests del scraper
+│   ├── test_workflow.py              # Tests del workflow
+│   └── test_anonymous_blogger.py     # Tests de blogueros anónimos
+├── daggr_blogger_workflow.py         # ⭐ Workflow visual con Daggr
+├── modal_app.py                      # Deployment Modal (serverless)
+├── llm_modal_host.py                 # Hosting LLM propio en Modal GPU
+├── generate_and_deploy.py            # Pipeline simplificado
+├── test_full_pipeline.py             # Test end-to-end
+├── requirements.txt                  # Dependencias Python
+├── pyproject.toml                    # Configuración del proyecto
+├── Dockerfile                        # Imagen Docker
+├── setup.sh / setup.ps1              # Scripts de instalación
+└── README.md                         # Este archivo
 ```
 
 ## 🚀 Setup Local
@@ -61,8 +71,8 @@ backend/
 
 - Python 3.11+
 - **uv** (gestor de paquetes Python ultrarrápido)
-- **HuggingFace Token** (gratis, recomendado): `HF_TOKEN` o `HUGGINGFACE_TOKEN`
-  - O alternativamente: `OPENAI_API_KEY` (pago, fallback opcional)
+- **HuggingFace Token** (gratis, recomendado): `HF_TOKEN`
+- Alternativas: `GEMINI_API_KEY` (gratis), `OPENAI_API_KEY` (pago)
 
 ### Obtener HuggingFace Token (Gratis) 🆓
 
@@ -76,7 +86,7 @@ backend/
 
 ### Instalación con uv ⚡
 
-**Opción 1: Usando script automatizado** (recomendado):
+**Opción 1: Script automatizado** (recomendado):
 
 ```bash
 # Linux/macOS
@@ -89,139 +99,92 @@ chmod +x setup.sh
 
 **Opción 2: Instalación manual:**
 
-1. **Instalar uv** (si no lo tienes):
-
 ```bash
-# macOS/Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Instalar uv
+curl -LsSf https://astral.sh/uv/install.sh | sh  # macOS/Linux
+# o: pip install uv
 
-# Windows (PowerShell)
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# O con pip
-pip install uv
-```
-
-2. **Crear entorno virtual y instalar dependencias** (todo en un comando):
-
-```bash
 cd backend
 uv venv
 uv pip install -r requirements.txt
-```
 
-3. **Activar entorno virtual:**
-
-```bash
-# Linux/macOS
-source .venv/bin/activate
-
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
-
-# Windows CMD
-.venv\Scripts\activate.bat
-```
-
-4. **Configurar variables de entorno:**
-
-```bash
-# Crear archivo .env (no commitear!)
-echo "OPENAI_API_KEY=tu-api-key-aqui" > .env
+# Activar entorno
+source .venv/bin/activate     # Linux/macOS
+# o: .venv\Scripts\Activate.ps1  # Windows
 ```
 
 ### Ejecución
 
-#### Opción 1: Ejecutar Orquestador (Recomendado) [✅ COMPLETADO]
+#### Orquestador (7 fases) — Recomendado
 
 ```bash
-# Configurar API key
-export OPENAI_API_KEY="sk-..."
-
-# Ejecutar pipeline completo
-cd backend
+# Con HuggingFace (gratis)
+export HF_TOKEN="hf_..."
 python -m src.orchestrator.runner \
-  --topic "El futuro de OpenClaw me alucina" \
+  --topic "El futuro de la IA" \
   --blog-url "https://javipas.com" \
-  --output "resultado.json"
+  --output "resultado.json" \
+  --provider huggingface
 ```
 
-El orquestador ejecuta automáticamente todos los agentes en secuencia (7 fases):
-1. StyleAnalyzer - Analiza estilo del blogger
-2. KeywordExtractor - Extrae keywords y expresiones  
-3. ContentGenerator - Genera borrador inicial
-4. CriticAgent - Evalúa calidad (score 0-10)
-5. ContentGenerator - Refina contenido (si score < 7)
-6. HTMLBuilder - Convierte a HTML/JSX para Next.js [✅ NUEVO]
-7. ImageSelectorAgent - Selecciona ubicación de imágenes
+Fases del orquestador:
+1. **STYLE_ANALYSIS** — StyleAnalyzer analiza tono, voz, expresiones
+2. **KEYWORD_EXTRACTION** — KeywordExtractor extrae keywords y temas
+3. **CONTENT_GENERATION_DRAFT** — ContentGenerator crea borrador
+4. **CRITIQUE** — CriticAgent evalúa coherencia (score 0-10)
+5. **REFINEMENT** — ContentGenerator refina si score < 7
+6. **HTML_BUILD** — HTMLBuilder convierte a HTML/JSX
+7. **IMAGE_SELECTION** — ImageSelectorAgent selecciona ubicaciones
 
-#### Opción 2: Ejecutar workflow directamente:
-
-```bash
-cd backend
-python -m aphra_blogger.workflows.blogger_style
-```
-
-Este comando ejecutará un ejemplo de prueba del workflow legacy.
-
-#### Uso programático (Orquestador):
+#### Uso programático
 
 ```python
 from src.orchestrator.main import BloggerOrchestrator
 from src.orchestrator.config import OrchestratorConfig
 
-# Configurar
 config = OrchestratorConfig(
-    openai_api_key="sk-...",
+    openai_api_key="sk-...",        # o huggingface_token="hf_..."
+    provider="huggingface",
     retry_max_attempts=3,
     save_state=True
 )
 
-# Inicializar orquestador
 orchestrator = BloggerOrchestrator(config)
-
-# Ejecutar pipeline completo
 result = orchestrator.run(
     topic="OpenClaw me alucina",
     blogger_urls=["https://javipas.com"]
 )
 
-# Obtener resultados
 print(f"Score: {result['critique']['overall_score']}/10")
 print(f"Contenido: {result['final_content'][:200]}...")
-print(f"Imágenes: {len(result['images'])}")
 ```
 
-#### Uso programático (Workflow Legacy):
+#### Workflow Visual con Daggr 🎨
 
-```python
-from aphra_blogger.workflows.blogger_style import BloggerStyleWorkflow
+```bash
+python daggr_blogger_workflow.py
+# → http://localhost:7860
+```
 
-workflow = BloggerStyleWorkflow()
-result = workflow.run(
-    blogger_urls=["https://ejemplo.com/blog"],
-    topic="El futuro de la IA"
-)
+Canvas interactivo con los 7 agentes, inspección por nodo, re-ejecución selectiva y debugging visual.
+
+#### Pipeline Simplificado
+
+```bash
+python generate_and_deploy.py "Tema del artículo"
 ```
 
 ## 🐳 Docker
 
-### Construir imagen:
-
 ```bash
 cd backend
 docker build -t blogger-agent-backend .
-```
-
-### Ejecutar contenedor:
-
-```bash
-docker run -e OPENAI_API_KEY=tu-api-key blogger-agent-backend
+docker run -e HF_TOKEN=tu-token blogger-agent-backend
 ```
 
 ## ⚙️ Configuración
 
-El archivo `aphra_blogger/config/default.toml` contiene la configuración principal:
+`aphra_blogger/config/default.toml`:
 
 ```toml
 [models]
@@ -239,191 +202,97 @@ min_word_count = 800
 max_word_count = 2000
 ```
 
-### Configuraciones personalizadas:
-
-```python
-# Usar archivo de configuración personalizado
-workflow = BloggerStyleWorkflow(config_path="path/to/custom_config.toml")
-```
-
 ## 🧪 Testing
 
 ```bash
-# Ejecutar todos los tests
+# Todos los tests (~80 tests)
 pytest tests/ -v
 
-# Tests del orquestador
+# Por archivo
 pytest tests/test_orchestrator.py -v
-
-# Tests de agentes individuales
 pytest tests/test_agents.py -v
-
-# Tests del workflow legacy
-pytest tests/test_workflow.py -v
+pytest tests/test_html_builder.py -v
 
 # Con coverage
 pytest --cov=aphra_blogger --cov=src.orchestrator tests/
 
-# Test específico de un agente
-pytest tests/test_agents.py::TestStyleAnalyzer -v
+# Test end-to-end
+python test_full_pipeline.py
 ```
-
-## 📝 Workflow
-
-### Orquestador (Implementado - 7 Fases) ✅
-
-El `BloggerOrchestrator` ejecuta automáticamente:
-
-1. **STYLE_ANALYSIS** - StyleAnalyzer analiza tono, voz, expresiones
-2. **KEYWORD_EXTRACTION** - KeywordExtractor extrae keywords, expresiones, temas
-3. **CONTENT_GENERATION_DRAFT** - ContentGenerator crea borrador (1500-2500 palabras)
-4. **CRITIQUE** - CriticAgent evalúa coherencia (0-10), estilo, engagement
-5. **REFINEMENT** - ContentGenerator refina si score < 7 (max 2 iteraciones)
-6. **IMAGE_SELECTION** - ImageSelectorAgent selecciona ubicaciones y genera prompts
-7. **COMPLETE** - Resultado final con contenido + imágenes + metadatos
-
-Cada fase tiene:
-- Retry automático (3 intentos con exponential backoff)
-- Logging detallado
-- State persistence para debugging
-
-### Workflow Legacy
-
-El `BloggerStyleWorkflow` incluye placeholders para desarrollo futuro.
 
 ## 🔧 Desarrollo
 
-### Linting y formato:
-
 ```bash
-# Formatear código
-black aphra_blogger/
+# Formatear
+black aphra_blogger/ src/
 
 # Linter
-ruff check aphra_blogger/
+ruff check aphra_blogger/ src/
 ```
 
-### Agentes Disponibles:
+### Agentes Disponibles
 
-Todos los agentes están implementados en `aphra_blogger/agents/`:
-- ✅ `style_analyzer.py` - Análisis de estilo (tono, voz, estructura)
-- ✅ `keyword_extractor.py` - Extracción de keywords y expresiones
-- ✅ `content_generator.py` - Generación y refinamiento de contenido
-- ✅ `critic.py` - Evaluación de calidad (scoring 0-10)
-- ✅ `image_selector.py` - Selección estratégica de imágenes
-- ✅ `html_builder.py` - Conversión Markdown→HTML/JSX para Next.js [✅ NUEVO]
+Todos implementados en `aphra_blogger/agents/`:
+- ✅ `style_analyzer.py` — Análisis de estilo (tono, voz, estructura)
+- ✅ `keyword_extractor.py` — Extracción de keywords y expresiones
+- ✅ `content_generator.py` — Generación y refinamiento de contenido
+- ✅ `critic.py` — Evaluación de calidad (scoring 0-10)
+- ✅ `image_selector.py` — Selección de imágenes y prompts
+- ✅ `html_builder.py` — Conversión Markdown → HTML/JSX para Next.js
+- ✅ `anonymous_blogger.py` — Emulación de blogueros anónimos
+- ✅ `style_extractor.py` — Extracción legacy de perfil de estilo
 
-Ver documentación completa: [aphra_blogger/agents/README.md](aphra_blogger/agents/README.md)
-
-### Agregar nuevos agentes:
-
-```python
-# En aphra_blogger/agents/custom_agent.py
-class CustomAgent:
-    def __init__(self, api_key=None):
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-    
-    def process(self, data):
-        # Implementar lógica
-        return result
-
-# Integrar en src/orchestrator/main.py
-self.custom_agent = CustomAgent(api_key=config.openai_api_key)
-```
+Ver docs completas: [aphra_blogger/agents/README.md](aphra_blogger/agents/README.md)
 
 ## 🌐 Deployment en Modal
-
-El backend puede desplegarse en [Modal](https://modal.com) como función serverless.
 
 ### Quick Start
 
 ```bash
-# 1. Instalar Modal CLI
+# Instalar y autenticar
 pip install modal
-
-# 2. Autenticarse
 modal token new
 
-# 3. Configurar secret con API key
-modal secret create openai-secret OPENAI_API_KEY="sk-your-key"
+# Configurar secretos
+modal secret create hf-secret HF_TOKEN="hf-..."
 
-# 4. Desplegar
+# Desplegar orquestador serverless
 modal deploy backend/modal_app.py
+
+# O desplegar LLM propio con GPU
+modal deploy backend/llm_modal_host.py
 ```
 
 ### Probar el endpoint
 
 ```bash
-curl -X POST https://[your-username]--blogger-agent-tfg-webhook.modal.run \
+curl -X POST https://[tu-usuario]--blogger-agent-tfg-webhook.modal.run \
   -H "Content-Type: application/json" \
   -d '{
-    "blogger_urls": ["https://javipas.com/post1"],
-    6 agentes implementados (Issues #6, #7, #3):
-  * StyleAnalyzer - Análisis de estilo
-  * KeywordExtractor - Extracción de keywords
-  * ContentGenerator - Generación y refinamiento
-  * CriticAgent - Evaluación de calidad
-  * ImageSelectorAgent - Selección de imágenes
-  * HTMLBuilder - Conversión Markdown→HTML/JSX [✅ NUEVO]
-- ✅ CLI runner avanzado con argparse
-- ✅ Tests unitarios del orquestador y agentes (40+ tests)
-- ✅ State management y retry logic
-- ✅ Web scraper para corpus (Issue #2):
-  * BlogScraper con soporte WordPress
-  * Extracción limpia de contenido
-  * Rate limiting configurable
-  * Formato JSON estructurado
-  * Tests completos
-- ✅ Modal deployment preparado (Issue #5):
-  * modal_app.py con funciones serverless
-  * Webhook endpoint
-  * Documentación completa
-- ✅ Documentación completa
-
-**Pendiente:**
-- ⏳ Desplegar a Modal (testing real con deployment)
-- ⏳ Frontend Next.js (Issue #4)
-- ⏳ Replicar CSS de javipas.com (Issue #8)
-- ⏳ Deployment a Vercel (documentado en docs/VERCEL_DEPLOYMENT.md)
-- 🔮 Migración a modelos HuggingFace (futuro
-1. Crear branch desde `develop`
-2. Implementar cambios
-3. Ejecutar tests
-4. Crear PR con descripción clara
+    "blogger_urls": ["https://javipas.com"],
+    "topic": "El futuro de la IA"
+  }'
+```
 
 ## 📋 Roadmap
 
 **Completado:**
 - ✅ Estructura base del proyecto
-- ✅ Workflow principal con placeholders
-- ✅ Configuración TOML
-- ✅ Contexto compartido
-- ✅ Sistema de orquestación completo (Issue #9)
-- ✅ 5 agentes implementados (Issues #6, #7):
-  * StyleAnalyzer - Análisis de estilo
-  * KeywordExtractor - Extracción de keywords
-  * ContentGenerator - Generación y refinamiento
-  * CriticAgent - Evaluación de calidad
-  * ImageSelectorAgent - Selección de imágenes
-- ✅ CLI runner avanzado con argparse
-- ✅ Tests unitarios del orquestador
-- ✅ Tests de agentes individuales
+- ✅ Workflow principal y sistema de orquestación (7 fases)
+- ✅ 8 agentes implementados (StyleAnalyzer, KeywordExtractor, ContentGenerator, CriticAgent, ImageSelectorAgent, HTMLBuilder, AnonymousBloggerEmulator, StyleExtractor)
+- ✅ CLI runner con argparse
+- ✅ ~80 tests
 - ✅ State management y retry logic
-- ✅ Web scraper para corpus (Issue #2):
-  * BlogScraper con soporte WordPress
-  * Extracción limpia de contenido
-  * Rate limiting configurable
-  * Formato JSON estructurado
-  * Tests completos
-- ✅ Documentación completa
+- ✅ Web scraper WordPress-optimizado
+- ✅ Abstracción LLM multi-provider (HF, OpenAI, Gemini, Modal)
+- ✅ Daggr workflow visual
+- ✅ Modal deployment preparado (serverless + GPU hosting)
 
 **Pendiente:**
-- ⏳ Agente HTMLBuilder (Issue #3)
-- ⏳ Integración con Modal para deployment (Issue #5)
-- ⏳ Frontend Next.js (Issue #4)
-- ⏳ Replicar CSS de javipas.com (Issue #8)
-- ⏳ Deployment a Vercel (documentado en docs/VERCEL_DEPLOYMENT.md)
+- ⏳ CI/CD con GitHub Actions
+- ⏳ Tests E2E para la web estática
+- ⏳ Pruebas de deployment real en Modal
 
 ## 📧 Soporte
 
-Para dudas sobre el backend, contactar al Backend Lead (Persona 1).
+Repo: [github.com/AlejandroRS21/blogger-agent-tfg](https://github.com/AlejandroRS21/blogger-agent-tfg)

@@ -9,6 +9,7 @@ from .base import LLMProvider, LLMConfig
 from .openai_provider import OpenAIProvider
 from .huggingface_provider import HuggingFaceProvider
 from .modal_provider import ModalProvider
+from .gemini_provider import GeminiProvider
 
 
 def create_llm_provider(
@@ -17,11 +18,11 @@ def create_llm_provider(
     model: Optional[str] = None,
     temperature: float = 0.7,
     max_tokens: int = 2000,
-    **kwargs
+    **kwargs,
 ) -> LLMProvider:
     """
     Create an LLM provider instance.
-    
+
     Args:
         provider: Provider name ("openai", "huggingface", "auto")
                  "auto" will try HuggingFace first, then OpenAI
@@ -30,10 +31,10 @@ def create_llm_provider(
         temperature: Sampling temperature
         max_tokens: Maximum tokens to generate
         **kwargs: Additional provider-specific config
-        
+
     Returns:
         LLMProvider instance
-        
+
     Raises:
         ValueError: If provider is invalid or not available
     """
@@ -43,24 +44,24 @@ def create_llm_provider(
             model = "gpt-4-turbo-preview"
         elif provider == "huggingface":
             model = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+        elif provider == "gemini":
+            model = "gemini-1.5-flash"
         elif provider == "modal":
             # Default Modal function name
             model = "blogger-agent-models/LlamaModel.generate"
         else:  # auto
             model = "gpt-4-turbo-preview"  # Will be overridden per provider
-    
+
     config = LLMConfig(
-        api_key=api_key,
-        model=model,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        **kwargs
+        api_key=api_key, model=model, temperature=temperature, max_tokens=max_tokens, **kwargs
     )
-    
-    # Auto mode: try Modal first if configured, then HuggingFace, then OpenAI
+
+    # Auto mode: try Modal first if configured, then Gemini, then HuggingFace, then OpenAI
     if provider == "auto":
         # Check for Modal config
-        modal_ready = (os.getenv("MODAL_TOKEN_ID") and os.getenv("MODAL_TOKEN_SECRET")) or os.getenv("MODAL_API_KEY")
+        modal_ready = (
+            os.getenv("MODAL_TOKEN_ID") and os.getenv("MODAL_TOKEN_SECRET")
+        ) or os.getenv("MODAL_API_KEY")
         if modal_ready:
             try:
                 modal_config = LLMConfig(
@@ -68,9 +69,26 @@ def create_llm_provider(
                     model="blogger-agent-models/LlamaModel.generate",
                     temperature=temperature,
                     max_tokens=max_tokens,
-                    **kwargs
+                    **kwargs,
                 )
                 llm = ModalProvider(modal_config)
+                if llm.is_available():
+                    return llm
+            except Exception:
+                pass
+
+        # Check for Gemini API key
+        gemini_key = api_key or os.getenv("GEMINI_API_KEY")
+        if gemini_key:
+            try:
+                gemini_config = LLMConfig(
+                    api_key=gemini_key,
+                    model="gemini-1.5-flash",
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    **kwargs,
+                )
+                llm = GeminiProvider(gemini_config)
                 if llm.is_available():
                     return llm
             except Exception:
@@ -85,19 +103,19 @@ def create_llm_provider(
                     model="meta-llama/Meta-Llama-3.1-8B-Instruct",
                     temperature=temperature,
                     max_tokens=max_tokens,
-                    **kwargs
+                    **kwargs,
                 )
                 llm = HuggingFaceProvider(hf_config)
                 if llm.is_available():
                     return llm
             except Exception:
                 pass
-        
+
         raise ValueError(
-            "No LLM provider available (Modal or HuggingFace). OpenAI is disabled. "
-            "Set MODAL_TOKEN_ID/SECRET or HF_TOKEN environment variable."
+            "No LLM provider available (Modal, Gemini, HuggingFace). "
+            "Set MODAL_TOKEN_ID/SECRET, GEMINI_API_KEY, or HF_TOKEN environment variable."
         )
-    
+
     # Specific provider requested
     elif provider == "huggingface":
         llm = HuggingFaceProvider(config)
@@ -107,7 +125,7 @@ def create_llm_provider(
                 "Set HF_TOKEN or HUGGINGFACE_TOKEN environment variable."
             )
         return llm
-        
+
     elif provider == "modal":
         llm = ModalProvider(config)
         if not llm.is_available():
@@ -116,7 +134,7 @@ def create_llm_provider(
                 "Set MODAL_TOKEN_ID and MODAL_TOKEN_SECRET environment variables."
             )
         return llm
-    
+
     elif provider == "openai":
         llm = OpenAIProvider(config)
         if not llm.is_available():
@@ -124,24 +142,32 @@ def create_llm_provider(
                 "OpenAI provider not available. Set OPENAI_API_KEY environment variable."
             )
         return llm
-    
+
+    elif provider == "gemini":
+        llm = GeminiProvider(config)
+        if not llm.is_available():
+            raise ValueError(
+                "Gemini provider not available. Set GEMINI_API_KEY environment variable."
+            )
+        return llm
+
     else:
         raise ValueError(
-            f"Unknown provider: {provider}. Valid options: 'openai', 'huggingface', 'auto'"
+            f"Unknown provider: {provider}. Valid options: 'openai', 'huggingface', 'gemini', 'auto'"
         )
 
 
 def get_default_provider() -> LLMProvider:
     """
     Get the default LLM provider.
-    
+
     Priority:
     1. HuggingFace (if HF_TOKEN set)
     2. OpenAI (if OPENAI_API_KEY set)
-    
+
     Returns:
         LLMProvider instance
-        
+
     Raises:
         ValueError: If no provider is available
     """

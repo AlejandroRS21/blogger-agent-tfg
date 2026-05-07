@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 class HTMLOutput:
     """Structured HTML output from HTMLBuilder."""
     html: str
-    jsx: str
+    full_page: str
     meta_title: str
     meta_description: str
     meta_keywords: List[str]
@@ -47,7 +47,7 @@ class HTMLBuilder:
     
     Features:
     - Markdown to HTML conversion
-    - JSX-compatible output for Next.js
+    - Complete HTML5 page generation
     - Semantic HTML structure
     - Image placeholder integration
     - Meta tags generation
@@ -108,7 +108,7 @@ class HTMLBuilder:
             style_profile: Style profile from StyleAnalyzer (optional)
             
         Returns:
-            HTMLOutput with html, jsx, and metadata
+            HTMLOutput with html, full_page, and metadata
         """
         logger.info(f"Building HTML/JSX for topic: {topic}")
         
@@ -122,9 +122,6 @@ class HTMLBuilder:
         # Extract headings for TOC
         headings = self._extract_headings(html)
         
-        # Generate JSX version
-        jsx = self._html_to_jsx(html)
-        
         # Calculate reading time and word count
         word_count = len(content.split())
         reading_time = max(1, word_count // 200)  # ~200 words per minute
@@ -134,9 +131,19 @@ class HTMLBuilder:
         meta_description = self._generate_meta_description(content)
         meta_keywords = self._extract_keywords_for_meta(content, style_profile)
         
+        # Generate full HTML page
+        full_page = self.generate_full_html_page(
+            html_content=html,
+            meta_title=meta_title,
+            meta_description=meta_description,
+            meta_keywords=meta_keywords,
+            reading_time=reading_time,
+            word_count=word_count
+        )
+        
         output = HTMLOutput(
             html=html,
-            jsx=jsx,
+            full_page=full_page,
             meta_title=meta_title,
             meta_description=meta_description,
             meta_keywords=meta_keywords,
@@ -208,7 +215,7 @@ class HTMLBuilder:
                     html_lines.append('<ul>')
                     in_list = True
                 html_lines.append(f'<li>{line[2:]}</li>')
-            elif line.startswith(re.match(r'^\d+\. ', line) is not None):
+            elif re.match(r'^\d+\. ', line) is not None:
                 if not in_list:
                     html_lines.append('<ol>')
                     in_list = True
@@ -239,10 +246,12 @@ class HTMLBuilder:
             alt_text = image.get('alt_text', 'Blog image')
             
             # Create image placeholder
+            image_url = image.get('url') or "/api/placeholder/800/400"
+            
             placeholder = f'''
 <figure class="blog-image" data-position="{position}">
   <img 
-    src="/api/placeholder/800/400" 
+    src="{image_url}" 
     alt="{alt_text}"
     data-image-prompt="{prompt}"
     loading="lazy"
@@ -268,23 +277,71 @@ class HTMLBuilder:
         
         return html
     
-    def _html_to_jsx(self, html: str) -> str:
-        """Convert HTML to JSX-compatible format."""
-        jsx = html
-        
-        # Convert class to className
-        jsx = re.sub(r'\sclass="', ' className="', jsx)
-        
-        # Self-closing tags
-        jsx = re.sub(r'<img([^>]*?)>', r'<img\1 />', jsx)
-        jsx = re.sub(r'<br>', '<br />', jsx)
-        jsx = re.sub(r'<hr>', '<hr />', jsx)
-        
-        # Convert data attributes to camelCase
-        jsx = re.sub(r'data-image-prompt', 'dataImagePrompt', jsx)
-        jsx = re.sub(r'data-position', 'dataPosition', jsx)
-        
-        return jsx
+    
+    def generate_full_html_page(
+        self,
+        html_content: str,
+        meta_title: str,
+        meta_description: str,
+        meta_keywords: List[str],
+        reading_time: int,
+        word_count: int
+    ) -> str:
+        """Generate a complete HTML5 page styled with Tailwind Typography."""
+        return f'''<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{meta_title}} - Blogger Agent IA</title>
+    <meta name="description" content="{{meta_description}}">
+    <meta name="keywords" content="{{', '.join(meta_keywords)}}">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        body {{ font-family: 'Inter', sans-serif; }}
+        .font-serif {{ font-family: 'Lora', serif; }}
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="bg-white border-b sticky top-0 z-50">
+        <nav class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../index.html" class="text-2xl font-black text-gray-900 tracking-tighter">BLOGGER<span class="text-blue-600">IA</span></a>
+            <div class="flex gap-6 text-sm font-bold uppercase tracking-widest text-gray-400">
+                <a href="../index.html" class="hover:text-blue-600 transition-colors">Volver al Blog</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <article class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 overflow-hidden">
+            <header class="mb-10 text-center border-b pb-10">
+                <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-4 leading-tight">{{meta_title}}</h1>
+                <div class="flex items-center justify-center gap-3 text-sm font-bold uppercase tracking-widest text-gray-400">
+                    <span>{{reading_time}} min de lectura</span>
+                    <span class="bg-gray-200 w-1.5 h-1.5 rounded-full"></span>
+                    <span>{{word_count}} palabras</span>
+                </div>
+            </header>
+            
+            <div class="prose prose-lg md:prose-xl max-w-none prose-a:text-blue-600 hover:prose-a:text-blue-500 font-serif prose-headings:font-sans prose-headings:font-black prose-img:rounded-2xl prose-img:shadow-md">
+                {{html_content}}
+            </div>
+        </article>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-12 mt-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-xs font-black text-gray-400 uppercase tracking-widest leading-loose">
+                © 2026 Blogger Agent TFG<br>
+                AlejandroRS21 - Universidad San Pablo CEU
+            </p>
+        </div>
+    </footer>
+</body>
+</html>'''
     
     def _extract_headings(self, html: str) -> List[Dict[str, str]]:
         """Extract headings from HTML for table of contents."""
@@ -396,52 +453,7 @@ class HTMLBuilder:
         
         return keywords if keywords else ["blog", "tecnología", "innovación"]
     
-    def generate_nextjs_component(
-        self,
-        html_output: HTMLOutput,
-        slug: str
-    ) -> str:
-        """
-        Generate a complete Next.js component file.
-        
-        Args:
-            html_output: HTMLOutput from build()
-            slug: URL slug for the post
-            
-        Returns:
-            Complete Next.js component code as string
-        """
-        component = f'''import React from 'react';
-import Head from 'next/head';
 
-export default function BlogPost() {{
-  return (
-    <>
-      <Head>
-        <title>{html_output.meta_title}</title>
-        <meta name="description" content="{html_output.meta_description}" />
-        <meta name="keywords" content="{', '.join(html_output.meta_keywords)}" />
-        <meta property="og:title" content="{html_output.meta_title}" />
-        <meta property="og:description" content="{html_output.meta_description}" />
-        <meta property="og:type" content="article" />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-4 text-sm text-gray-600">
-            {html_output.reading_time} min lectura • {html_output.word_count} palabras
-          </div>
-          
-          {html_output.jsx}
-        </div>
-      </div>
-    </>
-  );
-}}
-'''
-        
-        return component
 
 
 if __name__ == '__main__':

@@ -8,13 +8,15 @@ from .content_generator import ContentGenerator
 from .critic import CriticAgent
 from .image_selector import ImageSelectorAgent
 from .html_builder import HTMLBuilder
+from .anonymous_blogger import AnonymousBloggerEmulator, AnonymousProfile
 
 __all__ = [
-    'StyleAnalyzer',
-    'KeywordExtractor',
-    'ContentGenerator',
-    'CriticAgent',
-    'ImageSelectorAgent',
-    'HTMLBuilder'
+    "StyleAnalyzer",
+    "KeywordExtractor",
+    "ContentGenerator",
+    "CriticAgent",
+    "ImageSelectorAgent",
+    "HTMLBuilder",
+    "AnonymousBloggerEmulator",
+    "AnonymousProfile",
 ]
-

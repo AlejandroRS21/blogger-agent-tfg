@@ -1,141 +1,174 @@
-/**
- * API Route: Generate Post
- * 
- * POST /api/generate-post
- * 
- * Conecta con el backend Python para generar posts usando el Blogger Agent.
- */
+import { NextRequest, NextResponse } from "next/server";
+import type { GenerateRequest, GenerateResponse } from "@/types/post";
 
-import { NextRequest, NextResponse } from 'next/server';
-import type { GenerateRequest, GenerateResponse, BlogPost } from '../../types/post';
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-// Configuración del backend
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
-const USE_MOCK = process.env.USE_MOCK === 'true' || true; // Default to mock for development
-
-/**
- * Mock backend response para desarrollo sin backend corriendo
- */
-function mockGeneratePost(request: GenerateRequest): BlogPost {
-  const slug = request.topic.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-  
-  return {
-    id: slug,
-    title: `${request.topic}: Una Perspectiva Única`,
-    description: `Explorando ${request.topic} desde el estilo de ${request.blogger_name}`,
-    html_code: `
-      <article>
-        <p>Hola, soy <strong>${request.blogger_name}</strong>, y hoy quiero hablar sobre <em>${request.topic}</em>.</p>
-        
-        <h2>Introducción</h2>
-        <p>${request.blogger_bio}</p>
-        
-        <h2>Desarrollo del Tema</h2>
-        <p>Este es un post generado de forma mock para desarrollo. En producción, aquí verías contenido generado por los agentes de IA basándose en mi estilo de escritura.</p>
-        
-        <h3>Puntos Clave</h3>
-        <ul>
-          ${(request.keywords || []).map(kw => `<li>${kw}</li>`).join('\n          ')}
-        </ul>
-        
-        <blockquote>
-          "El contenido generado por IA debe mantener la autenticidad del blogger"
-        </blockquote>
-        
-        <h2>Conclusión</h2>
-        <p>Gracias por leer. Este contenido fue generado usando el Blogger Agent TFG.</p>
-      </article>
-    `,
-    metadata: {
-      word_count: 150,
-      reading_time: 1,
-      date: new Date().toISOString().split('T')[0],
-      author: request.blogger_name,
-      tags: request.keywords || []
-    }
-  };
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9áéíóúüñ]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
-/**
- * Llama al backend Python real
- */
-async function callBackendAPI(request: GenerateRequest): Promise<BlogPost> {
-  const response = await fetch(`${BACKEND_URL}/api/generate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+function generateMockResponse(topic: string): GenerateResponse {
+  const content = `
+<h2>Introducción</h2>
+<p>En el mundo actual, la tecnología avanza a pasos agigantados y cada vez son más las personas que se interesan por <strong>${topic}</strong>. Este artículo explora los aspectos fundamentales y las últimas tendencias que están marcando el panorama actual.</p>
+
+<h2>Contexto y antecedentes</h2>
+<p>El ecosistema digital ha evolucionado de manera significativa en los últimos años. La adopción de nuevas tecnologías relacionadas con <strong>${topic}</strong> ha crecido exponencialmente, transformando la forma en que interactuamos con la información.</p>
+
+<h2>Puntos clave</h2>
+<ul>
+  <li><strong>Innovación constante:</strong> El sector se caracteriza por una innovación continua.</li>
+  <li><strong>Impacto en la industria:</strong> Las empresas que adoptan estas tecnologías reportan mejoras significativas.</li>
+  <li><strong>Formación especializada:</strong> La demanda de profesionales ha aumentado considerablemente.</li>
+</ul>
+
+<h2>Análisis en profundidad</h2>
+<p>Para comprender realmente el impacto de <strong>${topic}</strong>, es necesario analizar varios factores. La infraestructura tecnológica actual permite procesar volúmenes de datos que hace una década eran impensables.</p>
+
+<blockquote>
+  "La tecnología no es nada. Lo importante es que tengas fe en la gente, que sean básicamente buenas e inteligentes, y si les das herramientas, harán cosas maravillosas con ellas." — Steve Jobs
+</blockquote>
+
+<h2>Conclusiones</h2>
+<p>En resumen, <strong>${topic}</strong> representa una oportunidad única para aquellos que deseen mantenerse a la vanguardia en el mundo digital. La clave está en la formación continua.</p>
+`;
+
+  const words = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
+  const readingTime = Math.max(1, Math.ceil(words / 200));
+  const title = topic.charAt(0).toUpperCase() + topic.slice(1);
+  const slug = generateSlug(topic);
+
+  return {
+    success: true,
+    execution_time: 2.3,
+    post: {
+      id: crypto.randomUUID(),
+      slug,
+      title,
+      description: `Análisis completo y detallado sobre ${topic}, explorando sus fundamentos, tendencias actuales y perspectivas futuras.`,
+      content,
+      author: "Blogger Agent AI",
+      date: new Date().toISOString().split("T")[0],
+      word_count: words,
+      reading_time: readingTime,
+      keywords: [topic, "tecnología", "innovación", "análisis"],
+      tags: [topic, "Tecnología", "Innovación"],
+      html_structure: {
+        html: content,
+        jsx: "<div>" + content + "</div>",
+        headings: ["Introducción", "Contexto y antecedentes", "Puntos clave", "Análisis en profundidad", "Conclusiones"],
+        meta: {
+          title,
+          description: `Análisis completo sobre ${topic}`,
+          keywords: `${topic}, tecnología, innovación, análisis`,
+        },
+        reading_time: readingTime,
+        word_count: words,
+      },
     },
-    body: JSON.stringify(request),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Backend error: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return data.post;
+  };
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: GenerateRequest = await request.json();
 
-    // Validación
-    if (!body.blogger_name || !body.blogger_bio || !body.topic) {
+    if (!body.topic || !body.topic.trim()) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Missing required fields: blogger_name, blogger_bio, topic' 
-        } as GenerateResponse,
+        { success: false, error: "El tema es obligatorio" },
         { status: 400 }
       );
     }
 
-    if (!body.blogger_sample_posts || body.blogger_sample_posts.length === 0) {
+    if (!body.blog_url || !body.blog_url.trim()) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'At least one sample post is required' 
-        } as GenerateResponse,
+        { success: false, error: "La URL del blog es obligatoria" },
         { status: 400 }
       );
     }
 
-    const startTime = Date.now();
+    const useMock = process.env.USE_MOCK !== "false";
 
-    // Generar post (mock o backend real)
-    let post: BlogPost;
-    if (USE_MOCK) {
-      console.log('[API] Using mock backend');
-      post = mockGeneratePost(body);
-      // Simular delay de procesamiento
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    } else {
-      console.log('[API] Calling real backend:', BACKEND_URL);
-      post = await callBackendAPI(body);
+    if (useMock) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = generateMockResponse(body.topic);
+      return NextResponse.json(response);
     }
 
-    const executionTime = Date.now() - startTime;
+    // === REAL MODE: Connect to Modal webhook ===
+    const backendUrl = process.env.BACKEND_URL;
+    if (!backendUrl) {
+      return NextResponse.json(
+        { success: false, error: "BACKEND_URL no configurado. Configuralo en Vercel Environment Variables." },
+        { status: 500 }
+      );
+    }
 
+    // Modal webhook expects: { blogger_urls, topic, provider, enable_critique, ... }
+    const modalResponse = await fetch(backendUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        blogger_urls: [body.blog_url],
+        topic: body.topic,
+        provider: body.provider || "huggingface",
+        enable_critique: true,
+        min_word_count: 800,
+        max_word_count: 2500,
+      }),
+    });
+
+    if (!modalResponse.ok) {
+      const errorText = await modalResponse.text();
+      return NextResponse.json(
+        { success: false, error: `Error del backend Modal (${modalResponse.status}): ${errorText}` },
+        { status: 502 }
+      );
+    }
+
+    // Modal response: { success: bool, data: {...}, error: string|null }
+    const modalResult = await modalResponse.json();
+
+    if (!modalResult.success) {
+      return NextResponse.json(
+        { success: false, error: modalResult.error || "Error del backend Modal" },
+        { status: 500 }
+      );
+    }
+
+    // Transform Modal data to our GenerateResponse format
+    const slug = generateSlug(body.topic);
+    const modalData = modalResult.data;
     return NextResponse.json({
       success: true,
-      post,
-      execution_time: executionTime
-    } as GenerateResponse);
+      execution_time: modalData.execution_time,
+      post: {
+        id: modalData.workflow_id || crypto.randomUUID(),
+        slug,
+        title: body.topic.charAt(0).toUpperCase() + body.topic.slice(1),
+        description: modalData.description || `Artículo generado sobre ${body.topic}`,
+        content: modalData.content || modalData.final_content || "",
+        author: "Blogger Agent AI",
+        date: new Date().toISOString().split("T")[0],
+        word_count: modalData.word_count || 0,
+        reading_time: modalData.reading_time || 1,
+        keywords: modalData.keywords || [],
+        tags: modalData.tags || [],
+        html_structure: modalData.html_structure,
+      } satisfies import("@/types/post").BlogPost,
+    } satisfies GenerateResponse);
 
-  } catch (error) {
-    console.error('[API] Error generating post:', error);
-    
+  } catch (err) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
-      } as GenerateResponse,
+        error: err instanceof Error ? err.message : "Error interno del servidor",
+      },
       { status: 500 }
     );
   }
 }
-
-// Exportar configuración de ruta
-export const runtime = 'nodejs'; // or 'edge'
-export const dynamic = 'force-dynamic'; // No caching
