@@ -15,7 +15,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-8">
+        <nav className="flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -29,9 +29,18 @@ export default function Header() {
             href="https://github.com/AlejandroRS21/blogger-agent-tfg"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+            className="text-sm font-medium text-gray-500 transition-colors hover:text-blue-600"
           >
             GitHub
+          </a>
+          <a
+            href="https://huggingface.co/spaces"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600"
+          >
+            <span>🤗</span>
+            <span className="hidden sm:inline">HF Spaces</span>
           </a>
         </nav>
       </div>

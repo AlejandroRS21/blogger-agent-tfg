@@ -11,30 +11,30 @@ function generateSlug(title: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-function generateMockResponse(topic: string, blogUrl: string): GenerateResponse {
+function generateMockResponse(topic: string): GenerateResponse {
   const content = `
-<h2>Introduccion</h2>
-<p>En el mundo actual, la tecnologia avanza a pasos agigantados y cada vez son mas las personas que se interesan por <strong>${topic}</strong>. Este articulo explora los aspectos fundamentales y las ultimas tendencias que estan marcando el panorama actual.</p>
+<h2>Introducción</h2>
+<p>En el mundo actual, la tecnología avanza a pasos agigantados y cada vez son más las personas que se interesan por <strong>${topic}</strong>. Este artículo explora los aspectos fundamentales y las últimas tendencias que están marcando el panorama actual.</p>
 
 <h2>Contexto y antecedentes</h2>
-<p>El ecosistema digital ha evolucionado de manera significativa en los ultimos anos. La adopcion de nuevas tecnologias relacionadas con <strong>${topic}</strong> ha crecido exponencialmente, transformando la forma en que interactuamos con la informacion y abriendo nuevas oportunidades para profesionales y empresas.</p>
+<p>El ecosistema digital ha evolucionado de manera significativa en los últimos años. La adopción de nuevas tecnologías relacionadas con <strong>${topic}</strong> ha crecido exponencialmente, transformando la forma en que interactuamos con la información.</p>
 
 <h2>Puntos clave</h2>
 <ul>
-  <li><strong>Innovacion constante:</strong> El sector se caracteriza por una innovacion continua, donde cada trimestre surgen nuevas herramientas y enfoques.</li>
-  <li><strong>Impacto en la industria:</strong> Las empresas que adoptan estas tecnologias reportan mejoras significativas en eficiencia y productividad.</li>
-  <li><strong>Formacion especializada:</strong> La demanda de profesionales con conocimientos en ${topic} ha aumentado considerablemente.</li>
+  <li><strong>Innovación constante:</strong> El sector se caracteriza por una innovación continua.</li>
+  <li><strong>Impacto en la industria:</strong> Las empresas que adoptan estas tecnologías reportan mejoras significativas.</li>
+  <li><strong>Formación especializada:</strong> La demanda de profesionales ha aumentado considerablemente.</li>
 </ul>
 
-<h2>Analisis en profundidad</h2>
-<p>Para comprender realmente el impacto de <strong>${topic}</strong>, es necesario analizar varios factores. La infraestructura tecnologica actual permite procesar volumenes de datos que hace una decada eran impensables, democratizando el acceso a herramientas que antes solo estaban al alcance de grandes corporaciones.</p>
+<h2>Análisis en profundidad</h2>
+<p>Para comprender realmente el impacto de <strong>${topic}</strong>, es necesario analizar varios factores. La infraestructura tecnológica actual permite procesar volúmenes de datos que hace una década eran impensables.</p>
 
 <blockquote>
-  "La tecnologia no es nada. Lo importante es que tengas fe en la gente, que sean basicamente buenas e inteligentes, y si les das herramientas, haran cosas maravillosas con ellas." — Steve Jobs
+  "La tecnología no es nada. Lo importante es que tengas fe en la gente, que sean básicamente buenas e inteligentes, y si les das herramientas, harán cosas maravillosas con ellas." — Steve Jobs
 </blockquote>
 
 <h2>Conclusiones</h2>
-<p>En resumen, <strong>${topic}</strong> representa una oportunidad unica para aquellos que deseen mantenerse a la vanguardia en el mundo digital. La clave esta en la formacion continua y en la capacidad de adaptacion a un entorno que cambia rapidamente.</p>
+<p>En resumen, <strong>${topic}</strong> representa una oportunidad única para aquellos que deseen mantenerse a la vanguardia en el mundo digital. La clave está en la formación continua.</p>
 `;
 
   const words = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
@@ -49,22 +49,22 @@ function generateMockResponse(topic: string, blogUrl: string): GenerateResponse 
       id: crypto.randomUUID(),
       slug,
       title,
-      description: `Analisis completo y detallado sobre ${topic}, explorando sus fundamentos, tendencias actuales y perspectivas futuras.`,
+      description: `Análisis completo y detallado sobre ${topic}, explorando sus fundamentos, tendencias actuales y perspectivas futuras.`,
       content,
       author: "Blogger Agent AI",
       date: new Date().toISOString().split("T")[0],
       word_count: words,
       reading_time: readingTime,
-      keywords: [topic, "tecnologia", "innovacion", "analisis"],
-      tags: [topic, "Tecnologia", "Innovacion"],
+      keywords: [topic, "tecnología", "innovación", "análisis"],
+      tags: [topic, "Tecnología", "Innovación"],
       html_structure: {
         html: content,
         jsx: "<div>" + content + "</div>",
-        headings: ["Introduccion", "Contexto y antecedentes", "Puntos clave", "Analisis en profundidad", "Conclusiones"],
+        headings: ["Introducción", "Contexto y antecedentes", "Puntos clave", "Análisis en profundidad", "Conclusiones"],
         meta: {
           title,
-          description: `Analisis completo sobre ${topic}`,
-          keywords: `${topic}, tecnologia, innovacion, analisis`,
+          description: `Análisis completo sobre ${topic}`,
+          keywords: `${topic}, tecnología, innovación, análisis`,
         },
         reading_time: readingTime,
         word_count: words,
@@ -77,7 +77,6 @@ export async function POST(request: NextRequest) {
   try {
     const body: GenerateRequest = await request.json();
 
-    // Validate required fields
     if (!body.topic || !body.topic.trim()) {
       return NextResponse.json(
         { success: false, error: "El tema es obligatorio" },
@@ -95,37 +94,74 @@ export async function POST(request: NextRequest) {
     const useMock = process.env.USE_MOCK !== "false";
 
     if (useMock) {
-      // Simulate processing delay
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      const response = generateMockResponse(body.topic, body.blog_url);
+      const response = generateMockResponse(body.topic);
       return NextResponse.json(response);
     }
 
-    // Real backend call
+    // === REAL MODE: Connect to Modal webhook ===
     const backendUrl = process.env.BACKEND_URL;
     if (!backendUrl) {
       return NextResponse.json(
-        { success: false, error: "BACKEND_URL no configurado" },
+        { success: false, error: "BACKEND_URL no configurado. Configuralo en Vercel Environment Variables." },
         { status: 500 }
       );
     }
 
-    const backendResponse = await fetch(`${backendUrl}/generate-post`, {
+    // Modal webhook expects: { blogger_urls, topic, provider, enable_critique, ... }
+    const modalResponse = await fetch(backendUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        blogger_urls: [body.blog_url],
+        topic: body.topic,
+        provider: body.provider || "huggingface",
+        enable_critique: true,
+        min_word_count: 800,
+        max_word_count: 2500,
+      }),
     });
 
-    if (!backendResponse.ok) {
-      const errorText = await backendResponse.text();
+    if (!modalResponse.ok) {
+      const errorText = await modalResponse.text();
       return NextResponse.json(
-        { success: false, error: `Error del backend: ${errorText}` },
-        { status: backendResponse.status }
+        { success: false, error: `Error del backend Modal (${modalResponse.status}): ${errorText}` },
+        { status: 502 }
       );
     }
 
-    const data: GenerateResponse = await backendResponse.json();
-    return NextResponse.json(data);
+    // Modal response: { success: bool, data: {...}, error: string|null }
+    const modalResult = await modalResponse.json();
+
+    if (!modalResult.success) {
+      return NextResponse.json(
+        { success: false, error: modalResult.error || "Error del backend Modal" },
+        { status: 500 }
+      );
+    }
+
+    // Transform Modal data to our GenerateResponse format
+    const slug = generateSlug(body.topic);
+    const modalData = modalResult.data;
+    return NextResponse.json({
+      success: true,
+      execution_time: modalData.execution_time,
+      post: {
+        id: modalData.workflow_id || crypto.randomUUID(),
+        slug,
+        title: body.topic.charAt(0).toUpperCase() + body.topic.slice(1),
+        description: modalData.description || `Artículo generado sobre ${body.topic}`,
+        content: modalData.content || modalData.final_content || "",
+        author: "Blogger Agent AI",
+        date: new Date().toISOString().split("T")[0],
+        word_count: modalData.word_count || 0,
+        reading_time: modalData.reading_time || 1,
+        keywords: modalData.keywords || [],
+        tags: modalData.tags || [],
+        html_structure: modalData.html_structure,
+      } satisfies import("@/types/post").BlogPost,
+    } satisfies GenerateResponse);
+
   } catch (err) {
     return NextResponse.json(
       {

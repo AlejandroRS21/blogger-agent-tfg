@@ -1,4 +1,6 @@
 import Link from "next/link";
+import PostCard from "@/components/PostCard";
+import { getSamplePosts } from "@/lib/api";
 
 const features = [
   {
@@ -110,8 +112,40 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Sample Posts */}
+      <section className="border-b border-gray-200 bg-gray-50 py-20 sm:py-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Posts Recientes
+            </h2>
+            <p className="mt-4 text-gray-600">
+              Ejemplos del contenido generado por nuestro sistema multi-agente.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {getSamplePosts().slice(0, 6).map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <Link
+              href="/generate"
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+            >
+              Generar tu propio post
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Tech Stack */}
-      <section className="bg-gray-50 py-20 sm:py-28">
+      <section className="border-b border-gray-200 bg-white py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -134,6 +168,83 @@ export default function HomePage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Daggr / HuggingFace Workflow */}
+      <section className="border-b border-gray-200 bg-gray-50 py-20 sm:py-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Pipeline Multi-Agente con <span className="text-yellow-600">Daggr</span>
+            </h2>
+            <p className="mt-4 text-gray-600">
+              El sistema orquesta agentes especializados en un pipeline secuencial
+              impulsado por modelos de HuggingFace.
+            </p>
+          </div>
+
+          <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                step: "1",
+                title: "Scraper Agent",
+                desc: "Extrae y analiza el contenido del blog de referencia para capturar el estilo y tono del escritor.",
+              },
+              {
+                step: "2",
+                title: "Writer Agent",
+                desc: "Genera el post completo en HTML semántico respetando la voz del autor original.",
+              },
+              {
+                step: "3",
+                title: "Critic Agent",
+                desc: "Revisa y mejora el contenido evaluando calidad, coherencia y estructura.",
+              },
+              {
+                step: "4",
+                title: "SEO Agent",
+                desc: "Optimiza keywords, meta tags y estructura para posicionamiento en buscadores.",
+              },
+            ].map((agent) => (
+              <div
+                key={agent.step}
+                className="relative rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm"
+              >
+                <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100 text-sm font-bold text-yellow-700">
+                  {agent.step}
+                </div>
+                <h3 className="font-semibold text-gray-900">{agent.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                  {agent.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 rounded-xl border border-yellow-200 bg-yellow-50 p-6 sm:p-8">
+            <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
+              <div className="flex-shrink-0 text-3xl">🤗</div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900">
+                  Impulsado por HuggingFace
+                </h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  Todos los agentes utilizan modelos open-source de HuggingFace
+                  desplegados en Modal. El pipeline completo está disponible como
+                  HuggingFace Space para ejecución interactiva.
+                </p>
+              </div>
+              <a
+                href="https://huggingface.co/spaces"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-shrink-0 rounded-lg bg-yellow-400 px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-yellow-500"
+              >
+                Explorar en HF Spaces
+              </a>
+            </div>
           </div>
         </div>
       </section>
