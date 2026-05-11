@@ -70,32 +70,15 @@ function generateMockPost(topic: string): BlogPost {
 
 // Generate static sample posts for homepage display
 export function getSamplePosts(): BlogPost[] {
-  const topics = [
-    "Inteligencia Artificial en 2026",
-    "El futuro de las APIs REST",
-    "Blockchain más allá de las criptomonedas",
-    "Machine Learning en producción",
-    "TypeScript vs JavaScript en 2026",
-    "Cloud Computing y serverless",
-  ];
-
-  return topics.map((topic) => generateMockPost(topic));
+  return [];
 }
 
 export async function generatePostMock(data: GenerateRequest): Promise<GenerateResponse> {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  const post = generateMockPost(data.topic);
-
-  return {
-    success: true,
-    post,
-    execution_time: 2.0,
-  };
+  return { success: false, error: "Modo mock desactivado" };
 }
 
 export async function generatePost(data: GenerateRequest): Promise<GenerateResponse> {
-  const useMock = process.env.USE_MOCK !== "false";
+  const useMock = process.env.USE_MOCK === "true";
 
   if (useMock) {
     return generatePostMock(data);
@@ -174,7 +157,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
     const response = await fetch(`${GITHUB_RAW_BASE}/posts.json`, { next: { revalidate: 60 } });
     
     if (!response.ok) {
-      return getSamplePosts();
+      return [];
     }
     
     const data = await response.json();
@@ -186,19 +169,16 @@ export async function getAllPosts(): Promise<BlogPost[]> {
       author: post.author || "Blogger Agent",
     }));
   } catch (error) {
-    console.warn('[API] Fallback to samples:', error);
-    return getSamplePosts();
+    console.warn('[API] Failed to fetch posts:', error);
+    return [];
   }
 }
 
 export async function fetchPost(slug: string): Promise<BlogPost | null> {
-  const useMock = process.env.USE_MOCK !== "false";
+  const useMock = process.env.USE_MOCK === "true";
 
   if (useMock) {
-    const sampleTopic = slug.replace(/-/g, " ");
-    const post = generateMockPost(sampleTopic);
-    post.slug = slug;
-    return post;
+    return null;
   }
 
   try {
