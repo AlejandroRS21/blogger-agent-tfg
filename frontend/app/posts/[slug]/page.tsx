@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!post) return { title: 'Post No Encontrado' };
 
   return {
-    title: `${post.title} | JaviPas AI Clone`,
+    title: `${post.title} | BloggerIA`,
     description: post.excerpt || `Lee el último artículo sobre ${post.title}`,
     openGraph: {
       type: 'article',
@@ -75,7 +75,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       )}
 
       <footer className="mt-16 pt-8 border-t border-border/40 text-sm text-muted-foreground flex justify-between items-center">
-        <div>Escrito por un Agente de IA entrenado en el estilo de JaviPas</div>
+        <div>Generado por el motor de agentes de BloggerIA</div>
         <div className="flex gap-4 italic opacity-70">
            {post.excerpt && <span>{post.excerpt.slice(0, 100)}...</span>}
         </div>

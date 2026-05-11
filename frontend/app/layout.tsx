@@ -15,26 +15,26 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Blog Javi Pas | Tecnología, Cacharreo y Opinión",
-    template: "%s | Blog Javi Pas"
+    default: "BloggerIA | Sistema Multi-Agente de Generación Editorial",
+    template: "%s | BloggerIA"
   },
-  description: "El blog personal de Javi Pas. Analizamos la tecnología con alma, humor y espíritu crítico. IA, dispositivos y experimentos desde el miniresort.",
+  description: "Un sistema avanzado de orquestación de IA diseñado para generar contenido editorial de alta calidad, mimetizando estilos de escritura.",
   metadataBase: new URL('https://javipas-agent.vercel.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: "Blog Javi Pas",
-    description: "Tecnología, Cacharreo y Opinión con un toque personal.",
+    title: "BloggerIA",
+    description: "Sistema Multi-Agente de Generación Editorial",
     url: 'https://javipas-agent.vercel.app',
-    siteName: 'Blog Javi Pas',
+    siteName: 'BloggerIA',
     locale: 'es_ES',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Blog Javi Pas",
-    description: "Tecnología y Cacharreo con alma.",
+    title: "BloggerIA",
+    description: "Sistema Multi-Agente de Generación Editorial",
   },
   icons: {
     icon: '/favicon.ico',
@@ -52,26 +52,34 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-stone-900 dark:bg-stone-950 dark:text-stone-100 min-h-screen flex flex-col`}
       >
-        <header className="sticky top-0 z-50 w-full border-b border-stone-100 bg-white/80 backdrop-blur-md dark:border-stone-900 dark:bg-stone-950/80">
-          <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <Link href="/" className="text-xl font-black tracking-tighter hover:opacity-80 transition-opacity">
-              JAVI <span className="text-red-600">PAS</span>
+        <header className="sticky top-0 z-50 border-b border-gray-200/80 bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/80">
+          <nav className="container mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+            <Link href="/" className="group flex items-center gap-2">
+              <span className="text-2xl font-extrabold tracking-tight text-gray-900 transition-colors group-hover:text-blue-600">
+                BLOGGER<span className="text-blue-600">IA</span>
+              </span>
             </Link>
-            <div className="flex gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
-              <Link href="/" className="hover:text-red-600 transition-colors">Inicio</Link>
-              <Link href="/posts/new" className="hover:text-red-600 transition-colors">Crear</Link>
-              <a href="https://javipas.com" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">Original</a>
-            </div>
+
+            <nav className="flex items-center gap-6">
+              <Link href="/" className="text-sm font-medium text-gray-600 transition-colors hover:text-blue-600">Blog</Link>
+              <Link href="/project" className="text-sm font-medium text-gray-600 transition-colors hover:text-blue-600">Proyecto</Link>
+              <Link href="/posts/new" className="text-sm font-medium text-gray-600 transition-colors hover:text-blue-600">Generar</Link>
+              <a href="https://javipas.com" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-500 transition-colors hover:text-blue-600">Original</a>
+              <a href="https://github.com/AlejandroRS21/blogger-agent-tfg" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-500 transition-colors hover:text-blue-600">GitHub</a>
+              <a href="https://huggingface.co/spaces/AlejandroRS21/blogger-agent-tfg" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600">
+                <span>🤗</span><span className="hidden sm:inline">HF Spaces</span>
+              </a>
+            </nav>
           </nav>
         </header>
 
-        <main className="flex-grow container mx-auto px-4 max-w-5xl">
+        <main className="flex-grow">
           {children}
         </main>
 
         <footer className="border-t border-stone-200 dark:border-stone-800 py-12 mt-20">
           <div className="container mx-auto px-4 text-center text-stone-500 dark:text-stone-400 text-sm">
-            <p className="font-mono mb-4">© 2026 Blog Javi Pas - Generado con IA & Aphra</p>
+            <p className="font-mono mb-4">© 2026 BloggerIA - Generado con IA & Aphra</p>
             <div className="flex justify-center gap-4">
               <span>Next.js 16</span>
               <span>•</span>

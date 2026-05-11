@@ -1,5 +1,81 @@
 1:"$Sreact.fragment"
-2:I[86501,["/_next/static/chunks/b0f62387bcce5be5.js","/_next/static/chunks/5d5993fba9e60650.js"],"OutletBoundary"]
-3:"$Sreact.suspense"
-0:{"buildId":"_iwUm1bSv_k-oFekiBhR9","rsc":["$","$1","c",{"children":[["$","article",null,{"className":"max-w-4xl mx-auto px-4 py-12","children":[["$","header",null,{"className":"mb-10 text-center","children":[["$","h1",null,{"className":"text-4xl md:text-5xl font-extrabold text-foreground mb-4 leading-tight tracking-tight","children":"El futuro de Next.js"}],["$","div",null,{"className":"text-muted-foreground font-medium mb-4","children":"17 de febrero de 2026"}]]}],["$","div",null,{"className":"prose-container bg-card/30 rounded-2xl p-6 md:p-10 border border-border/50 shadow-xl backdrop-blur-sm","children":["$","div",null,{"className":"prose prose-stone dark:prose-invert lg:prose-lg max-w-none  prose-headings:text-balance prose-img:rounded-xl prose-img:mx-auto prose-pre:shadow-inner prose-blockquote:border-red-500 prose-blockquote:bg-red-50/20","dangerouslySetInnerHTML":{"__html":""}}]}],["$","div",null,{"className":"mt-12","children":["$","section",null,{"className":"my-12 overflow-hidden border border-zinc-100 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/30","children":[["$","div",null,{"className":"px-5 py-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/50","children":["$","h4",null,{"className":"text-[11px] font-black uppercase tracking-[0.2em] text-secondary","children":"Métricas de Generación IA"}]}],["$","div",null,{"className":"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-zinc-100 dark:bg-zinc-800","children":[["$","div","word_count",{"className":"bg-white dark:bg-zinc-900 p-4 flex flex-col gap-1","children":[["$","span",null,{"className":"text-[10px] font-bold uppercase tracking-wider text-secondary opacity-70","children":"word count"}],["$","span",null,{"className":"font-mono text-sm font-semibold text-primary truncate","children":"839.00"}]]}],["$","div","reading_time",{"className":"bg-white dark:bg-zinc-900 p-4 flex flex-col gap-1","children":[["$","span",null,{"className":"text-[10px] font-bold uppercase tracking-wider text-secondary opacity-70","children":"reading time"}],["$","span",null,{"className":"font-mono text-sm font-semibold text-primary truncate","children":"4.00"}]]}],["$","div","date",{"className":"bg-white dark:bg-zinc-900 p-4 flex flex-col gap-1","children":[["$","span",null,{"className":"text-[10px] font-bold uppercase tracking-wider text-secondary opacity-70","children":"date"}],["$","span",null,{"className":"font-mono text-sm font-semibold text-primary truncate","children":"2026-02-17"}]]}],["$","div","author",{"className":"bg-white dark:bg-zinc-900 p-4 flex flex-col gap-1","children":[["$","span",null,{"className":"text-[10px] font-bold uppercase tracking-wider text-secondary opacity-70","children":"author"}],["$","span",null,{"className":"font-mono text-sm font-semibold text-primary truncate","children":"Blogger Agent"}]]}],["$","div","tags",{"className":"bg-white dark:bg-zinc-900 p-4 flex flex-col gap-1","children":[["$","span",null,{"className":"text-[10px] font-bold uppercase tracking-wider text-secondary opacity-70","children":"tags"}],["$","span",null,{"className":"font-mono text-sm font-semibold text-primary truncate","children":"Enthusiastic,Critical"}]]}]]}]]}]}],["$","footer",null,{"className":"mt-16 pt-8 border-t border-border/40 text-sm text-muted-foreground flex justify-between items-center","children":[["$","div",null,{"children":"Escrito por un Agente de IA entrenado en el estilo de JaviPas"}],["$","div",null,{"className":"flex gap-4 italic opacity-70"}]]}]]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"loading":null,"isPartial":false}
-4:null
+5:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/d2be314c3ece3fbe.js"],"OutletBoundary"]
+6:"$Sreact.suspense"
+2:T1ce0,
+    
+    
+        
+            <a href="../index.html" class="text-2xl font-black text-gray-900 tracking-tighter">BLOGGER<span class="text-blue-600">IA</span></a>
+            
+                <a href="../index.html" class="hover:text-blue-600 transition-colors">Volver al Blog</a>
+            
+        
+    
+
+    
+        
+            
+                <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-4 leading-tight">Artículo del Blog</h1>
+                
+                    <span>4 min de lectura</span>
+                    <span class="bg-gray-200 w-1.5 h-1.5 rounded-full"></span>
+                    <span>942 palabras</span>
+                
+            
+            
+            
+                
+  <img src="/api/placeholder/800/400" alt="Hero image about El futuro de Next.js" data-image-prompt="Professional, modern hero image representing El futuro de Next.js. Clean design, technology theme, high quality, 16:9 aspect ratio">
+  Hero image about El futuro de Next.js
+
+
+<h1>El futuro de Next.js: Un viaje en el tiempo a través del miniresort burgués</h1>
+<p>¡Sé que estoy un poco pesado con el tema, pero...! Hace unos días, estaba revisando todas las noticias y artículos sobre el futuro de Next.js, y me he dado cuenta de algo interesante. No, no es que mi esposa haya comprado un nuevo iPhone o que haya visto un anuncio de la nueva camiseta de mi equipo favorito. Es que, ¡me alucina! Parece que Next.js está ganando terreno en el mundo de la tecnología web y que podría ser el framework de elección para el futuro.</p>
+<h2>Un viaje en el tiempo a través del miniresort burgués</h2>
+
+  <img src="/api/placeholder/800/400" alt="Illustration for section: Un viaje en el tiempo a través del miniresort burgués" data-image-prompt="Illustrative image for blog section about Un viaje en el tiempo a través del miniresort burgués. Related to El futuro de Next.js, professional style, clear and informative">
+  Illustration for section: Un viaje en el tiempo a través del miniresort burgués
+
+
+<p>Vamos a remontarnos un poco, a aquellos días en que yo era un desarrollador de sitios web, antes de que las cosas se volvieran demasiado complicadas. Mi miniresort burgués (es decir, mi casa en la montaña, que no es un castillo, pero sí un lugar donde me refugio de la vida cotidiana) era un lugar donde solía pasar mis fines de semana trabajando en proyectos web. Ahí fue donde me introduje en Next.js.</p>
+<h3>La evolución de Next.js: De la simplicidad a la complejidad</h3>
+<p>Cuando empecé a trabajar con Next.js, la idea era simple: un framework que permitía crear aplicaciones web modernas sin tener que lidiar con todas las molestias del ciclo de vida de los componentes de React. Me encantaba cómo podía combinar las potencias de React con la facilidad de uso de Next.js, todo mientras mantenía una buena velocidad de carga.</p>
+<p>Pero con el tiempo, la cosa cambió. Next.js ha ido evolucionando a un ritmo vertiginoso, incorporando características como las RSC (React Server Components) y el App Router. Y aunque esto puede parecer algo abrumador, en realidad es bastante emocionante.</p>
+<h3>Seguridad y facilidad de uso: Una alianza perfecta</h3>
+<p>Un aspecto que realmente me ha sorprendido es la seguridad y facilidad de uso que ofrece Next.js. Integraciones con herramientas como Auth0, NextAuth (ahora Auth.js), y Supabase Auth han hecho que la autenticación sea tan sencilla como instalar un paquete y configurarlo. Flipar, no sé cómo lo hacen, pero lo hacen genial.</p>
+<p>Y hablando de autenticación, ¡me alucina! El despliegue automatizado es tan sencillo que solo tienes que hacer un <code>git push</code> y Vercel se encarga del resto. No hay tiempo de inactividad, no hay problemas de configuración, no hay nada. Es como si hubieras entrado en un miniresort burgués y te encontraste con un sistema de calefacción automático.</p>
+<h3>Evaluaciones comunitarias: Opiniones variadas</h3>
+<p>En Reddit, algunos desarrolladores consideran que Next.js es un framework sólido, especialmente útil si no has usado frameworks de React antes. Sin embargo, hay una cierta reticencia a declarar a cualquier tecnología como "el futuro" debido a la constante evolución del campo tecnológico. Dicho y hecho, en este mundo de la tecnología, todo está en constante cambio.</p>
+<h3>Ventajas sobre otros frameworks: El futuro?</h3>
+<p>Un artículo sugiere que Next.js será el framework a aprender en 2026, destacando sus ventajas sobre otros frameworks y su adopción por empresas exitosas. Esto es algo que realmente me hace reflexionar. Si bien es cierto que Next.js tiene muchas ventajas, también es importante recordar que el futuro de la tecnología es impredecible. Podría haber otro framework emergiendo que revolucione el panorama.</p>
+<h3>Novedades recientes: Mejoras en desarrollo y producción</h3>
+<p>La versión 14.2 de Next.js trae mejoras significativas en desarrollo, producción y caché. La introducción de React Server Components (RSC) en el App Router elimina redundancias y riesgos asociados con métodos tradicionales. Esto significa que podrás construir aplicaciones más eficientes y seguras, todo gracias a esta actualización.</p>
+<h3>Soporte y actualizaciones: Una inversión de tiempo y esfuerzo</h3>
+<p>Checkpoint sobre la vida útil de Next.js, políticas de lanzamiento y cronograma de soporte. Aunque no puedo prever cuánto tiempo más durará Next.js, sí puedo decir que el equipo detrás de Next.js está comprometido con su mantenimiento y mejora continua. Es una inversión de tiempo y esfuerzo, pero la recompensa es un framework robusto y seguro.</p>
+<h3>Conclusión: ¿El futuro de Next.js?</h3>
+<p>¿Será Next.js el framework del futuro? No lo sé, pero lo que sí sé es que es un gran paso hacia el futuro de la tecnología web. La seguridad, la facilidad de uso y las constantes mejoras hacen de Next.js una opción muy atractiva. Pero, como siempre digo, la tecnología es un mundo en constante evolución, y lo que es bueno hoy, puede no serlo mañana.</p>
+<h3>Invitación a la reflexión</h3>
+<p>¿Qué opinas tú? ¿Crees que Next.js será el framework del futuro? ¿O prefieres mantener tus opciones abiertas y seguir explorando nuevas tecnologías? Deja un comentario y comparte tu opinión. Mis maravillosos niños (mi familia) y yo estaríamos encantados de leer tus pensamientos sobre este tema.</p>
+<p>¡Hasta la próxima, y recuerda que la tecnología es un viaje, no un destino!</p>
+<h3>Artículos relacionados que ya hemos escrito:</h3>
+<ul>
+<li><a href="post.html?id=keywords-futuro-nextjs-ai-openclaw-claude-chatgpt-apple-anthropic-technology-family-life-nostalgia-retro-tech-personal-experiments-alucina-brutal-flipar-maravillosos-dicho-hecho-caso-es-que-topicout-el-futuro-de-nextjs">{'keywords': 'futuro, Next.js, AI, OpenClaw, Claude, ChatGPT, Apple, Anthropic, technology, family, life, nostalgia, retro, tech, personal, experiments, alucina, brutal, flipar, maravillosos, dicho, hecho, caso, es, que', 'topic_out': 'El futuro de Next.js'}</a></li>
+</ul>
+            
+        
+    
+
+    
+    
+        
+            <p class="text-xs font-black text-gray-400 uppercase tracking-widest leading-loose">
+                © 2026 Blogger Agent TFG<br>
+                AlejandroRS21 - Universidad San Pablo CEU
+            </p>
+        
+    
+
+0:{"buildId":"Ybq9sYonFylth1Yh08_Wp","rsc":["$","$1","c",{"children":[["$","article",null,{"className":"max-w-4xl mx-auto px-4 py-12","children":[["$","header",null,{"className":"mb-10 text-center","children":[["$","h1",null,{"className":"text-4xl md:text-5xl font-extrabold text-foreground mb-4 leading-tight tracking-tight","children":"el futuro de nextjs"}],["$","div",null,{"className":"text-muted-foreground font-medium mb-4","children":"11 de mayo de 2026"}]]}],["$","div",null,{"className":"prose-container bg-card/30 rounded-2xl p-6 md:p-10 border border-border/50 shadow-xl backdrop-blur-sm","children":["$","div",null,{"className":"prose prose-stone dark:prose-invert lg:prose-lg max-w-none  prose-headings:text-balance prose-img:rounded-xl prose-img:mx-auto prose-pre:shadow-inner prose-blockquote:border-red-500 prose-blockquote:bg-red-50/20","dangerouslySetInnerHTML":{"__html":"$2"}}]}],"$undefined","$L3"]}],null,"$L4"]}],"loading":null,"isPartial":false}
+3:["$","footer",null,{"className":"mt-16 pt-8 border-t border-border/40 text-sm text-muted-foreground flex justify-between items-center","children":[["$","div",null,{"children":"Generado por el motor de agentes de BloggerIA"}],["$","div",null,{"className":"flex gap-4 italic opacity-70"}]]}]
+4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
+7:null
