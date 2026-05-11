@@ -17,7 +17,7 @@ class OrchestratorConfig:
     """Configuration for the BloggerOrchestrator."""
     
     # LLM Settings
-    default_model: str = "gpt-4-turbo-preview"
+    default_model: str = "Qwen/Qwen2.5-72B-Instruct"
     temperature: float = 0.7
     max_tokens: int = 2000
     

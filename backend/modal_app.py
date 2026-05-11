@@ -134,17 +134,22 @@ def generate_blog_post(
     from src.orchestrator.config import OrchestratorConfig
     
     # Configure orchestrator
-    config = OrchestratorConfig(
-        openai_api_key=os.environ.get("OPENAI_API_KEY"),
-        huggingface_token=os.environ.get("HF_TOKEN"),
-        provider=provider,
-        enable_critique=enable_critique,
-        min_word_count=min_word_count,
-        max_word_count=max_word_count,
-        write_canonical_docs=publish, # Write local files if we are going to publish
-        docs_output_dir="../docs",
-        verbose=True,
-    )
+    config_path = "/aphra_blogger/config/default.toml"
+    if os.path.exists(config_path):
+        config = OrchestratorConfig.from_toml(config_path)
+    else:
+        config = OrchestratorConfig.default()
+    
+    # Override with Modal-specific values
+    config.openai_api_key = os.environ.get("OPENAI_API_KEY")
+    config.huggingface_token = os.environ.get("HF_TOKEN")
+    config.provider = provider
+    config.enable_critique = enable_critique
+    config.min_word_count = min_word_count
+    config.max_word_count = max_word_count
+    config.write_canonical_docs = publish
+    config.docs_output_dir = "../docs"
+    config.verbose = True
     
     # Create orchestrator
     orchestrator = BloggerOrchestrator(config=config, verbose=True)
@@ -182,15 +187,19 @@ def run_continuous_publishing(
     from src.orchestrator.main import BloggerOrchestrator
     from src.orchestrator.config import OrchestratorConfig
 
-    config = OrchestratorConfig(
-        openai_api_key=os.environ.get("OPENAI_API_KEY"),
-        huggingface_token=os.environ.get("HF_TOKEN"),
-        provider=provider,
-        enable_continuous_publishing=True,
-        write_canonical_docs=True,
-        docs_output_dir="../docs",
-        verbose=True,
-    )
+    config_path = "/aphra_blogger/config/default.toml"
+    if os.path.exists(config_path):
+        config = OrchestratorConfig.from_toml(config_path)
+    else:
+        config = OrchestratorConfig.default()
+
+    config.openai_api_key = os.environ.get("OPENAI_API_KEY")
+    config.huggingface_token = os.environ.get("HF_TOKEN")
+    config.provider = provider
+    config.enable_continuous_publishing = True
+    config.write_canonical_docs = True
+    config.docs_output_dir = "../docs"
+    config.verbose = True
 
     orchestrator = BloggerOrchestrator(config=config, verbose=True)
     
