@@ -10,8 +10,8 @@ class SafetyAgent:
     """
     
     def __init__(self, api_key: str, provider: str = "huggingface", model: Optional[str] = None):
-        from aphra_blogger.llm.factory import LLMFactory
-        self.llm = LLMFactory.create_provider(
+        from aphra_blogger.llm.factory import create_llm_provider
+        self.llm = create_llm_provider(
             provider=provider,
             api_key=api_key,
             model=model
