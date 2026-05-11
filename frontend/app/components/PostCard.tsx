@@ -24,11 +24,24 @@ export default function PostCard({ post }: Props) {
   const postHref = post.slug ? `/posts/${post.slug}` : '#';
 
   return (
-    <article className="group flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200">
+    <article className="group flex flex-col h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-200">
       <Link href={postHref} className="flex flex-col h-full no-underline">
-        <h3 className="text-xl font-bold text-gray-900 transition-colors group-hover:text-blue-600 line-clamp-2">
-          {post.title}
-        </h3>
+        {post.image ? (
+          <div className="relative h-48 w-full overflow-hidden border-b border-gray-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src={post.image} 
+              alt={post.title}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          </div>
+        ) : (
+          <div className="h-2 w-full bg-gradient-to-r from-blue-400 to-purple-500"></div>
+        )}
+        <div className="flex flex-col flex-grow p-6">
+          <h3 className="text-xl font-bold text-gray-900 transition-colors group-hover:text-blue-600 line-clamp-2">
+            {post.title}
+          </h3>
 
         <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-600 flex-grow">
           {post.excerpt}
@@ -62,6 +75,7 @@ export default function PostCard({ post }: Props) {
             </svg>
             {(post as any).meta?.word_count || 1200} palabras
           </span>
+        </div>
         </div>
       </Link>
     </article>

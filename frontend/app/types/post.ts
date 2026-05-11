@@ -37,6 +37,9 @@ export const PostDocumentSchema = z.object({
   metadata: z.record(z.string(), z.any()).optional(),
   date: z.string().optional(),
   excerpt: z.string().optional(),
+  image: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  author: z.string().optional(),
 });
 
 export type PostListItem = z.infer<typeof PostListItemSchema>;
