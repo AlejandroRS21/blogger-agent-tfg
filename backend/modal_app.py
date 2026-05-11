@@ -38,20 +38,13 @@ image = (
 # modal secret create hf-secret HF_TOKEN=hf_...
 
 
-@app.function(
-    image=image,
-    secrets=[
-        modal.Secret.from_name("blogger-agent-secrets"),
-    ],
-    timeout=600,  # 10 minutes max
-    memory=2048,  # 2GB RAM
-)
 def _publish_artifacts(topic: str):
     """
     Helper to commit and push generated artifacts to GitHub.
     Requires GITHUB_TOKEN and GITHUB_REPO secrets.
     """
     import subprocess
+    import os
     
     token = os.environ.get("GITHUB_TOKEN")
     repo = os.environ.get("GITHUB_REPO") # e.g. "AlejandroRS21/blogger-agent-tfg"
@@ -64,29 +57,35 @@ def _publish_artifacts(topic: str):
     
     try:
         # 1. Configure git
+        print("[Git] Configuring user...")
         subprocess.run(["git", "config", "--global", "user.email", "blogger-agent@modal.run"], check=True)
         subprocess.run(["git", "config", "--global", "user.name", "Blogger Agent (Modal)"], check=True)
         
         # 2. Setup remote with token
+        print(f"[Git] Setting up remote for {repo}...")
         remote_url = f"https://x-access-token:{token}@github.com/{repo}.git"
         
-        # 3. Add docs directory (where canonical artifacts are written)
-        # Note: In Modal, we need to make sure we are in the repo root or point to the right path
-        # The add_local_dir usually puts things in / (root) or a specific dir.
-        # Based on config.docs_output_dir = "../docs", and if we run from /backend...
-        
-        subprocess.run(["git", "add", "../docs"], check=True)
+        # 3. Add docs directory
+        print("[Git] Adding changes in docs/...")
+        # Make sure we are in the right directory. Modal usually puts us in /
+        # If the app is at /backend, and docs at /docs...
+        subprocess.run(["git", "add", "/docs"], check=True)
         
         # 4. Commit
+        print("[Git] Committing...")
         commit_msg = f"feat: automatic publish - {topic}"
-        subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+        result = subprocess.run(["git", "commit", "-m", commit_msg], capture_output=True, text=True)
+        print(f"[Git] Commit output: {result.stdout}")
         
         # 5. Push
+        print("[Git] Pushing to origin main...")
         subprocess.run(["git", "push", remote_url, "main"], check=True)
         print("[Git] Successfully pushed to GitHub")
         
     except Exception as e:
         print(f"[Git] Error during publishing: {e}")
+        if hasattr(e, 'stderr'):
+            print(f"[Git] Stderr: {e.stderr}")
 
 
 @app.function(
@@ -163,7 +162,7 @@ def generate_blog_post(
 
     # Publish to GitHub if requested
     if publish:
-        _publish_artifacts.remote(topic)
+        _publish_artifacts(topic)
     
     return result
 
@@ -213,7 +212,7 @@ def run_continuous_publishing(
 
     # Note: Orchestrator writes multiple docs in continuous mode.
     # We push once at the end of the batch.
-    _publish_artifacts.remote("continuous publishing batch")
+    _publish_artifacts("continuous publishing batch")
     
     return result
 
