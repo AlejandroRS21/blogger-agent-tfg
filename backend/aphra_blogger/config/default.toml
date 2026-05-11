@@ -6,13 +6,13 @@
 provider = "auto"
 
 # Default LLM model for content generation
-default_model = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+default_model = "Qwen/Qwen2.5-72B-Instruct"
 
 # Model for style analysis (can use smaller/cheaper model)
 style_analysis_model = "mistralai/Mistral-7B-Instruct-v0.2"
 
 # Model for critique (may need more powerful model)
-critic_model = "meta-llama/Meta-Llama-3.1-70B-Instruct"
+critic_model = "Qwen/Qwen2.5-72B-Instruct"
 
 [models.huggingface]
 # HuggingFace configuration (primary provider)

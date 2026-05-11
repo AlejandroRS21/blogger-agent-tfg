@@ -23,7 +23,7 @@ class HuggingFaceProvider(LLMProvider):
     # Default models for different tasks
     DEFAULT_MODELS = {
         "chat": "Qwen/Qwen2.5-72B-Instruct",
-        "analysis": "meta-llama/Llama-3.2-1B-Instruct",
+        "analysis": "mistralai/Mistral-7B-Instruct-v0.2",
         "generation": "Qwen/Qwen2.5-72B-Instruct",
     }
     

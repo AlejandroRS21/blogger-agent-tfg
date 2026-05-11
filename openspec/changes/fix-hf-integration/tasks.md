@@ -1,17 +1,17 @@
 # Tasks: fix-hf-integration
 
 ## Backend: Environment
-- [ ] Uninstall conflicting google packages: `google-api-python-client`, `google-generativeai`, `google-ai-generativelanguage`
-- [ ] Reinstall `google-genai`
-- [ ] Verify `from google import genai` import
+- [x] Uninstall conflicting google packages: `google-api-python-client`, `google-generativeai`, `google-ai-generativelanguage`
+- [x] Reinstall `google-genai`
+- [x] Verify `from google import genai` import (Requires PYTHONPATH fix)
 
 ## Backend: LLM Configuration
-- [ ] Update `backend/aphra_blogger/config/default.toml`:
+- [x] Update `backend/aphra_blogger/config/default.toml`:
     - Set `huggingface.default_model` to `Qwen/Qwen2.5-72B-Instruct`
     - Set `huggingface.critic_model` to `Qwen/Qwen2.5-72B-Instruct`
-- [ ] Update `backend/aphra_blogger/llm/factory.py`:
+- [x] Update `backend/aphra_blogger/llm/factory.py`:
     - Set `huggingface` default to `Qwen/Qwen2.5-72B-Instruct`
-- [ ] Update `backend/aphra_blogger/llm/huggingface_provider.py`:
+- [x] Update `backend/aphra_blogger/llm/huggingface_provider.py`:
     - Set `analysis` model to `mistralai/Mistral-7B-Instruct-v0.2`
 
 ## Verification

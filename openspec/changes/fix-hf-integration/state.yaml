@@ -1,6 +1,6 @@
 name: fix-hf-integration
-status: tasking
-current_phase: tasks
+status: verifying
+current_phase: verify
 history:
   - phase: proposal
     timestamp: '2026-05-11T16:18:00Z'
@@ -13,4 +13,7 @@ history:
     status: completed
   - phase: tasks
     timestamp: '2026-05-11T16:19:23Z'
+    status: completed
+  - phase: apply
+    timestamp: '2026-05-11T17:02:40Z'
     status: completed

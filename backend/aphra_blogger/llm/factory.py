@@ -24,7 +24,7 @@ def _default_model_for_provider(provider: str) -> str:
     defaults = {
         "vllm": "Qwen2.5-7B-Instruct",
         "openai": "gpt-4-turbo-preview",
-        "huggingface": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+        "huggingface": "Qwen/Qwen2.5-72B-Instruct",
         "gemini": "gemini-2.0-flash",
         "modal": "blogger-agent-models/LlamaModel.generate",
         "auto": "Qwen2.5-7B-Instruct",
