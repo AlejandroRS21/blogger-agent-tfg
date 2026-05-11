@@ -1,0 +1,9 @@
+backend/
+.agents/
+.atl/
+.playwright-mcp/
+openspec/
+project_docs/
+IA/
+docs/
+backend/src/
