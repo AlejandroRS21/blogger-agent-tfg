@@ -50,16 +50,16 @@ export default function RootLayout({
   return (
     <html lang="es" className="scroll-smooth">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100 min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-stone-900 dark:bg-stone-950 dark:text-stone-100 min-h-screen flex flex-col`}
       >
-        <header className="sticky top-0 z-50 w-full border-b border-stone-200 bg-white/80 backdrop-blur-md dark:border-stone-800 dark:bg-stone-950/80">
+        <header className="sticky top-0 z-50 w-full border-b border-stone-100 bg-white/80 backdrop-blur-md dark:border-stone-900 dark:bg-stone-950/80">
           <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="text-xl font-black tracking-tighter hover:opacity-80 transition-opacity">
               JAVI <span className="text-red-600">PAS</span>
             </Link>
-            <div className="flex gap-6 text-sm font-medium uppercase tracking-widest items-center">
+            <div className="flex gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
               <Link href="/" className="hover:text-red-600 transition-colors">Inicio</Link>
-              <Link href="/posts/new" className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-all text-[10px] font-bold">Crear Post</Link>
+              <Link href="/posts/new" className="hover:text-red-600 transition-colors">Crear</Link>
               <a href="https://javipas.com" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">Original</a>
             </div>
           </nav>
