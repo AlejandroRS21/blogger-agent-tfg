@@ -1,0 +1,24 @@
+schema: spec-driven
+
+context: |
+  Stack: Python 3.11, Hatchling, Modal, Daggr.
+  Architecture: Multi-agent blogger system.
+  Testing: Pytest, pytest-cov.
+  Style: Ruff, Black.
+
+strict_tdd: true
+
+testing:
+  runner: pytest
+  command: pytest
+  layers:
+    unit: true
+    integration: true
+  quality:
+    linter: ruff
+    command_linter: ruff check .
+    formatter: black
+    command_formatter: black .
+  coverage:
+    available: true
+    command: pytest --cov

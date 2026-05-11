@@ -3,7 +3,7 @@ import Link from "next/link";
 const navLinks = [
   { href: "/", label: "Blog" },
   { href: "/project", label: "Proyecto" },
-  { href: "/generate", label: "Generar" },
+  { href: "/posts/new", label: "Generar" },
 ];
 
 export default function Header() {

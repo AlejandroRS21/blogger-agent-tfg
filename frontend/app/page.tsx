@@ -104,7 +104,7 @@ export default function HomePage() {
               ¿Querés generar tu propio post con el estilo de tu escritor favorito?
             </p>
             <Link
-              href="/generate"
+              href="/posts/new"
               className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
             >
               Generar nuevo post

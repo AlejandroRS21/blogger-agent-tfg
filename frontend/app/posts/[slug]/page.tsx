@@ -39,7 +39,7 @@ export default async function PostPage({ params }: PostPageProps) {
         </Link>
 
         <Link
-          href="/generate"
+          href="/posts/new"
           className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           Generar otro
@@ -62,7 +62,7 @@ export default async function PostPage({ params }: PostPageProps) {
         </Link>
 
         <Link
-          href="/generate"
+          href="/posts/new"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-800"
         >
           Generar nuevo post

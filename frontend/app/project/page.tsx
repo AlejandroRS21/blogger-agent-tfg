@@ -48,7 +48,7 @@ export default function ProjectPage() {
             </p>
             <div className="mt-10 flex items-center justify-center gap-4">
               <Link
-                href="/generate"
+                href="/posts/new"
                 className="rounded-lg bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
               >
                 Generar Post Ahora
@@ -223,7 +223,7 @@ export default function ProjectPage() {
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
             <Link
-              href="/generate"
+              href="/posts/new"
               className="rounded-lg bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
             >
               Generar Post Ahora
