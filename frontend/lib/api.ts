@@ -168,6 +168,29 @@ export async function generatePost(data: GenerateRequest): Promise<GenerateRespo
   }
 }
 
+export async function getAllPosts(): Promise<BlogPost[]> {
+  try {
+    const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/AlejandroRS21/blogger-agent-tfg/main/docs";
+    const response = await fetch(`${GITHUB_RAW_BASE}/posts.json`, { next: { revalidate: 60 } });
+    
+    if (!response.ok) {
+      return getSamplePosts();
+    }
+    
+    const data = await response.json();
+    return data.map((post: any) => ({
+      ...post,
+      slug: post.slug || post.id || "unnamed-post",
+      title: post.title || "Post sin título",
+      date: post.date || new Date().toISOString(),
+      author: post.author || "Blogger Agent",
+    }));
+  } catch (error) {
+    console.warn('[API] Fallback to samples:', error);
+    return getSamplePosts();
+  }
+}
+
 export async function fetchPost(slug: string): Promise<BlogPost | null> {
   const useMock = process.env.USE_MOCK !== "false";
 
@@ -178,6 +201,16 @@ export async function fetchPost(slug: string): Promise<BlogPost | null> {
     return post;
   }
 
-  // Real implementation would fetch from backend
-  return null;
+  try {
+    const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/AlejandroRS21/blogger-agent-tfg/main/docs";
+    const response = await fetch(`${GITHUB_RAW_BASE}/posts/${slug}.json`, { next: { revalidate: 60 } });
+    
+    if (response.ok) {
+      return await response.json();
+    }
+    
+    return null;
+  } catch (error) {
+    return null;
+  }
 }
