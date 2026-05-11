@@ -1,0 +1,16 @@
+name: fix-hf-integration
+status: tasking
+current_phase: tasks
+history:
+  - phase: proposal
+    timestamp: '2026-05-11T16:18:00Z'
+    status: completed
+  - phase: spec
+    timestamp: '2026-05-11T16:18:45Z'
+    status: completed
+  - phase: design
+    timestamp: '2026-05-11T16:19:05Z'
+    status: completed
+  - phase: tasks
+    timestamp: '2026-05-11T16:19:23Z'
+    status: completed

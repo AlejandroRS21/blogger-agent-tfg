@@ -22,9 +22,9 @@ class HuggingFaceProvider(LLMProvider):
     
     # Default models for different tasks
     DEFAULT_MODELS = {
-        "chat": "meta-llama/Meta-Llama-3.1-8B-Instruct",  # Fast and good quality
-        "analysis": "mistralai/Mistral-7B-Instruct-v0.2",  # Good for analysis
-        "generation": "meta-llama/Meta-Llama-3.1-70B-Instruct",  # Best quality
+        "chat": "Qwen/Qwen2.5-72B-Instruct",
+        "analysis": "meta-llama/Llama-3.2-1B-Instruct",
+        "generation": "Qwen/Qwen2.5-72B-Instruct",
     }
     
     def __init__(self, config: LLMConfig):
