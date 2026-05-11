@@ -13,6 +13,7 @@ import re
 try:
     from ..llm import create_llm_provider, LLMProvider
     LLM_AVAILABLE = True
+    from ..utils import parse_json_from_text
 except ImportError:
     LLM_AVAILABLE = False
 
@@ -124,7 +125,7 @@ Return ONLY valid JSON."""
             )
             
             response = self.llm.chat_completion(messages)
-            result = self._parse_critique_payload(response.content)
+            result = parse_json_from_text(response.content)
             return result
             
         except Exception as e:

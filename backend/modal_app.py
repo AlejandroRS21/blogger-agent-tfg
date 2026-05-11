@@ -163,7 +163,7 @@ def generate_blog_post(
 
     # Publish to GitHub if requested
     if publish:
-        _publish_artifacts(topic)
+        _publish_artifacts.remote(topic)
     
     return result
 
@@ -213,7 +213,7 @@ def run_continuous_publishing(
 
     # Note: Orchestrator writes multiple docs in continuous mode.
     # We push once at the end of the batch.
-    _publish_artifacts("continuous publishing batch")
+    _publish_artifacts.remote("continuous publishing batch")
     
     return result
 
