@@ -10,7 +10,7 @@ const PHASES = [
   { id: "generation", label: "Generación de Contenido", icon: "📝", duration: 25000 },
   { id: "critique", label: "Refinamiento y Crítica", icon: "🧐", duration: 15000 },
   { id: "images", label: "Selección de Imágenes", icon: "🖼️", duration: 7000 },
-  { id: "publishing", label: "Publicación en GitHub", icon: "🚀", duration: 6000 },
+  { id: "publishing", label: "Guardando en Base de Datos", icon: "🚀", duration: 6000 },
 ];
 
 type State = {

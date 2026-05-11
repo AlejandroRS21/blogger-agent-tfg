@@ -17,6 +17,7 @@ Then call the webhook:
 
 import modal
 import os
+from datetime import datetime
 from typing import Dict, Any, List
 
 # Create Modal app
@@ -38,7 +39,6 @@ image = (
     image=image,
     secrets=[
         modal.Secret.from_name("openai-secret"),
-        modal.Secret.from_name("hf-secret"),
     ],
     timeout=600,  # 10 minutes max
     memory=2048,  # 2GB RAM
@@ -101,14 +101,33 @@ def generate_blog_post(
     return result
 
 
+def _map_to_supabase(result: Dict[str, Any]) -> Dict[str, Any]:
+    """Map the orchestrator result dict to the Supabase posts schema."""
+    metadata = result.get("html_structure", {}).get("metadata", {})
+    return {
+        "id": result.get("workflow_id", ""),
+        "slug": metadata.get("slug") or result.get("workflow_id", ""),
+        "title": metadata.get("title") or result.get("title", "Sin título"),
+        "description": metadata.get("description", ""),
+        "content": result.get("html_structure", {}).get("html", ""),
+        "author": "Blogger Agent",
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "word_count": metadata.get("word_count"),
+        "reading_time": metadata.get("reading_time"),
+        "keywords": result.get("keywords", []),
+        "tags": metadata.get("keywords", []),
+        "cover_image_url": None,
+    }
+
+
 @app.function(
     image=image,
     secrets=[
         modal.Secret.from_name("openai-secret"),
-        modal.Secret.from_name("hf-secret"),
+        modal.Secret.from_name("supabase-secret"),
     ],
 )
-@modal.web_endpoint(method="POST")
+@modal.fastapi_endpoint(method="POST")
 def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Webhook endpoint for generating blog posts.
@@ -189,11 +208,28 @@ def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
             max_word_count=max_word_count,
             provider=provider,
         )
-        
+
+        # Persist to Supabase
+        try:
+            from supabase import create_client
+            sb = create_client(
+                os.environ["SUPABASE_URL"],
+                os.environ["SUPABASE_SERVICE_KEY"],
+            )
+            post_data = _map_to_supabase(result)
+            sb.table("posts").upsert(post_data).execute()
+        except Exception as db_err:
+            # Don't block the response, but report the DB failure
+            return {
+                "success": False,
+                "data": None,
+                "error": f"DB insert failed: {db_err}",
+            }
+
         return {
             "success": True,
-            "data": result,
-            "error": None
+            "data": {"slug": post_data["slug"]},
+            "error": None,
         }
         
     except Exception as e:

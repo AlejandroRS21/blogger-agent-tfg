@@ -1,47 +1,48 @@
 import type { BlogPost } from "@/types/post";
+import { supabase } from "./supabase";
 
-// Note: post generation was moved to app/posts/new/page.tsx which calls the Modal webhook directly.
-// This module only handles reading posts from the GitHub-hosted docs/ directory.
-
-// Generate static sample posts for homepage display
-export function getSamplePosts(): BlogPost[] {
-  return [];
-}
+// Note: post generation happens in app/posts/new/page.tsx (Modal webhook).
+// This module handles reading posts from Supabase.
 
 export async function getAllPosts(): Promise<BlogPost[]> {
   try {
-    const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/AlejandroRS21/blogger-agent-tfg/main/docs";
-    const response = await fetch(`${GITHUB_RAW_BASE}/posts.json`, { next: { revalidate: 60 } });
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .order("date", { ascending: false });
 
-    if (!response.ok) {
+    if (error) {
+      console.warn("[API] Supabase error fetching posts:", error.message);
       return [];
     }
 
-    const data = await response.json();
-    return data.map((post: any) => ({
-      ...post,
-      slug: post.slug || post.id || "unnamed-post",
-      title: post.title || "Post sin título",
-      date: post.date || new Date().toISOString(),
-      author: post.author || "Blogger Agent",
-    }));
-  } catch (error) {
-    console.warn("[API] Failed to fetch posts:", error);
+    return (data ?? []) as BlogPost[];
+  } catch (err) {
+    console.warn("[API] Failed to fetch posts:", err);
     return [];
   }
 }
 
 export async function fetchPost(slug: string): Promise<BlogPost | null> {
   try {
-    const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/AlejandroRS21/blogger-agent-tfg/main/docs";
-    const response = await fetch(`${GITHUB_RAW_BASE}/posts/${slug}.json`, { next: { revalidate: 60 } });
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("slug", slug)
+      .single();
 
-    if (response.ok) {
-      return await response.json();
+    if (error) {
+      console.warn(`[API] Supabase error fetching post "${slug}":`, error.message);
+      return null;
     }
 
-    return null;
+    return data as BlogPost;
   } catch {
     return null;
   }
+}
+
+/** @deprecated — kept for backward compat, returns empty array */
+export function getSamplePosts(): BlogPost[] {
+  return [];
 }
