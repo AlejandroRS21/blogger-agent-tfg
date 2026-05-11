@@ -31,6 +31,7 @@ from .continuous import (
     TopicCandidate,
     TopicSelector,
 )
+from .safety import SafetyAgent
 from aphra_blogger.workflows.blogger_style import BloggerStyleWorkflow
 from aphra_blogger.context import BloggerContext
 from aphra_blogger.agents.style_analyzer import StyleAnalyzer
@@ -114,6 +115,7 @@ class BloggerOrchestrator:
         elif provider == "modal":
             agent_api_key = config.modal_api_key
             
+        self.safety_agent = SafetyAgent(api_key=agent_api_key, model=config.default_model, provider=provider)
         self.style_analyzer = StyleAnalyzer(api_key=agent_api_key, model=config.default_model, provider=provider)
         self.keyword_extractor = KeywordExtractor(api_key=agent_api_key, provider=provider)
         self.content_generator = ContentGenerator(api_key=agent_api_key, model=config.default_model, provider=provider)
@@ -242,6 +244,19 @@ class BloggerOrchestrator:
         self._log("=" * 60)
         
         try:
+            # Phase 0: Safety Validation
+            phase = "safety_validation"
+            self.state_manager.start_phase(phase, "SafetyAgent")
+            safety_result = self.safety_agent.validate_topic(topic)
+            
+            if not safety_result.get("safe", False):
+                reason = safety_result.get("reason", "Tema inapropiado")
+                self.state_manager.fail_phase(phase, f"Seguridad: {reason}")
+                raise ValueError(f"BLOQUEO DE SEGURIDAD: {reason}")
+            
+            self.state_manager.complete_phase(phase, output="Safe")
+            self._log("Topic validated successfully.")
+
             # Phase 1: Style Analysis
             self._phase_style_analysis(blogger_urls)
             

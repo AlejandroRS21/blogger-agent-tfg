@@ -57,8 +57,9 @@ export default function RootLayout({
             <Link href="/" className="text-xl font-black tracking-tighter hover:opacity-80 transition-opacity">
               JAVI <span className="text-red-600">PAS</span>
             </Link>
-            <div className="flex gap-6 text-sm font-medium uppercase tracking-widest">
+            <div className="flex gap-6 text-sm font-medium uppercase tracking-widest items-center">
               <Link href="/" className="hover:text-red-600 transition-colors">Inicio</Link>
+              <Link href="/posts/new" className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-all text-[10px] font-bold">Crear Post</Link>
               <a href="https://javipas.com" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">Original</a>
             </div>
           </nav>
