@@ -13,7 +13,7 @@ export default function PostMeta({ metadata }: Props) {
   return (
     <section className="my-12 overflow-hidden border border-zinc-100 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/30">
       <div className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/50">
-        <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-secondary">
+        <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">
           Métricas de Generación IA
         </h4>
       </div>

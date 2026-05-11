@@ -1,4 +1,10 @@
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "BloggerIA | El Futuro del Contenido Editorial",
+  description: "Sistema avanzado de orquestación de IA para generar contenido editorial de alta calidad emulando estilos de escritura específicos.",
+};
 
 const steps = [
   { number: "01", title: "Análisis", desc: "Se analiza el estilo y tono del autor original.", color: "bg-blue-600" },
@@ -11,13 +17,13 @@ export default function ProjectPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="border-b border-gray-200 bg-gray-50 py-20 sm:py-28">
+      <section className="border-b border-zinc-200 bg-zinc-50 py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-6xl">
+            <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 sm:text-6xl">
               Proyecto <span className="text-blue-600">BloggerIA</span>
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-gray-600">
+            <p className="mt-6 text-lg leading-relaxed text-zinc-600">
               Un sistema avanzado de orquestación de IA diseñado para generar
               contenido editorial de alta calidad, mimetizando estilos de
               escritura específicos de forma autónoma.
@@ -27,13 +33,13 @@ export default function ProjectPage() {
       </section>
 
       {/* ── Cómo funciona ── */}
-      <section className="border-b border-gray-200 bg-white py-20 sm:py-28">
+      <section className="border-b border-zinc-200 bg-white py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
               Cómo funciona
             </h2>
-            <p className="mt-4 text-gray-600">
+            <p className="mt-4 text-zinc-600">
               Un pipeline de agentes de IA orquestados que transforman una URL
               y un tema en un post listo para publicar.
             </p>
@@ -52,10 +58,10 @@ export default function ProjectPage() {
                     {step.number}
                   </div>
                   <div className="min-w-0 lg:mt-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-zinc-900">
                       {step.title}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                    <p className="mt-2 text-sm leading-relaxed text-zinc-600">
                       {step.desc}
                     </p>
                   </div>
@@ -66,10 +72,10 @@ export default function ProjectPage() {
 
           {/* Detalle de agentes */}
           <div className="mt-20">
-            <h3 className="text-center text-2xl font-bold text-gray-900">
+            <h3 className="text-center text-2xl font-bold text-zinc-900">
               Agentes del pipeline
             </h3>
-            <p className="mx-auto mt-3 max-w-xl text-center text-sm text-gray-600">
+            <p className="mx-auto mt-3 max-w-xl text-center text-sm text-zinc-600">
               Cada agente tiene una responsabilidad específica dentro del flujo de trabajo.
             </p>
 
@@ -98,11 +104,11 @@ export default function ProjectPage() {
               ].map((agent) => (
                 <div
                   key={agent.title}
-                  className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center"
+                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center"
                 >
                   <div className="text-4xl">{agent.icon}</div>
-                  <h4 className="mt-4 font-semibold text-gray-900">{agent.title}</h4>
-                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                  <h4 className="mt-4 font-semibold text-zinc-900">{agent.title}</h4>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">
                     {agent.desc}
                   </p>
                 </div>
@@ -128,7 +134,7 @@ export default function ProjectPage() {
                 href="https://huggingface.co/spaces"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-shrink-0 rounded-lg bg-yellow-400 px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-yellow-500"
+                className="flex-shrink-0 rounded-lg bg-yellow-400 px-6 py-3 text-sm font-bold text-amber-950 shadow-sm transition-colors hover:bg-yellow-500"
               >
                 Explorar en HF Spaces
               </a>
@@ -138,13 +144,13 @@ export default function ProjectPage() {
       </section>
 
       {/* ── Stack Tecnológico ── */}
-      <section className="border-b border-gray-200 bg-gray-50 py-20 sm:py-28">
+      <section className="border-b border-zinc-200 bg-zinc-50 py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
               Stack Tecnológico
             </h2>
-            <p className="mt-4 text-gray-600">
+            <p className="mt-4 text-zinc-600">
               Tecnologías modernas para un sistema robusto y escalable.
             </p>
           </div>
@@ -152,7 +158,7 @@ export default function ProjectPage() {
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { name: "HuggingFace", description: "Modelos de lenguaje de última generación", icon: "🤗", bg: "bg-yellow-50 border-yellow-200" },
-              { name: "Next.js 16", description: "Framework React con App Router y Server Components", icon: "▲", bg: "bg-white border-gray-200" },
+              { name: "Next.js 16", description: "Framework React con App Router y Server Components", icon: "▲", bg: "bg-white border-zinc-200" },
               { name: "Python Backend", description: "Sistema multi-agente asíncrono con Daggr", icon: "🐍", bg: "bg-blue-50 border-blue-200" },
               { name: "Modal", description: "Despliegue serverless en la nube con auto-escalado", icon: "☁️", bg: "bg-green-50 border-green-200" },
             ].map((tech) => (
@@ -161,8 +167,8 @@ export default function ProjectPage() {
                 className={`rounded-xl border p-6 text-center ${tech.bg}`}
               >
                 <div className="text-3xl">{tech.icon}</div>
-                <h3 className="mt-3 font-semibold text-gray-900">{tech.name}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-gray-500">
+                <h3 className="mt-3 font-semibold text-zinc-900">{tech.name}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-zinc-500">
                   {tech.description}
                 </p>
               </div>
@@ -174,10 +180,10 @@ export default function ProjectPage() {
       {/* ── CTA ── */}
       <section className="bg-white py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
             ¿Listo para probarlo?
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-gray-600">
+          <p className="mx-auto mt-4 max-w-xl text-zinc-600">
             Ingresa un tema y el blog de referencia, y deja que los agentes de
             IA hagan el resto.
           </p>
@@ -192,7 +198,7 @@ export default function ProjectPage() {
               href="https://github.com/AlejandroRS21/blogger-agent-tfg"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-lg border border-gray-300 bg-white px-8 py-3.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+              className="rounded-lg border border-zinc-300 bg-white px-8 py-3.5 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50"
             >
               Ver en GitHub
             </a>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPostBySlug, getAllPosts } from '../../lib/api';
 import HTMLRenderer from '../../components/HTMLRenderer';
+import FormattedDate from '../../components/FormattedDate';
 import { Metadata } from 'next';
 import Image from 'next/image';
 
@@ -45,12 +46,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   }
 
   // Use metadata or fallbacks
-  const postDate = post.date || (post.metadata?.date as string);
-  const displayDate = postDate ? new Date(postDate).toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  }) : null;
+  const postDate = post.date || (post.metadata?.date as string) || new Date();
 
   const readingTime = (post as any).meta?.reading_time || 5;
   const wordCount = (post as any).meta?.word_count || 1200;
@@ -63,9 +59,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       <div className="mb-10 flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 transition-colors hover:text-blue-600"
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
           Volver al inicio
@@ -82,18 +78,18 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       {/* Main Container */}
       <article className="mx-auto max-w-3xl">
         {/* Header info */}
-        <header className="mb-8 border-b border-gray-200 pb-6">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        <header className="mb-8 border-b border-zinc-200 pb-6">
+          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
             {post.title}
           </h1>
 
-          <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-500">
-            <span className="font-medium text-gray-700">{author}</span>
-            <span className="text-gray-300">|</span>
-            <span>{displayDate}</span>
-            <span className="text-gray-300">|</span>
+          <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-zinc-500">
+            <span className="font-medium text-zinc-700">{author}</span>
+            <span className="text-zinc-300">|</span>
+            <FormattedDate date={postDate} />
+            <span className="text-zinc-300">|</span>
             <span>{readingTime} min de lectura</span>
-            <span className="text-gray-300">|</span>
+            <span className="text-zinc-300">|</span>
             <span>{wordCount} palabras</span>
           </div>
 
@@ -133,28 +129,28 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
         )}
 
         {/* Blog content with prose styles */}
-        <div className="prose max-w-none text-gray-800 prose-headings:text-gray-900 prose-a:text-blue-600">
+        <div className="prose max-w-none text-zinc-800 prose-headings:text-zinc-900 prose-a:text-blue-600">
           <HTMLRenderer html={post.content} />
         </div>
 
         {/* Meta keywords */}
         {(post as any).meta?.keywords && (post as any).meta.keywords.length > 0 && (
-          <div className="mt-10 border-t border-gray-200 pt-6">
-            <p className="text-xs text-gray-500">
+          <div className="mt-10 border-t border-zinc-200 pt-6">
+            <p className="text-xs text-zinc-500">
               Palabras clave:{" "}
-              <span className="text-gray-700">{(post as any).meta.keywords.join(", ")}</span>
+              <span className="text-zinc-700">{(post as any).meta.keywords.join(", ")}</span>
             </p>
           </div>
         )}
       </article>
 
       {/* Bottom navigation */}
-      <div className="mx-auto max-w-3xl mt-12 flex items-center justify-between border-t border-gray-200 pt-8">
+      <div className="mx-auto max-w-3xl mt-12 flex items-center justify-between border-t border-zinc-200 pt-8">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 transition-colors hover:text-blue-600"
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
           Volver al inicio
@@ -165,7 +161,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-800"
         >
           Generar nuevo post
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
           </svg>
         </Link>

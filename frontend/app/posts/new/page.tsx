@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const PHASES = [
@@ -13,35 +13,76 @@ const PHASES = [
   { id: "publishing", label: "Publicación en GitHub", icon: "🚀", duration: 6000 },
 ];
 
+type State = {
+  topic: string;
+  urls: string;
+  isGenerating: boolean;
+  currentPhase: number;
+  progress: number;
+  error: string | null;
+};
+
+type Action = 
+  | { type: 'SET_TOPIC'; payload: string }
+  | { type: 'SET_URLS'; payload: string }
+  | { type: 'START_GENERATION' }
+  | { type: 'NEXT_PHASE' }
+  | { type: 'SET_ERROR'; payload: string }
+  | { type: 'RESET' };
+
+const initialState: State = {
+  topic: "",
+  urls: "https://javipas.com",
+  isGenerating: false,
+  currentPhase: 0,
+  progress: 0,
+  error: null,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_TOPIC':
+      return { ...state, topic: action.payload };
+    case 'SET_URLS':
+      return { ...state, urls: action.payload };
+    case 'START_GENERATION':
+      return { ...state, isGenerating: true, currentPhase: 0, progress: 0, error: null };
+    case 'NEXT_PHASE': {
+      const nextPhase = state.currentPhase + 1;
+      const stepProgress = 100 / PHASES.length;
+      return { 
+        ...state, 
+        currentPhase: nextPhase, 
+        progress: Math.min(state.progress + stepProgress, 100) 
+      };
+    }
+    case 'SET_ERROR':
+      return { ...state, error: action.payload, isGenerating: false };
+    case 'RESET':
+      return initialState;
+    default:
+      return state;
+  }
+}
+
 export default function NewPostPage() {
-  const [topic, setTopic] = useState("");
-  const [urls, setUrls] = useState("https://javipas.com");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { push, refresh } = useRouter();
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (isGenerating && currentPhase < PHASES.length) {
-      const phase = PHASES[currentPhase];
-      const stepProgress = 100 / PHASES.length;
-      
+    if (state.isGenerating && state.currentPhase < PHASES.length) {
+      const phase = PHASES[state.currentPhase];
       timer = setTimeout(() => {
-        setCurrentPhase((prev) => prev + 1);
-        setProgress((prev) => Math.min(prev + stepProgress, 100));
+        dispatch({ type: 'NEXT_PHASE' });
       }, phase.duration);
     }
     return () => clearTimeout(timer);
-  }, [isGenerating, currentPhase]);
+  }, [state.isGenerating, state.currentPhase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsGenerating(true);
-    setCurrentPhase(0);
-    setProgress(0);
-    setError(null);
+    dispatch({ type: 'START_GENERATION' });
 
     try {
       const webhookUrl = process.env.NEXT_PUBLIC_MODAL_WEBHOOK_URL || "https://alejandrors21--blogger-agent-tfg-webhook.modal.run";
@@ -50,8 +91,8 @@ export default function NewPostPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          topic,
-          blogger_urls: urls.split(",").map(u => u.trim()),
+          topic: state.topic,
+          blogger_urls: state.urls.split(",").map(u => u.trim()),
           provider: "huggingface"
         }),
       });
@@ -64,54 +105,53 @@ export default function NewPostPage() {
 
       // If successful, wait a bit for the last phase animation and redirect
       setTimeout(() => {
-        router.push("/");
-        router.refresh();
+        push("/");
+        refresh();
       }, 2000);
 
     } catch (err: any) {
-      setError(err.message);
-      setIsGenerating(false);
+      dispatch({ type: 'SET_ERROR', payload: err.message });
     }
   };
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-12">
       <div className="mb-12">
-        <h1 className="text-4xl font-bold tracking-tight mb-4">Crear Nuevo Post</h1>
+        <h1 className="text-4xl font-semibold tracking-tight mb-4">Crear Nuevo Post</h1>
         <p className="text-secondary text-lg">
           Configura el tema y la fuente de inspiración para que la IA haga su magia.
         </p>
       </div>
 
-      {!isGenerating ? (
-        <form onSubmit={handleSubmit} className="space-y-8 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      {!state.isGenerating ? (
+        <form onSubmit={handleSubmit} className="space-y-8 bg-white dark:bg-zinc-900 p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
           <div className="space-y-2">
-            <label htmlFor="topic" className="block text-sm font-semibold uppercase tracking-wider">
+            <label htmlFor="topic" className="block text-sm font-semibold uppercase tracking-wider text-zinc-700">
               Tema del Post
             </label>
             <input
               id="topic"
               type="text"
               required
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
+              value={state.topic}
+              onChange={(e) => dispatch({ type: 'SET_TOPIC', payload: e.target.value })}
               placeholder="Ej: El futuro de la IA en el desarrollo web"
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-accent outline-none transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             />
             <p className="text-xs text-secondary italic">El Agente Guardián validará que el tema sea profesional.</p>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="urls" className="block text-sm font-semibold uppercase tracking-wider">
+            <label htmlFor="urls" className="block text-sm font-semibold uppercase tracking-wider text-zinc-700">
               URLs de Inspiración (Separadas por coma)
             </label>
             <input
               id="urls"
               type="text"
               required
-              value={urls}
-              onChange={(e) => setUrls(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-accent outline-none transition-all"
+              value={state.urls}
+              onChange={(e) => dispatch({ type: 'SET_URLS', payload: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             />
           </div>
 
@@ -122,9 +162,9 @@ export default function NewPostPage() {
             GENERAR POST AUTÓNOMO
           </button>
           
-          {error && (
+          {state.error && (
             <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl border border-red-100 dark:border-red-800 text-sm">
-              <strong>Error:</strong> {error}
+              <strong>Error:</strong> {state.error}
             </div>
           )}
         </form>
@@ -139,15 +179,15 @@ export default function NewPostPage() {
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-xs font-semibold inline-block text-accent">
-                  {Math.round(progress)}%
+                <span className="text-xs font-semibold inline-block text-blue-600">
+                  {Math.round(state.progress)}%
                 </span>
               </div>
             </div>
-            <div className="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-slate-100 dark:bg-slate-800">
+            <div className="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-zinc-100 dark:bg-zinc-800">
               <div
-                style={{ width: `${progress}%` }}
-                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-accent transition-all duration-1000 ease-out"
+                style={{ width: `${state.progress}%` }}
+                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600 transition-all duration-1000 ease-out"
               ></div>
             </div>
           </div>
@@ -158,26 +198,26 @@ export default function NewPostPage() {
               <div 
                 key={phase.id}
                 className={`flex items-center p-4 rounded-xl border transition-all duration-500 ${
-                  index === currentPhase 
-                    ? "bg-accent/5 border-accent scale-[1.02] shadow-md" 
-                    : index < currentPhase 
-                    ? "bg-slate-50 dark:bg-slate-800/50 border-transparent opacity-60" 
-                    : "bg-transparent border-slate-200 dark:border-slate-800 opacity-40"
+                  index === state.currentPhase 
+                    ? "bg-blue-50/50 border-blue-200 scale-[1.02] shadow-md" 
+                    : index < state.currentPhase 
+                    ? "bg-zinc-50 dark:bg-zinc-800/50 border-transparent opacity-60" 
+                    : "bg-transparent border-zinc-200 dark:border-zinc-800 opacity-40"
                 }`}
               >
                 <span className="text-2xl mr-4">{phase.icon}</span>
                 <div className="flex-1">
-                  <h3 className={`font-bold ${index === currentPhase ? "text-accent" : ""}`}>
+                  <h3 className={`font-bold ${index === state.currentPhase ? "text-blue-600" : "text-zinc-900"}`}>
                     {phase.label}
                   </h3>
-                  <p className="text-xs text-secondary">
-                    {index === currentPhase ? "En proceso..." : index < currentPhase ? "Completado" : "Pendiente"}
+                  <p className="text-xs text-zinc-500">
+                    {index === state.currentPhase ? "En proceso..." : index < state.currentPhase ? "Completado" : "Pendiente"}
                   </p>
                 </div>
-                {index === currentPhase && (
-                  <div className="w-2 h-2 bg-accent rounded-full animate-ping"></div>
+                {index === state.currentPhase && (
+                  <div className="size-2 bg-blue-600 rounded-full animate-ping"></div>
                 )}
-                {index < currentPhase && (
+                {index < state.currentPhase && (
                   <span className="text-green-500 text-xl">✓</span>
                 )}
               </div>

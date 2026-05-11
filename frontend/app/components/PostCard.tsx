@@ -1,5 +1,7 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Post } from '../types/post';
+import FormattedDate from './FormattedDate';
 
 interface Props {
   post: Post;
@@ -13,37 +15,30 @@ export default function PostCard({ post }: Props) {
     Ciencia: "bg-cyan-100 text-cyan-700",
   };
 
-  // Safe date formatting
-  const dateObj = post.date ? new Date(post.date) : new Date();
-  const formattedDate = dateObj.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-
   const postHref = post.slug ? `/posts/${post.slug}` : '#';
 
   return (
-    <article className="group flex flex-col h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-200">
+    <article className="group flex flex-col h-full overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-200">
       <Link href={postHref} className="flex flex-col h-full no-underline">
         {post.image ? (
-          <div className="relative h-48 w-full overflow-hidden border-b border-gray-100">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
+          <div className="relative h-48 w-full overflow-hidden border-b border-zinc-100">
+            <Image 
               src={post.image} 
               alt={post.title}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
         ) : (
           <div className="h-2 w-full bg-gradient-to-r from-blue-400 to-purple-500"></div>
         )}
         <div className="flex flex-col flex-grow p-6">
-          <h3 className="text-xl font-bold text-gray-900 transition-colors group-hover:text-blue-600 line-clamp-2">
+          <h3 className="text-xl font-semibold text-zinc-900 transition-colors group-hover:text-blue-600 line-clamp-2">
             {post.title}
           </h3>
 
-        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-600 flex-grow">
+        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-zinc-600 flex-grow">
           {post.excerpt}
         </p>
 
@@ -52,7 +47,7 @@ export default function PostCard({ post }: Props) {
             <span
               key={tag}
               className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                tagColors[tag] || "bg-gray-100 text-gray-600"
+                tagColors[tag] || "bg-zinc-100 text-zinc-600"
               }`}
             >
               {tag}
@@ -60,17 +55,20 @@ export default function PostCard({ post }: Props) {
           ))}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-gray-500 border-t border-gray-50 pt-4">
-          <span>{formattedDate}</span>
+        <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-zinc-500 border-t border-zinc-50 pt-4">
+          <FormattedDate 
+            date={post.date} 
+            options={{ year: 'numeric', month: 'short', day: 'numeric' }} 
+          />
           <span className="flex items-center gap-1">
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
             {(post as any).meta?.reading_time || 5} min
           </span>
           <span className="flex items-center gap-1">
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             {(post as any).meta?.word_count || 1200} palabras

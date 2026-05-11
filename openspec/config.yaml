@@ -1,0 +1,17 @@
+schema:spec-driven
+
+context: |
+  Tech stack: Next.js 16.1.6, React 19.2.3, Tailwind CSS 4, TypeScript 5
+  Architecture: App Router, Multi-agent pipeline
+  Testing: Jest + RTL (Frontend), pytest (Backend)
+  Style: ESLint, Tailwind 4
+
+strict_tdd: true
+
+testing:
+  runner: npm test
+  framework: jest
+  layers:
+    unit: true
+    integration: true
+    e2e: false

@@ -1,0 +1,11 @@
+current_phase: apply
+change_name: fix-react-doctor-issues
+completed_phases:
+  - init
+  - explore
+  - propose
+  - spec
+  - design
+  - tasks
+next_recommended: apply
+status: active
