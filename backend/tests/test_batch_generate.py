@@ -1,6 +1,6 @@
 import json
 from unittest.mock import patch
-import backend.batch_generate as bg
+import batch_generate as bg
 
 def test_batch_generate_state_recovery(tmp_path):
     # Mock inputs
@@ -17,10 +17,10 @@ def test_batch_generate_state_recovery(tmp_path):
     out_dir = tmp_path / "out"
     out_dir.mkdir()
 
-    with patch("backend.batch_generate.INPUT_JSON", input_file), \
-         patch("backend.batch_generate.BATCH_STATUS_JSON", status_file), \
-         patch("backend.batch_generate.OUTPUT_DIR", out_dir), \
-         patch("backend.batch_generate.generate_single_post") as mock_generate, \
+    with patch("batch_generate.INPUT_JSON", input_file), \
+         patch("batch_generate.BATCH_STATUS_JSON", status_file), \
+         patch("batch_generate.OUTPUT_DIR", out_dir), \
+         patch("batch_generate.generate_single_post") as mock_generate, \
          patch("sys.argv", ["batch_generate.py", "--input", str(input_file), "--output", str(out_dir), "--urls", "https://javipas.com/test-1", "https://javipas.com/test-2"]):
          
         mock_generate.return_value = {"metadata": {"tokens": 100}}

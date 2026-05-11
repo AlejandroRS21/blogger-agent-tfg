@@ -359,18 +359,14 @@ IES Rafael Alberti - 2026
 
 - [x] Backend: 7 agentes con HuggingFace
 - [x] Backend: Orquestador completo (7 fases)
-- [x] Backend: Tests (10 archivos, ~75/76 passing)
+- [x] Backend: Tests (115 passing)
 - [x] Backend: Daggr workflow visual
 - [x] Backend: Continuous publishing module
-- [x] Backend: Dockerfile actualizado (src/ + tools/)
-- [x] Frontend: Next.js 16 + React 19 + Tailwind 4
-- [x] Frontend: 3 componentes + 2 páginas
-- [x] Frontend: Tests con Jest + Testing Library (5 archivos)
-- [x] Frontend: Lighthouse CI workflow
+- [x] Frontend: Live API (GitHub Fetching) - Actualización en tiempo real.
+- [x] CI/CD: GitHub Actions + Auto-publish Modal -> GitHub.
+- [x] Deployment: Vercel operativo con datos dinámicos.
 - [x] Documentación: docs/ con 15 archivos
 - [x] Limpieza: Archivos Gradio redundantes eliminados
-- [ ] Deploy: Modal (backend)
-- [ ] Deploy: Vercel (frontend)
 
 **Estado Global:** 🟢 ~92% Completo y Funcional
 

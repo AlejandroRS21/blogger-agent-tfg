@@ -46,6 +46,57 @@ image = (
     timeout=600,  # 10 minutes max
     memory=2048,  # 2GB RAM
 )
+def _publish_artifacts(topic: str):
+    """
+    Helper to commit and push generated artifacts to GitHub.
+    Requires GITHUB_TOKEN and GITHUB_REPO secrets.
+    """
+    import subprocess
+    
+    token = os.environ.get("GITHUB_TOKEN")
+    repo = os.environ.get("GITHUB_REPO") # e.g. "AlejandroRS21/blogger-agent-tfg"
+    
+    if not token or not repo:
+        print("[Git] Skipping publishing: GITHUB_TOKEN or GITHUB_REPO not found")
+        return
+
+    print(f"[Git] Publishing artifacts for topic: {topic}")
+    
+    try:
+        # 1. Configure git
+        subprocess.run(["git", "config", "--global", "user.email", "blogger-agent@modal.run"], check=True)
+        subprocess.run(["git", "config", "--global", "user.name", "Blogger Agent (Modal)"], check=True)
+        
+        # 2. Setup remote with token
+        remote_url = f"https://x-access-token:{token}@github.com/{repo}.git"
+        
+        # 3. Add docs directory (where canonical artifacts are written)
+        # Note: In Modal, we need to make sure we are in the repo root or point to the right path
+        # The add_local_dir usually puts things in / (root) or a specific dir.
+        # Based on config.docs_output_dir = "../docs", and if we run from /backend...
+        
+        subprocess.run(["git", "add", "../docs"], check=True)
+        
+        # 4. Commit
+        commit_msg = f"feat: automatic publish - {topic}"
+        subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+        
+        # 5. Push
+        subprocess.run(["git", "push", remote_url, "main"], check=True)
+        print("[Git] Successfully pushed to GitHub")
+        
+    except Exception as e:
+        print(f"[Git] Error during publishing: {e}")
+
+
+@app.function(
+    image=image,
+    secrets=[
+        modal.Secret.from_name("blogger-agent-secrets"),
+    ],
+    timeout=600,  # 10 minutes max
+    memory=2048,  # 2GB RAM
+)
 def generate_blog_post(
     blogger_urls: List[str],
     topic: str,
@@ -53,6 +104,7 @@ def generate_blog_post(
     min_word_count: int = 800,
     max_word_count: int = 2500,
     provider: str = "huggingface",
+    publish: bool = True,
 ) -> Dict[str, Any]:
     """
     Generate a blog post that mimics the style of the given blogger.
@@ -72,6 +124,7 @@ def generate_blog_post(
         min_word_count: Minimum words for generated content (default: 800)
         max_word_count: Maximum words for generated content (default: 2500)
         provider: LLM provider to use ("huggingface", "openai", "auto")
+        publish: Whether to push changes to GitHub (default: True)
         
     Returns:
         Dict with complete blog post data
@@ -88,6 +141,8 @@ def generate_blog_post(
         enable_critique=enable_critique,
         min_word_count=min_word_count,
         max_word_count=max_word_count,
+        write_canonical_docs=publish, # Write local files if we are going to publish
+        docs_output_dir="../docs",
         verbose=True,
     )
     
@@ -100,6 +155,10 @@ def generate_blog_post(
         blogger_urls=blogger_urls,
         output_path=None,  # Don't save to file in serverless
     )
+
+    # Publish to GitHub if requested
+    if publish:
+        _publish_artifacts(topic)
     
     return result
 
@@ -129,16 +188,25 @@ def run_continuous_publishing(
         provider=provider,
         enable_continuous_publishing=True,
         write_canonical_docs=True,
+        docs_output_dir="../docs",
         verbose=True,
     )
 
     orchestrator = BloggerOrchestrator(config=config, verbose=True)
-    return orchestrator.start_continuous_publishing(
+    
+    # Start publishing
+    result = orchestrator.start_continuous_publishing(
         blogger_urls=blogger_urls,
         topic_candidates=topic_candidates,
         cycles=cycles,
         interval_seconds=interval_seconds,
     )
+
+    # Note: Orchestrator writes multiple docs in continuous mode.
+    # We push once at the end of the batch.
+    _publish_artifacts("continuous publishing batch")
+    
+    return result
 
 
 @app.function(

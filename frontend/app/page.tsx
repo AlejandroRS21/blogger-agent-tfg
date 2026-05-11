@@ -1,10 +1,10 @@
-import { getPosts } from './lib/api';
+import { getAllPosts } from './lib/api';
 import PostCard from './components/PostCard';
 
 export const dynamic = 'force-static';
 
 export default async function Home() {
-  const posts = await getPosts();
+  const posts = await getAllPosts();
 
   return (
     <div className="space-y-16">

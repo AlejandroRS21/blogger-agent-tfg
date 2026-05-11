@@ -40,6 +40,8 @@ max_tokens = 2000
 max_iterations = 3
 enable_critic = true
 verbose = true
+write_canonical_docs = true
+docs_output_dir = "../docs"
 
 [content]
 # Content generation settings

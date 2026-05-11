@@ -13,9 +13,9 @@ describe('SEO Metadata Generation', () => {
         };
         (getPostBySlug as jest.Mock).mockResolvedValue(mockPost);
 
-        const metadata = await generateMetadata({ params: { slug: 'test-post' } });
+        const metadata = await generateMetadata({ params: Promise.resolve({ slug: 'test-post' }) });
 
-        expect(metadata.title).toBe('Test Post Title | Blogger Agent');
+        expect(metadata.title).toBe('Test Post Title | JaviPas AI Clone');
         expect(metadata.description).toBe('This is a test excerpt');
         expect(metadata.openGraph?.title).toBe('Test Post Title');
         expect(metadata.openGraph?.description).toBe('This is a test excerpt');
@@ -24,8 +24,8 @@ describe('SEO Metadata Generation', () => {
     it('uses fallback metadata when post is missing', async () => {
         (getPostBySlug as jest.Mock).mockResolvedValue(null);
 
-        const metadata = await generateMetadata({ params: { slug: 'missing-post' } });
+        const metadata = await generateMetadata({ params: Promise.resolve({ slug: 'missing-post' }) });
 
-        expect(metadata.title).toBe('Post Not Found | Blogger Agent');
+        expect(metadata.title).toBe('Post No Encontrado');
     });
 });

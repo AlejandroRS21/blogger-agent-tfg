@@ -1,26 +1,29 @@
 import { getAllPosts, getPostBySlug } from '../app/lib/api';
-import fs from 'fs/promises';
-
-jest.mock('fs/promises');
 
 describe('API functions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    global.fetch = jest.fn();
   });
 
   describe('getAllPosts', () => {
     it('returns an empty array when posts.json does not exist', async () => {
-      const error = new Error('ENOENT') as any;
-      error.code = 'ENOENT';
-      (fs.readFile as jest.Mock).mockRejectedValue(error);
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found'
+      });
 
       const posts = await getAllPosts();
       expect(posts).toEqual([]);
     });
 
     it('returns posts from posts array', async () => {
-      const mockData = { posts: [{ slug: 'post-1', title: 'Post 1' }] };
-      (fs.readFile as jest.Mock).mockResolvedValue(JSON.stringify(mockData));
+      const mockData = [{ slug: 'post-1', title: 'Post 1' }];
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => mockData
+      });
 
       const posts = await getAllPosts();
       expect(posts).toHaveLength(1);
@@ -31,17 +34,26 @@ describe('API functions', () => {
   describe('getPostBySlug', () => {
     it('loads json fallback successfully', async () => {
       const mockPost = { slug: 'post-test', title: 'Test', content: 'test content' };
-      (fs.readFile as jest.Mock).mockResolvedValueOnce(JSON.stringify(mockPost));
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => mockPost
+      });
 
       const post = await getPostBySlug('post-test');
       expect(post?.title).toBe('Test');
     });
 
     it('loads HTML fallback successfully when JSON fails', async () => {
-      // JSON fetch fails
-      (fs.readFile as jest.Mock).mockRejectedValueOnce(new Error('ENOENT'));
+      // JSON fetch fails (404)
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 404
+      });
       // HTML fetch succeeds
-      (fs.readFile as jest.Mock).mockResolvedValueOnce('<h1>Title</h1>');
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        text: async () => '<h1>Title</h1>'
+      });
 
       const post = await getPostBySlug('post-from-html');
       expect(post?.title).toBe('post from html');
@@ -49,7 +61,10 @@ describe('API functions', () => {
     });
 
     it('returns null if neither JSON nor HTML are found', async () => {
-      (fs.readFile as jest.Mock).mockRejectedValue(new Error('ENOENT'));
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 404
+      });
       
       const post = await getPostBySlug('missing');
       expect(post).toBeNull();

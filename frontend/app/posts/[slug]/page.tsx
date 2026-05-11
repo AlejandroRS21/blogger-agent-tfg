@@ -1,4 +1,4 @@
-import { getPostBySlug, getPosts } from '../../lib/api';
+import { getPostBySlug, getAllPosts } from '../../lib/api';
 import HTMLRenderer from '../../components/HTMLRenderer';
 import PostMeta from '../../components/PostMeta';
 import { notFound } from 'next/navigation';
@@ -9,7 +9,7 @@ interface Params {
 }
 
 export async function generateStaticParams() {
-  const posts = await getPosts();
+  const posts = await getAllPosts();
   return posts.map((post) => ({
     slug: post.slug,
   }));

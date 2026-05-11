@@ -1,9 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { PostSchema, PostsCatalogSchema, Post, PostDocumentSchema, PostDocument } from '../types/post';
+import { PostSchema, Post, PostDocumentSchema, PostDocument } from '../types/post';
 
-const DATA_DIR = path.join(process.cwd(), '../docs');
-const POSTS_DIR = path.join(DATA_DIR, 'posts');
+const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/AlejandroRS21/blogger-agent-tfg/main/docs";
 
 /**
  * Common data normalization to prevent build/runtime crashes.
@@ -35,20 +32,21 @@ function normalizePost(post: any): Post {
   return parsed.data;
 }
 
-export async function getPosts(): Promise<Post[]> {
+export async function getAllPosts(): Promise<Post[]> {
   try {
-    const filePath = path.join(DATA_DIR, 'posts.json');
-    if (!fs.existsSync(filePath)) {
-      console.warn(`[API] posts.json not found at ${filePath}`);
+    const url = `${GITHUB_RAW_BASE}/posts.json`;
+    const response = await fetch(url, { next: { revalidate: 60 } }); // Cache 1 minute
+    
+    if (!response.ok) {
+      console.warn(`[API] Failed to fetch catalog from ${url}: ${response.statusText}`);
       return [];
     }
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    const data = JSON.parse(fileContents);
     
+    const data = await response.json();
     const catalog = Array.isArray(data) ? data : (data.posts || []);
     return catalog.map(normalizePost);
   } catch (error) {
-    console.error('[API] Error reading posts catalog:', error);
+    console.error('[API] Error fetching posts catalog:', error);
     return [];
   }
 }
@@ -56,15 +54,15 @@ export async function getPosts(): Promise<Post[]> {
 export async function getPostBySlug(slug: string): Promise<PostDocument | null> {
   if (!slug) return null;
   
-  try {
-    // Check for .json or .html versions
-    const jsonPath = path.join(POSTS_DIR, `${slug}.json`);
-    const htmlPath = path.join(POSTS_DIR, `${slug}.html`);
+  const jsonUrl = `${GITHUB_RAW_BASE}/posts/${slug}.json`;
+  const htmlUrl = `${GITHUB_RAW_BASE}/posts/${slug}.html`;
 
-    if (fs.existsSync(jsonPath)) {
-      const fileContents = fs.readFileSync(jsonPath, 'utf8');
-      const data = JSON.parse(fileContents);
-      
+  // Try JSON first
+  try {
+    const response = await fetch(jsonUrl, { next: { revalidate: 60 } });
+    
+    if (response.ok) {
+      const data = await response.json();
       const parsed = PostDocumentSchema.safeParse({
         ...data,
         content: data.content || data.body || "",
@@ -76,15 +74,19 @@ export async function getPostBySlug(slug: string): Promise<PostDocument | null> 
          return null;
       }
       return parsed.data;
-    } 
+    }
     
-    if (fs.existsSync(htmlPath)) {
-      const content = fs.readFileSync(htmlPath, 'utf8');
-      return {
-        title: slug.replace(/-/g, ' '),
-        content: content,
-        date: new Date().toISOString()
-      };
+    // If JSON not found (404), try HTML
+    if (response.status === 404) {
+      const htmlResponse = await fetch(htmlUrl, { next: { revalidate: 60 } });
+      if (htmlResponse.ok) {
+        const content = await htmlResponse.text();
+        return {
+          title: slug.replace(/-/g, ' '),
+          content: content,
+          date: new Date().toISOString()
+        };
+      }
     }
 
     return null;

@@ -2,10 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import HTMLRenderer from '../app/components/HTMLRenderer';
 
-// Mock isomorphic-dompurify due to CommonJS/ESM Jest transformation issues with its deep dependencies
-jest.mock('isomorphic-dompurify', () => ({
-  sanitize: (html: string) => (html || '').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Simple mock stripping scripts
-}));
+// Mock now handled globally in jest.setup.ts
 
 describe('HTMLRenderer', () => {
   it('renders sanitized HTML correctly', () => {
