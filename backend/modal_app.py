@@ -23,17 +23,20 @@ from typing import Dict, Any, List
 # Create Modal app
 app = modal.App("blogger-agent-tfg")
 
+backend_dir = os.path.dirname(__file__)
+
 # Create Docker image with all dependencies
 image = (
     modal.Image.debian_slim(python_version="3.11")
-    .pip_install_from_requirements("requirements.txt")
+    .pip_install_from_requirements(os.path.join(backend_dir, "requirements.txt"))
     .apt_install("git")  # For potential git operations
+    .add_local_dir(os.path.join(backend_dir, "src"), remote_path="/root/src")
+    .add_local_dir(os.path.join(backend_dir, "tools"), remote_path="/root/tools")
 )
 
 # Define secrets (will need to be configured in Modal dashboard)
 # modal secret create openai-secret OPENAI_API_KEY=sk-...
 # modal secret create hf-secret HF_TOKEN=hf_...
-
 
 @app.function(
     image=image,
@@ -73,6 +76,11 @@ def generate_blog_post(
     Returns:
         Dict with complete blog post data
     """
+    # Ensure /root is in sys.path so the mounts can be resolved
+    import sys
+    if "/root" not in sys.path:
+        sys.path.insert(0, "/root")
+        
     # Import here to avoid loading during image build
     from src.orchestrator.main import BloggerOrchestrator
     from src.orchestrator.config import OrchestratorConfig
@@ -267,6 +275,11 @@ def scrape_blogger_corpus(
             "metadata": {...}
         }
     """
+    # Ensure /root is in sys.path so the mounts can be resolved
+    import sys
+    if "/root" not in sys.path:
+        sys.path.insert(0, "/root")
+        
     from tools.scraper import BlogScraper
     
     scraper = BlogScraper(

@@ -26,26 +26,26 @@
 
 ## Phase 2: Backend — Modal webhook INSERT
 
-- [ ] 2.1 Añadir `supabase>=2.0.0` a `backend/requirements.txt`
-- [ ] 2.2 Añadir `SUPABASE_URL` y `SUPABASE_SERVICE_KEY` a `backend/.env.example`
-- [ ] 2.3 Crear secret `supabase-secret` en Modal dashboard con ambas variables
-- [ ] 2.4 Añadir `modal.Secret.from_name("supabase-secret")` al `@app.function` del webhook en `modal_app.py`
-- [ ] 2.5 Implementar `map_to_supabase(result: dict) -> dict` en `modal_app.py` (mapea result dict al schema de posts)
-- [ ] 2.6 Añadir bloque INSERT en `webhook()` tras `generate_blog_post.remote()`:
+- [x] 2.1 Añadir `supabase>=2.0.0` a `backend/requirements.txt`
+- [x] 2.2 Añadir `SUPABASE_URL` y `SUPABASE_SERVICE_KEY` a `backend/.env.example`
+- [x] 2.3 Crear secret `supabase-secret` en Modal dashboard con ambas variables
+- [x] 2.4 Añadir `modal.Secret.from_name("supabase-secret")` al `@app.function` del webhook en `modal_app.py`
+- [x] 2.5 Implementar `map_to_supabase(result: dict) -> dict` en `modal_app.py` (mapea result dict al schema de posts)
+- [x] 2.6 Añadir bloque INSERT en `webhook()` tras `generate_blog_post.remote()`:
   ```python
   from supabase import create_client
   sb = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"])
   sb.table("posts").upsert(map_to_supabase(result)).execute()
   ```
-- [ ] 2.7 Resolver `hf-secret` faltante: crear en Modal o quitar del `@app.function` de `generate_blog_post`
+- [x] 2.7 Resolver `hf-secret` faltante: crear en Modal o quitar del `@app.function` de `generate_blog_post`
 
 ## Phase 3: Frontend — Supabase client + api.ts
 
-- [ ] 3.1 Instalar `@supabase/supabase-js`: `cd frontend && npm install @supabase/supabase-js`
-- [ ] 3.2 Crear `frontend/lib/supabase.ts` con singleton `createClient(URL, ANON_KEY)`
-- [ ] 3.3 Reescribir `getAllPosts()` en `frontend/lib/api.ts` usando Supabase client (`.from("posts").select("*").order("date", { ascending: false })`)
-- [ ] 3.4 Reescribir `fetchPost(slug)` en `frontend/lib/api.ts` usando `.from("posts").select("*").eq("slug", slug).single()`
-- [ ] 3.5 Añadir a `frontend/.env.local`: `NEXT_PUBLIC_SUPABASE_URL=` y `NEXT_PUBLIC_SUPABASE_ANON_KEY=`
+- [x] 3.1 Instalar `@supabase/supabase-js`: `cd frontend && npm install @supabase/supabase-js`
+- [x] 3.2 Crear `frontend/lib/supabase.ts` con singleton `createClient(URL, ANON_KEY)`
+- [x] 3.3 Reescribir `getAllPosts()` en `frontend/lib/api.ts` usando Supabase client (`.from("posts").select("*").order("date", { ascending: false })`)
+- [x] 3.4 Reescribir `fetchPost(slug)` en `frontend/lib/api.ts` usando `.from("posts").select("*").eq("slug", slug).single()`
+- [x] 3.5 Añadir a `frontend/.env.local`: `NEXT_PUBLIC_SUPABASE_URL=` y `NEXT_PUBLIC_SUPABASE_ANON_KEY=`
 - [ ] 3.6 Añadir las mismas env vars a Vercel (Settings → Environment Variables)
 
 ## Phase 4: Verification
