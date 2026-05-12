@@ -32,6 +32,7 @@ image = (
     .apt_install("git")  # For potential git operations
     .add_local_dir(os.path.join(backend_dir, "src"), remote_path="/root/src")
     .add_local_dir(os.path.join(backend_dir, "tools"), remote_path="/root/tools")
+    .add_local_dir(os.path.join(backend_dir, "aphra_blogger"), remote_path="/root/aphra_blogger")
 )
 
 # Define secrets (will need to be configured in Modal dashboard)
