@@ -43,7 +43,7 @@ def create_llm_provider(
         if provider == "openai":
             model = "gpt-4-turbo-preview"
         elif provider == "huggingface":
-            model = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+            model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
         elif provider == "gemini":
             model = "gemini-1.5-flash"
         elif provider == "modal":
@@ -100,7 +100,7 @@ def create_llm_provider(
             try:
                 hf_config = LLMConfig(
                     api_key=hf_token,
-                    model="meta-llama/Meta-Llama-3.1-8B-Instruct",
+                    model="mistralai/Mixtral-8x7B-Instruct-v0.1",
                     temperature=temperature,
                     max_tokens=max_tokens,
                     **kwargs,

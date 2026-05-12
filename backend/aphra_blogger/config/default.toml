@@ -1,12 +1,12 @@
 # Blogger Agent Configuration
 
 [models]
-# Primary LLM provider: "huggingface", "openai", "anthropic", or "auto"
+# Primary LLM provider: "huggingface", "openai", "anthropic", "modal", or "auto"
 # "auto" will try HuggingFace first, then fall back to OpenAI
-provider = "auto"
+provider = "modal"
 
 # Default LLM model for content generation
-default_model = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+default_model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 # Model for style analysis (can use smaller/cheaper model)
 style_analysis_model = "mistralai/Mistral-7B-Instruct-v0.2"

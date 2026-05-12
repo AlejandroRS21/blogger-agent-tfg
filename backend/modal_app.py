@@ -43,6 +43,7 @@ image = (
     image=image,
     secrets=[
         modal.Secret.from_name("openai-secret"),
+        modal.Secret.from_name("huggingface-secret"),
     ],
     timeout=600,  # 10 minutes max
     memory=2048,  # 2GB RAM
