@@ -93,7 +93,7 @@ export default function NewPostPage() {
         body: JSON.stringify({
           topic: state.topic,
           blogger_urls: state.urls.split(",").map(u => u.trim()),
-          provider: "huggingface"
+          provider: "gemini"
         }),
       });
 
