@@ -61,39 +61,39 @@ class ModalProvider(LLMProvider):
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
     ) -> LLMResponse:
-        """Create chat completion by calling the Modal function."""
+        """Create chat completion by calling the Modal class method."""
         if not self.is_available():
             raise RuntimeError("Modal configuration missing. Set MODAL_TOKEN_ID and MODAL_TOKEN_SECRET.")
-            
+
         temp = temperature if temperature is not None else self.config.temperature
         tokens = max_tokens if max_tokens is not None else self.config.max_tokens
-        
+
         try:
-            # Try to lookup the remote function
-            # Use appropriate method based on modal version
-            if hasattr(modal.Function, "lookup"):
-                f = modal.Function.lookup(self.function_name)
-            elif hasattr(modal.Function, "from_name"):
-                # Split app name and function name if necessary
-                if "/" in self.function_name:
-                    app_name, func_name = self.function_name.split("/", 1)
-                    f = modal.Function.from_name(app_name, func_name)
-                else:
-                    f = modal.Function.from_name("blogger-agent-models", self.function_name)
+            # function_name format: "app-name/ClassName.method_name"
+            # e.g. "blogger-agent-models/LlamaModel.generate"
+            if "/" in self.function_name:
+                app_name, class_method = self.function_name.split("/", 1)
             else:
-                raise AttributeError("Modal library is incompatible: neither 'lookup' nor 'from_name' found on modal.Function")
-            
-            # Format payload
-            payload = {
-                "messages": messages,
-                "temperature": temp,
-                "max_tokens": tokens,
-            }
-            
-            # Call the function
-            response = f.remote(**payload)
-            
-            # Assume response is a dict with 'content' and metadata
+                app_name = "blogger-agent-models"
+                class_method = self.function_name
+
+            if "." in class_method:
+                class_name, method_name = class_method.split(".", 1)
+            else:
+                class_name = class_method
+                method_name = "generate"
+
+            # modal.Cls.from_name is the correct API for class methods
+            RemoteCls = modal.Cls.from_name(app_name, class_name)
+            instance = RemoteCls()
+            method = getattr(instance, method_name)
+
+            response = method.remote(
+                messages=messages,
+                temperature=temp,
+                max_tokens=tokens,
+            )
+
             if isinstance(response, dict):
                 content = response.get("content", str(response))
                 model_name = response.get("model", self.function_name)
@@ -104,13 +104,13 @@ class ModalProvider(LLMProvider):
                 model_name = self.function_name
                 finish_reason = "stop"
                 usage = None
-                
+
             return LLMResponse(
                 content=content,
                 model=model_name,
                 provider="modal",
                 finish_reason=finish_reason,
-                usage=usage
+                usage=usage,
             )
         except Exception as e:
             raise RuntimeError(f"Modal function error ({self.function_name}): {e}")

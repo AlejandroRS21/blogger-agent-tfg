@@ -50,14 +50,14 @@
 
 ## Phase 4: Verification
 
-- [ ] 4.1 `modal deploy modal_app.py` — verificar sin errores de secrets
-- [ ] 4.2 Generar post via `/posts/new` → confirmar row en Supabase table `posts`
-- [ ] 4.3 Verificar que `/` lista el post generado (lee de Supabase)
-- [ ] 4.4 Verificar que `/posts/[slug]` renderiza el post individual
-- [ ] 4.5 Confirmar que error de INSERT retorna `{ success: false }` en el frontend
+- [x] 4.1 `modal deploy modal_app.py` — verificar sin errores de secrets
+- [x] 4.2 Generar post via `/posts/new` → confirmar row en Supabase table `posts`
+- [x] 4.3 Verificar que `/` lista el post generado (lee de Supabase)
+- [x] 4.4 Verificar que `/posts/[slug]` renderiza el post individual
+- [x] 4.5 Confirmar que error de INSERT retorna `{ success: false }` en el frontend
 
 ## Phase 5: Cleanup
 
-- [ ] 5.1 Eliminar fetch de GitHub raw de `lib/api.ts` (reemplazado por Supabase)
-- [ ] 5.2 Commit: `feat(backend): persist posts to Supabase after generation`
-- [ ] 5.3 Commit: `feat(frontend): read posts from Supabase instead of GitHub raw`
+- [x] 5.1 Eliminar fetch de GitHub raw de `lib/api.ts` (reemplazado por Supabase)
+- [x] 5.2 Commit: `feat(backend): persist posts to Supabase after generation`
+- [x] 5.3 Commit: `feat(frontend): read posts from Supabase instead of GitHub raw`
