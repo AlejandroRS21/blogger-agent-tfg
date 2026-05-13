@@ -117,9 +117,15 @@ def generate_blog_post(
 def _map_to_supabase(result: Dict[str, Any]) -> Dict[str, Any]:
     """Map the orchestrator result dict to the Supabase posts schema."""
     metadata = result.get("html_structure", {}).get("metadata", {})
+    workflow_id = result.get("workflow_id", "")
+    base_slug = metadata.get("slug") or workflow_id
+    short_id = workflow_id[:6] if workflow_id else "post"
+    # Añadimos un sufijo para evitar errores de restricción UNIQUE en supabase
+    unique_slug = f"{base_slug}-{short_id}"
+    
     return {
-        "id": result.get("workflow_id", ""),
-        "slug": metadata.get("slug") or result.get("workflow_id", ""),
+        "id": workflow_id,
+        "slug": unique_slug,
         "title": metadata.get("title") or result.get("title", "Sin título"),
         "description": metadata.get("description", ""),
         "content": result.get("html_structure", {}).get("html", ""),

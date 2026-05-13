@@ -1,13 +1,15 @@
 import Link from "next/link";
 import PostCard from "@/components/PostCard";
-import { getSamplePosts } from "@/lib/api";
+import { getAllPosts } from "@/lib/api";
 import type { BlogPost } from "@/types/post";
 
-const posts = getSamplePosts();
-const featuredPost: BlogPost | undefined = posts[0];
-const remainingPosts = posts.slice(1);
+export const revalidate = 0; // Desactivar cache para que salgan los posts nuevos
 
-export default function HomePage() {
+export default async function HomePage() {
+  const posts = await getAllPosts();
+  const featuredPost: BlogPost | undefined = posts[0];
+  const remainingPosts = posts.slice(1);
+
   return (
     <>
       {/* ── Blog Header ── */}
