@@ -30,6 +30,7 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install_from_requirements(os.path.join(backend_dir, "requirements.txt"))
     .apt_install("git")  # For potential git operations
+    .pip_install("google-genai")
     .add_local_dir(os.path.join(backend_dir, "src"), remote_path="/root/src")
     .add_local_dir(os.path.join(backend_dir, "tools"), remote_path="/root/tools")
     .add_local_dir(os.path.join(backend_dir, "aphra_blogger"), remote_path="/root/aphra_blogger")
@@ -44,6 +45,7 @@ image = (
     secrets=[
         modal.Secret.from_name("openai-secret"),
         modal.Secret.from_name("huggingface-secret"),
+        modal.Secret.from_name("gemini-secret"),
     ],
     timeout=600,  # 10 minutes max
     memory=2048,  # 2GB RAM
@@ -54,7 +56,7 @@ def generate_blog_post(
     enable_critique: bool = True,
     min_word_count: int = 800,
     max_word_count: int = 2500,
-    provider: str = "huggingface",
+    provider: str = "gemini",
 ) -> Dict[str, Any]:
     """
     Generate a blog post that mimics the style of the given blogger.
@@ -91,6 +93,7 @@ def generate_blog_post(
     config = OrchestratorConfig(
         openai_api_key=os.environ.get("OPENAI_API_KEY"),
         huggingface_token=os.environ.get("HF_TOKEN"),
+        gemini_api_key=os.environ.get("GEMINI_API_KEY"),
         provider=provider,
         enable_critique=enable_critique,
         min_word_count=min_word_count,
@@ -135,6 +138,7 @@ def _map_to_supabase(result: Dict[str, Any]) -> Dict[str, Any]:
     secrets=[
         modal.Secret.from_name("openai-secret"),
         modal.Secret.from_name("supabase-secret"),
+        modal.Secret.from_name("gemini-secret"),
     ],
 )
 @modal.fastapi_endpoint(method="POST")
@@ -192,7 +196,7 @@ def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
         enable_critique = data.get("enable_critique", True)
         min_word_count = data.get("min_word_count", 800)
         max_word_count = data.get("max_word_count", 2500)
-        provider = data.get("provider", "huggingface")
+        provider = data.get("provider", "gemini")
         
         # Validate types
         if not isinstance(blogger_urls, list):
