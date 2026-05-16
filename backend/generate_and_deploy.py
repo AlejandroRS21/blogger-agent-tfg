@@ -57,7 +57,9 @@ def generate_article(topic: str) -> dict:
     content_gen.style_profile = style_profile or {}
 
     content = content_gen.generate_draft(
-        topic=topic, keywords=news_result.get("related_topics", [])[:10]
+        topic=topic,
+        keywords=news_result.get("related_topics", [])[:10],
+        blogger_urls=None,
     )
 
     word_count = len(content.split())

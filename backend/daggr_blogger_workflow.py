@@ -321,7 +321,12 @@ def generate_content(topic_out: Any, keywords: Any, style_json: Any, research_su
 
     # Enriquecemos el tema con la investigación real
     topic_with_context = f"{actual_topic}\n\nDATOS DE INVESTIGACIÓN RECIENTE:\n{actual_research}"
-    content = state.agents["generator"].generate_draft(topic=topic_with_context, style_profile=style, keywords=kw_list)
+    content = state.agents["generator"].generate_draft(
+        topic=topic_with_context,
+        style_profile=style,
+        keywords=kw_list,
+        blogger_urls=state.get("blogger_urls", None)
+    )
     
     if related_links:
         content += related_links

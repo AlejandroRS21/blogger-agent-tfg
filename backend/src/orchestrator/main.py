@@ -419,7 +419,8 @@ class BloggerOrchestrator:
                 sample_text=sample_text,
                 research_context=research_context,
                 min_words=self.config.min_word_count,
-                max_words=self.config.max_word_count
+                max_words=self.config.max_word_count,
+                blogger_urls=self.state_manager.state.blogger_urls
             )
             return draft
         

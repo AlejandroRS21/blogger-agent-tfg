@@ -107,6 +107,96 @@ class ContentGenerator:
 
         return sample_trimmed, research_trimmed
 
+    @staticmethod
+    def _extract_blogger_name(blogger_urls: Optional[List[str]]) -> str:
+        """Extract a human-readable blogger name from URLs."""
+        if not blogger_urls or not blogger_urls[0]:
+            return "el blogger de referencia"
+        url = blogger_urls[0].strip().rstrip("/")
+        # Remove protocol
+        for prefix in ("https://", "http://", "www."):
+            if url.startswith(prefix):
+                url = url[len(prefix):]
+        # Take the domain name part (before first / or .)
+        name = url.split("/")[0]
+        # If it's a subdomain like "blog.ejemplo.com", use the main domain
+        parts = name.split(".")
+        if len(parts) >= 3:
+            name = parts[1]  # "ejemplo" from "blog.ejemplo.com"
+        elif len(parts) >= 2:
+            name = parts[0]  # "ejemplo" from "ejemplo.com"
+        return name.capitalize()
+
+    @staticmethod
+    def _build_style_context(profile: Dict[str, Any], blogger_urls: Optional[List[str]]) -> str:
+        """Build a rich style context block from the profile."""
+        if not profile:
+            return ""
+
+        name = ContentGenerator._extract_blogger_name(blogger_urls)
+        blocks = [f"━━━━━━ PERFIL DE ESTILO ─────────────────────"]
+        blocks.append(f"Blogger de referencia: {name}")
+        if blogger_urls:
+            blocks.append(f"Blog de referencia: {blogger_urls[0].strip().rstrip('/')}")
+
+        tone = profile.get("tone", "")
+        voice = profile.get("voice", "")
+        if tone or voice:
+            blocks.append(f"\nTono y Voz:")
+            if tone:
+                blocks.append(f"  Tono: {tone}")
+            if voice:
+                blocks.append(f"  Voz: {voice}")
+
+        vocab = profile.get("vocabulary", [])
+        if vocab:
+            blocks.append(f"\nVocabulario característico (usá estas palabras):")
+            blocks.append(f"  {', '.join(vocab[:15])}")
+
+        expressions = profile.get("expressions", [])
+        if expressions:
+            blocks.append(f"\nExpresiones típicas (incorporalas naturalmente):")
+            blocks.append(f"  {', '.join(expressions[:8])}")
+
+        transitions = profile.get("transition_phrases", [])
+        if transitions:
+            blocks.append(f"\nFrases de transición (usalas para conectar ideas):")
+            blocks.append(f"  {', '.join(transitions[:6])}")
+
+        tech = profile.get("technical_level", "")
+        if tech:
+            blocks.append(f"\nNivel técnico: {tech}")
+
+        humor = profile.get("use_of_humor", "")
+        if humor:
+            blocks.append(f"Uso de humor: {humor}")
+
+        engagement = profile.get("engagement_style", "")
+        if engagement:
+            blocks.append(f"Interacción con lectores: {engagement}")
+
+        opens = profile.get("common_opens", [])
+        if opens:
+            blocks.append(f"\nCómo suele empezar:")
+            blocks.append(f"  \"{opens[0]}\"")
+
+        closes = profile.get("common_closes", [])
+        if closes:
+            blocks.append(f"Cómo suele terminar:")
+            blocks.append(f"  \"{closes[0]}\"")
+
+        blocks.append("━━━━━━ FIN DEL PERFIL ─────────────────")
+        return "\n".join(blocks)
+
+    @staticmethod
+    def _build_attribution(blogger_urls: Optional[List[str]]) -> str:
+        """Build attribution footer for the post."""
+        if not blogger_urls or not blogger_urls[0]:
+            return ""
+        name = ContentGenerator._extract_blogger_name(blogger_urls)
+        url = blogger_urls[0].strip().rstrip("/")
+        return f"\n\n---\n\n*✍️ Este post fue escrito emulando el estilo de [{name}]({url}).*"
+
     def generate_draft(
         self,
         topic: str,
@@ -116,6 +206,7 @@ class ContentGenerator:
         research_context: str = None,
         min_words: int = 1500,
         max_words: int = 2500,
+        blogger_urls: List[str] = None,
     ) -> str:
         """
         Generate initial draft content using in-context learning from real blog examples.
@@ -128,6 +219,7 @@ class ContentGenerator:
             research_context: Real search results and data about the topic for factual grounding
             min_words: Minimum word count
             max_words: Maximum word count
+            blogger_urls: Original blogger URLs for attribution
 
         Returns:
             Draft content as markdown string
@@ -139,10 +231,11 @@ class ContentGenerator:
 
         keywords_str = ", ".join(keywords[:10]) if keywords else ""
 
-        # Extract style hints as a compact reference line
-        tone = profile.get("tone", "")
-        voice = profile.get("voice", "")
-        style_hint = f"Tono: {tone}. Voz: {voice}." if (tone or voice) else ""
+        # Build a rich style context block from the full profile
+        style_context = self._build_style_context(profile, blogger_urls)
+
+        # Build attribution footer
+        attribution = self._build_attribution(blogger_urls)
 
         # Fit context to Modal's 4096 token limit
         sample_text, research_context = self._fit_context_to_token_limit(
@@ -159,9 +252,12 @@ Usá esta información como base factual para el post. No inventes datos, basate
 ━━━━━━ FIN DE INFORMACIÓN ━━━━━━━━━━━━━━━━━━━━━
 """
 
+        # Name for the instruction block
+        blogger_name = self._extract_blogger_name(blogger_urls)
+
         if sample_text and len(sample_text.strip()) > 200:
             # ---- PROMPT CON EJEMPLOS REALES (modo principal) ----
-            prompt = f"""Abajo tenés posts REALES escritos por el blogger cuyo estilo tenés que imitar, e información factual sobre el tema del post.
+            prompt = f"""Abajo tenés posts REALES escritos por {blogger_name}, cuyo estilo de escritura tenés que imitar fielmente, e información factual sobre el tema del post.
 
 ━━━━━━ EJEMPLOS DEL BLOGGER ORIGINAL ────────
 {sample_text[:20000]}
@@ -169,7 +265,7 @@ Usá esta información como base factual para el post. No inventes datos, basate
 {research_block}
 Ahora escribí un NUEVO post sobre: {topic}
 
-{style_hint}
+{style_context}
 
 REGLAS:
 
@@ -206,19 +302,22 @@ REGLAS:
   - Si el blogger usa primera persona, anécdotas personales, humor, etc., hace lo mismo.
   - Mencioná estos temas si aplican naturalmente: {keywords_str}
 
-- ### ESTILO — que no parezca IA
+- ### ESTILO — emulación del blogger + que no parezca IA
+  - Emulá el estilo de {blogger_name} en TODO el post: su vocabulario, expresiones, tono, forma de empezar y terminar. El perfil de estilo está arriba.
   - NO aclares que esto es contenido generado por IA.
   - NO generes URLs de imágenes falsas (src="https://..." inventadas).
   - Variá los conectores. No uses "Sin embargo" más de una vez. Alterná con "Pero", "No obstante", "Ahora bien", "Eso sí", "El problema", "Lo cierto es que", etc.
   - Escribí como un ser humano, no como un asistente. Sin estructuras repetitivas.
 
-Escribí el post completo ahora:"""
+Escribí el post completo ahora:{attribution}"""
         else:
             # ---- PROMPT SIMPLIFICADO (sin ejemplos del blogger) ----
             prompt = f"""{research_block}
-Escribí un post de blog sobre: {topic}
+Escribí un post de blog imitando el estilo de {blogger_name}. Abajo está su perfil de estilo.
 
-{style_hint}
+Tema: {topic}
+
+{style_context}
 
 REGLAS:
 
@@ -253,13 +352,14 @@ REGLAS:
   - Mencioná estos temas si aplican: {keywords_str}
   - Longitud: entre {min_words} y {max_words} palabras.
 
-- ### ESTILO — que no parezca IA
+- ### ESTILO — emulación del blogger + que no parezca IA
+  - Emulá el estilo de {blogger_name}: su vocabulario, expresiones, tono y forma de escribir. El perfil está arriba.
   - NO aclares que es contenido generado por IA.
   - NO generes URLs de imágenes falsas.
   - Variá los conectores. No uses "Sin embargo" más de una vez. Alterná con "Pero", "Eso sí", "El problema", "Lo cierto es que", etc.
   - Escribí como un ser humano, no como un asistente.
 
-Escribí el post ahora:"""
+Escribí el post ahora:{attribution}"""
 
         try:
             messages = self.llm.create_messages(

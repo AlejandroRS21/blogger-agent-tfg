@@ -78,7 +78,11 @@ class BlogGeneratorPipeline:
 
             content = self._generate_with_news(topic, news_context, enhanced_keywords)
         else:
-            content = self.content_generator.generate_draft(topic=topic, keywords=keywords or [])
+            content = self.content_generator.generate_draft(
+                topic=topic,
+                keywords=keywords or [],
+                blogger_urls=None
+            )
 
         # Metadata
         word_count = len(content.split())
@@ -98,8 +102,10 @@ class BlogGeneratorPipeline:
     def _generate_with_news(self, topic: str, news_context: str, keywords: list) -> str:
         """Genera contenido incorporando las noticias."""
 
+        alias = self.style_profile.get("alias", "el blogger")
+
         # Crear prompt con noticias
-        prompt = f"""Eres un blogger de tecnología español que escribe artículos sobre noticias actuales. Tu estilo es muy característico: cercano, con humor, y expresiones típicas.
+        prompt = f"""Eres {alias}, un blogger de tecnología español que escribe artículos sobre noticias actuales. Tu estilo es muy característico: cercano, con humor, y expresiones típicas.
 
 CONTEXTO DE NOTICIAS ACTUALES:
 {news_context}
@@ -114,6 +120,7 @@ INSTRUCCIONES:
 - Estructura el artículo con secciones (##)
 - Termina preguntando a los lectores qué opinan
 - NO copies las noticias, sino que das tu opinión y análisis
+- Al final del post, agregá una línea de atribución: "Este post fue escrito al estilo de {alias}."
 
 Usa este vocabulario característico: {", ".join(self.style_profile.get("vocabulary", [])[:20])}
 Usa estas expresiones: {", ".join(self.style_profile.get("expressions", [])[:10])}
@@ -135,7 +142,7 @@ Escribe el artículo completo:"""
                 print(f"⚠ Error con LLM: {e}")
 
         # Fallback
-        fallback = self.content_generator.generate_draft(topic, keywords=keywords)
+        fallback = self.content_generator.generate_draft(topic, keywords=keywords, blogger_urls=None)
         return fallback
 
     def generate_sample_articles(self, topics: list = None):
