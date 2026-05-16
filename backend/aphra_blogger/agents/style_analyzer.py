@@ -77,38 +77,31 @@ class StyleAnalyzer:
             return self._fallback_analysis(sample_text or "")
         
         # Safe extraction of sample_text
-        safe_sample = (sample_text or "")[:500]
-        url_context = f"URLs: {', '.join(blogger_urls)}" if blogger_urls else f"Sample Text: {safe_sample}"
+        safe_sample = (sample_text or "")[:5000]
+        url_context = f"URLs: {', '.join(blogger_urls)}" if blogger_urls else ""
         
-        # For now, use a comprehensive prompt with known info about Javi Pas style
-        prompt = f"""Analyze the writing style of the blogger from this context: {url_context}.
+        prompt = f"""Analyze the writing style of the blogger from this context: 
+{url_context}
 
-Based on research, this blogger (Javi Pas from javipas.com "Incognitosis") has the following characteristics:
-
-KNOWN STYLE TRAITS:
-- Tone: Conversational, humorous, self-ironic, personal, enthusiastic but critical
-- Voice: First person, speaks directly to reader
-- Language: Colloquial Spanish with expressions like "me alucina", "flipar", "mazo", "brutal"
-- Structure: Personal intro → Experience narrative → Technical details → Reflection
-- Characteristic phrases: "miniresort burgués" (his home), "mis maravillosos niños", "dicho y hecho", 
-  "total, que...", "el caso es que...", "ciertamente", "como digo", "insisto"
-- Paragraph style: Medium paragraphs (3-5 lines)
-- Use of parentheses for clarifications
-- Frequent ellipsis (...)
-- Post length: 1500-3000 words typically
+SAMPLE TEXT FROM THE BLOGGER:
+{safe_sample}
 
 Your task: Create a detailed style profile as JSON with these fields:
 {{
-  "tone": "string describing overall tone",
-  "voice": "narrative voice perspective",
+  "tone": "string describing overall tone (e.g. conversational, formal, humorous, technical)",
+  "voice": "narrative voice perspective (e.g. first person, third person, instructional)",
   "language_level": "formal/casual/colloquial",
-  "structure": "typical post structure",
-  "expressions": ["list", "of", "characteristic", "expressions"],
-  "avg_sentence_length": estimated_number,
+  "structure": "typical post structure and flow",
+  "expressions": ["list", "of", "characteristic", "expressions", "and", "phrases", "used", "in", "text"],
+  "vocabulary": ["list", "of", "characteristic", "words", "and", "terms", "the", "blogger", "uses"],
+  "topics": ["list", "of", "topics", "the", "blogger", "typically", "covers"],
+  "common_opens": ["typical", "opening", "lines", "or", "phrases"],
+  "common_closes": ["typical", "closing", "lines", "or", "phrases"],
+  "sentence_pattern": "description of typical sentence structure (e.g. 'short and punchy', 'medium length with occasional complex sentences', 'long and elaborate')",
   "paragraph_pattern": "description of paragraph style",
-  "use_of_humor": "description",
-  "technical_depth": "how technical the content gets",
-  "personality_traits": ["trait1", "trait2"],
+  "use_of_humor": "description of how humor is used (or if it is absent)",
+  "technical_level": "how technical the content gets (e.g. 'non-technical', 'technical-intermediate', 'very technical')",
+  "personality_traits": ["trait1", "trait2", "trait3"],
   "engagement_style": "how they engage with readers"
 }}
 
@@ -133,31 +126,30 @@ Respond with ONLY the JSON, no other text."""
     def _fallback_analysis(self, text: str) -> Dict[str, Any]:
         """Fallback rule-based analysis when LLM is not available."""
         return {
-            "tone": "conversational, humorous, personal, enthusiastic",
-            "voice": "first person, close to reader",
-            "language_level": "colloquial",
-            "structure": "personal intro → experience → technical details → reflection",
+            "tone": "conversational, direct, informative",
+            "voice": "first person",
+            "language_level": "casual tech",
+            "structure": "intro → main points → reflection",
             "expressions": [
-                "me alucina",
-                "dicho y hecho",
-                "el caso es que",
-                "total, que",
-                "ciertamente",
-                "como digo",
-                "insisto",
-                "miniresort burgués",
-                "mis maravillosos niños"
+                "interesante",
+                "en definitiva",
+                "el problema es que",
+                "por otro lado",
+                "en conclusión"
             ],
-            "avg_sentence_length": 15,
+            "vocabulary": ["tecnología", "innovación", "futuro", "digital", "cambio"],
+            "topics": ["technology", "programming", "AI", "digital transformation"],
+            "common_opens": ["Vamos a ver...", "El otro día...", "Hace tiempo que..."],
+            "common_closes": ["Y vosotros, ¿qué opináis?", "En fin, hasta la próxima."],
+            "sentence_pattern": "medium length, varied structure",
             "paragraph_pattern": "3-5 lines, medium complexity",
-            "use_of_humor": "Subtle irony and self-deprecating humor",
-            "technical_depth": "Medium-high, explains complex topics accessibly",
+            "use_of_humor": "Subtle and occasional",
+            "technical_level": "technical-intermediate, explains complex topics accessibly",
             "personality_traits": [
                 "curious",
-                "enthusiastic about technology",
-                "family-oriented",
-                "reflective",
-                "critical thinker"
+                "enthusiastic",
+                "analytical"
             ],
-            "engagement_style": "Invites reader comments, asks questions, shares personal experiences"
+            "engagement_style": "Directly addresses the reader and asks open questions"
         }
+

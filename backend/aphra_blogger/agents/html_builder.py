@@ -91,6 +91,60 @@ class HTMLBuilder:
         if not MARKDOWN_AVAILABLE:
             logger.warning("python-markdown not installed. Using basic conversion.")
     
+    def _strip_title_from_content(self, content: str) -> tuple:
+        """Strip the first Title from content, return (title, body).
+
+        The full-page template already renders an <h1> from meta_title, so
+        we remove any leading title from the body to avoid duplication.
+
+        Handles three formats:
+          - Markdown: ``# Title``
+          - Plain:    ``Title: ...`` or ``title: ...``
+          - Decorated:``━━━ title: ... ━━━`` (the model often wraps titles)
+
+        Args:
+            content: Raw markdown content.
+
+        Returns:
+            Tuple of (title: str, body: str).
+        """
+        lines = content.split("\n", 1)
+        first_line = lines[0].strip()
+        rest = lines[1] if len(lines) > 1 else ""
+
+        # 1. Standard markdown heading
+        if first_line.startswith("# "):
+            title = first_line[2:].strip()
+            body = rest.strip()
+            return title, body
+
+        # 2. Plain "Title:" or "title:" prefix
+        title_match = re.match(r"^[Tt]itle:\s*(.*)", first_line)
+        if title_match:
+            title = title_match.group(1).strip()
+            body = rest.strip()
+            return title, body
+
+        # 3. Decorated box format: ━━━━━ title: ... ━━━━━
+        # Strip leading/trailing box-drawing chars, then look for "title:"
+        stripped = first_line.strip("━─═– ")
+        lowered = stripped.lower()
+        if lowered.startswith("title:"):
+            title = stripped[6:].strip()
+            body = rest.strip()
+            return title, body
+
+        # Fallback — scan rest of content for a markdown heading
+        h1_match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
+        if h1_match:
+            title = h1_match.group(1).strip()
+            # Remove that heading from the body too
+            body = re.sub(r"^#\s+.+$\n?", "", content, count=1, flags=re.MULTILINE).strip()
+            return title, body
+
+        # No explicit title found
+        return "", content
+
     def build(
         self,
         content: str,
@@ -112,8 +166,11 @@ class HTMLBuilder:
         """
         logger.info(f"Building HTML/JSX for topic: {topic}")
         
-        # Convert Markdown to HTML
-        html = self._markdown_to_html(content)
+        # Strip the first # Title from content to avoid duplicate <h1>
+        extracted_title, body_content = self._strip_title_from_content(content)
+        
+        # Convert Markdown to HTML (body only — title is in the page template)
+        html = self._markdown_to_html(body_content)
         
         # Insert image placeholders
         if images:
@@ -126,8 +183,8 @@ class HTMLBuilder:
         word_count = len(content.split())
         reading_time = max(1, word_count // 200)  # ~200 words per minute
         
-        # Generate meta tags
-        meta_title = self._generate_meta_title(topic, content)
+        # Generate meta tags — use extracted title, fallback to topic
+        meta_title = extracted_title or self._generate_meta_title(topic, content)
         meta_description = self._generate_meta_description(content)
         meta_keywords = self._extract_keywords_for_meta(content, style_profile)
         
@@ -245,8 +302,12 @@ class HTMLBuilder:
             prompt = image.get('prompt', '')
             alt_text = image.get('alt_text', 'Blog image')
             
-            # Create image placeholder
-            image_url = image.get('url') or "/api/placeholder/800/400"
+            # Use actual URL if provided, otherwise use picsum.photos (free, no API key)
+            image_url = image.get('url')
+            if not image_url:
+                # Seed determinístico para que misma posición siempre misma imagen
+                seed = re.sub(r'[^a-zA-Z0-9]+', '-', prompt.lower().strip()[:50]).strip('-') or f"blog-img-{i}"
+                image_url = f"https://picsum.photos/seed/{seed}/800/400"
             
             placeholder = f'''
 <figure class="blog-image" data-position="{position}">
@@ -293,9 +354,9 @@ class HTMLBuilder:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{meta_title}} - Blogger Agent IA</title>
-    <meta name="description" content="{{meta_description}}">
-    <meta name="keywords" content="{{', '.join(meta_keywords)}}">
+    <title>{meta_title} - Blogger Agent IA</title>
+    <meta name="description" content="{meta_description}">
+    <meta name="keywords" content="{', '.join(meta_keywords)}">
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Lora:ital@0;1&display=swap" rel="stylesheet">
     <style>
@@ -317,16 +378,16 @@ class HTMLBuilder:
     <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <article class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 overflow-hidden">
             <header class="mb-10 text-center border-b pb-10">
-                <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-4 leading-tight">{{meta_title}}</h1>
+                <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-4 leading-tight">{meta_title}</h1>
                 <div class="flex items-center justify-center gap-3 text-sm font-bold uppercase tracking-widest text-gray-400">
-                    <span>{{reading_time}} min de lectura</span>
+                    <span>{reading_time} min de lectura</span>
                     <span class="bg-gray-200 w-1.5 h-1.5 rounded-full"></span>
-                    <span>{{word_count}} palabras</span>
+                    <span>{word_count} palabras</span>
                 </div>
             </header>
             
             <div class="prose prose-lg md:prose-xl max-w-none prose-a:text-blue-600 hover:prose-a:text-blue-500 font-serif prose-headings:font-sans prose-headings:font-black prose-img:rounded-2xl prose-img:shadow-md">
-                {{html_content}}
+                {html_content}
             </div>
         </article>
     </main>

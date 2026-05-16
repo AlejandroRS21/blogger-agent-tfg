@@ -12,9 +12,12 @@ Coordinates all agents through a multi-phase workflow:
 
 import time
 import uuid
+import requests
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from pathlib import Path
+from urllib.parse import urljoin, urlparse
+from bs4 import BeautifulSoup
 
 from .config import OrchestratorConfig
 from .state import StateManager, WorkflowState, PhaseStatus
@@ -25,7 +28,9 @@ from aphra_blogger.agents.keyword_extractor import KeywordExtractor
 from aphra_blogger.agents.content_generator import ContentGenerator
 from aphra_blogger.agents.critic import CriticAgent
 from aphra_blogger.agents.image_selector import ImageSelectorAgent
+from aphra_blogger.agents.unsplash import enrich_images
 from aphra_blogger.agents.html_builder import HTMLBuilder
+from aphra_blogger.agents.news_research_agent import research_topic as research_topic_online
 
 
 class BloggerOrchestrator:
@@ -66,13 +71,13 @@ class BloggerOrchestrator:
         self.workflow = BloggerStyleWorkflow()
         self.state_manager: Optional[StateManager] = None
         
-        # Initialize agents
-        api_key = config.openai_api_key
-        self.style_analyzer = StyleAnalyzer(api_key=api_key, model=config.default_model)
-        self.keyword_extractor = KeywordExtractor(api_key=api_key)
-        self.content_generator = ContentGenerator(api_key=api_key, model=config.default_model)
-        self.critic = CriticAgent(api_key=api_key, model=config.default_model)
-        self.image_selector = ImageSelectorAgent(api_key=api_key)
+        # Initialize agents — pass None so each agent's factory resolves
+        # the right API key from environment variables (GEMINI_API_KEY, etc.)
+        self.style_analyzer = StyleAnalyzer(api_key=None, model=config.default_model)
+        self.keyword_extractor = KeywordExtractor(api_key=None)
+        self.content_generator = ContentGenerator(api_key=None, model=config.default_model)
+        self.critic = CriticAgent(api_key=None, model=config.default_model)
+        self.image_selector = ImageSelectorAgent(api_key=None)
         self.html_builder = HTMLBuilder()
     
     def _log(self, message: str, level: str = "INFO") -> None:
@@ -176,26 +181,35 @@ class BloggerOrchestrator:
             # Phase 2: Keyword Extraction
             self._phase_keyword_extraction(blogger_urls)
             
-            # Phase 3: Content Generation (Draft)
+            # Phase 3: Research (información factual sobre el tema)
+            self._phase_research(topic)
+            
+            # Phase 4: Content Generation (Draft)
             self._phase_content_generation_draft(topic)
             
-            # Phase 4: Critique (if enabled)
+            # Phase 5: Critique (if enabled)
             if self.config.enable_critique:
                 self._phase_critique()
                 
-                # Phase 5: Refinement (if critique suggests changes)
+                # Phase 6: Refinement (if critique suggests changes)
                 if self._needs_refinement():
                     self._phase_refinement()
+                else:
+                    # Critique ran but didn't request changes → draft IS final
+                    state.final_content = state.draft_content
             else:
                 self.state_manager.skip_phase("critique", "Critique disabled in config")
                 self.state_manager.skip_phase("refinement", "Critique disabled")
                 state.final_content = state.draft_content
             
-            # Phase 6: HTML Building
-            self._phase_html_building()
-            
-            # Phase 7: Image Selection
+            # Phase 7: Image Selection (before HTML building so images are included)
             self._phase_image_selection()
+            
+            # Phase 8: Image Enrichment with Unsplash (real photos from prompts)
+            self._phase_image_enrichment()
+            
+            # Phase 9: HTML Building (with images + real URLs)
+            self._phase_html_building()
             
             # Finalize
             self.state_manager.finalize()
@@ -226,13 +240,100 @@ class BloggerOrchestrator:
                     self.state_manager.save_to_file(output_path)
             raise
     
+    def _discover_blog_posts(self, base_url: str, limit: int = 3) -> List[str]:
+        """Discover blog post URLs from a base URL."""
+        try:
+            self._log(f"Discovering blog posts from {base_url}...")
+            response = requests.get(base_url, timeout=10, headers={'User-Agent': 'Mozilla/5.0'})
+            if response.status_code != 200:
+                return [base_url]
+                
+            soup = BeautifulSoup(response.text, 'html.parser')
+            links = soup.find_all('a', href=True)
+            
+            base_domain = urlparse(base_url).netloc
+            discovered = set()
+            
+            for link in links:
+                href = link['href']
+                full_url = urljoin(base_url, href)
+                parsed = urlparse(full_url)
+                
+                # Basic filters: same domain, not the home itself, and NO fragments (like #comments)
+                if parsed.netloc != base_domain or parsed.path in ["", "/"] or parsed.fragment:
+                    continue
+                
+                # Heuristic for blog posts:
+                # 1. Contains numbers (dates)
+                # 2. Longer paths
+                # 3. Not common category/tag/feed paths
+                path = parsed.path.lower()
+                if any(x in path for x in ['/category/', '/tag/', '/feed/', '/author/', '/page/']):
+                    continue
+                
+                # Check for date patterns (e.g. /2024/05/...)
+                has_date = any(char.isdigit() for char in path)
+                # Check for slug-like structure
+                has_slug = path.count('-') >= 2 or len(path.split('/')) >= 3
+                
+                if has_date or has_slug:
+                    discovered.add(full_url)
+                    if len(discovered) >= limit:
+                        break
+            
+            result = list(discovered)
+            self._log(f"Discovered {len(result)} potential posts: {', '.join(result)}")
+            return result if result else [base_url]
+            
+        except Exception as e:
+            self._log(f"Error discovering posts: {e}", "WARNING")
+            return [base_url]
+
     def _phase_style_analysis(self, blogger_urls: List[str]) -> None:
         """Phase 1: Analyze blogger style."""
         phase_name = "style_analysis"
         self.state_manager.start_phase(phase_name, "StyleAnalyzer")
         
         def analyze():
-            return self.style_analyzer.analyze(blogger_urls)
+            combined_sample_text = ""
+            
+            if blogger_urls:
+                # If only one URL provided, try to discover more
+                target_urls = blogger_urls
+                if len(blogger_urls) == 1:
+                    discovered = self._discover_blog_posts(blogger_urls[0])
+                    # Add discovered ones but keep original first
+                    target_urls = list(dict.fromkeys([blogger_urls[0]] + discovered))
+                
+                for url in target_urls[:5]: # Cap at 5 URLs
+                    try:
+                        self._log(f"Fetching sample text from {url}...")
+                        response = requests.get(url, timeout=10, headers={'User-Agent': 'Mozilla/5.0'})
+                        if response.status_code == 200:
+                            soup = BeautifulSoup(response.text, 'html.parser')
+                            
+                            # Clean up soup: remove scripts, styles
+                            for script in soup(["script", "style"]):
+                                script.decompose()
+                                
+                            # Extract text from p tags to get content
+                            paragraphs = soup.find_all('p')
+                            text = "\n\n".join([p.get_text() for p in paragraphs if len(p.get_text().split()) > 10])
+                            
+                            combined_sample_text += f"\n--- CONTENT FROM {url} ---\n{text}\n"
+                            
+                    except Exception as e:
+                        self._log(f"Error scraping {url}: {e}", "WARNING")
+                
+                # Final cleanup and limit
+                combined_sample_text = combined_sample_text.strip()
+                combined_sample_text = combined_sample_text[:30000]  # Increase limit for multi-post context
+                self._log(f"Extracted total {len(combined_sample_text)} characters from {len(target_urls)} URL(s)")
+            
+            # Save the extracted text to state so other phases can use it
+            self.state_manager.state.metadata['sample_text'] = combined_sample_text
+            
+            return self.style_analyzer.analyze(blogger_urls, sample_text=combined_sample_text)
         
         result = self._execute_with_retry(phase_name, "StyleAnalyzer", analyze)
         self.state_manager.state.style_profile = result
@@ -244,7 +345,8 @@ class BloggerOrchestrator:
         self.state_manager.start_phase(phase_name, "KeywordExtractor")
         
         def extract():
-            extraction_result = self.keyword_extractor.extract(blogger_urls)
+            sample_text = self.state_manager.state.metadata.get('sample_text', "")
+            extraction_result = self.keyword_extractor.extract(blogger_urls, sample_text=sample_text)
             # Return just the keywords list for backward compatibility
             return extraction_result.get("keywords", [])
         
@@ -252,19 +354,70 @@ class BloggerOrchestrator:
         self.state_manager.state.keywords = result
         self.state_manager.complete_phase(phase_name, result)
     
+    def _phase_research(self, topic: str) -> None:
+        """Phase 3: Research the topic for factual grounding."""
+        phase_name = "research"
+        self.state_manager.start_phase(phase_name, "ResearchAgent")
+        
+        def research():
+            self._log(f"Researching topic: {topic}")
+            
+            # Pass the ContentGenerator's LLM provider for deep research synthesis
+            llm = getattr(self.content_generator, 'llm', None)
+            
+            research_result = research_topic_online(
+                topic,
+                llm_provider=llm,
+                max_articles=self.config.max_research_articles,
+            )
+            
+            # Store in state for content generation
+            self.state_manager.state.metadata['research_context'] = research_result.get("context", "")
+            self.state_manager.state.metadata['research_articles'] = research_result.get("articles", [])
+            self.state_manager.state.metadata['research_findings'] = research_result.get("key_findings", [])
+            self.state_manager.state.metadata['research_synthesis'] = research_result.get("research_synthesis", "")
+            self.state_manager.state.metadata['scrape_stats'] = research_result.get("scrape_stats", {})
+            
+            # Richer logging
+            articles_count = len(research_result.get('articles', []))
+            scrape_stats = research_result.get('scrape_stats', {})
+            synthesis = research_result.get('research_synthesis', '')
+            
+            stats_log = ""
+            if scrape_stats:
+                stats_log = f", scraped {scrape_stats.get('succeeded', 0)}/{scrape_stats.get('total', 0)}"
+            if synthesis:
+                stats_log += f", synthesis: {len(synthesis)} chars"
+            
+            result_summary = f"{articles_count} articles found{stats_log}"
+            self._log(f"Research complete: {result_summary}")
+            return result_summary
+        
+        result = self._execute_with_retry(phase_name, "ResearchAgent", research)
+        self.state_manager.complete_phase(phase_name, result)
+    
     def _phase_content_generation_draft(self, topic: str) -> None:
-        """Phase 3: Generate initial draft."""
+        """Phase 4: Generate initial draft."""
         phase_name = "content_generation"
         self.state_manager.start_phase(phase_name, "ContentGenerator")
         
         def generate():
             style = self.state_manager.state.style_profile
             keywords = self.state_manager.state.keywords
+            sample_text = self.state_manager.state.metadata.get('sample_text', '')
+            
+            # Use research_synthesis as primary context, fall back to research_context
+            research_context = (
+                self.state_manager.state.metadata.get('research_synthesis', '')
+                or self.state_manager.state.metadata.get('research_context', '')
+            )
             
             draft = self.content_generator.generate_draft(
                 topic=topic,
                 style_profile=style,
                 keywords=keywords,
+                sample_text=sample_text,
+                research_context=research_context,
                 min_words=self.config.min_word_count,
                 max_words=self.config.max_word_count
             )
@@ -341,12 +494,13 @@ class BloggerOrchestrator:
             topic = self.state_manager.state.topic
             style_profile = self.state_manager.state.style_profile
             
-            # Note: images will be selected in the next phase
-            # For now, build HTML/JSX without images
+            # Use selected images (now selected in previous phase)
+            images = self.state_manager.state.image_prompts
+            
             html_output = self.html_builder.build(
                 content=content,
                 topic=topic,
-                images=None,  # Images come from next phase
+                images=images,
                 style_profile=style_profile
             )
             
@@ -391,6 +545,26 @@ class BloggerOrchestrator:
         result = self._execute_with_retry(phase_name, "ImageSelectorAgent", select)
         self.state_manager.state.image_prompts = result
         self.state_manager.complete_phase(phase_name, result)
+    
+    def _phase_image_enrichment(self) -> None:
+        """Phase 8: Enrich image prompts with real Unsplash photo URLs."""
+        phase_name = "image_enrichment"
+        self.state_manager.start_phase(phase_name, "UnsplashAgent")
+        
+        prompts = self.state_manager.state.image_prompts
+        if prompts:
+            self._log(f"[Unsplash] Searching photos for {len(prompts)} images...")
+            enriched = enrich_images(prompts)
+            self.state_manager.state.image_prompts = enriched
+            urls_found = sum(1 for p in enriched if p.get("url"))
+            self._log(f"[Unsplash] Found {urls_found}/{len(enriched)} real photos")
+        else:
+            self._log("[Unsplash] No image prompts to enrich, skipping")
+        
+        self.state_manager.complete_phase(phase_name, {
+            "total": len(prompts) if prompts else 0,
+            "enriched": sum(1 for p in (prompts or []) if p.get("url")),
+        })
     
     def _build_result(self) -> Dict[str, Any]:
         """Build final result dictionary."""

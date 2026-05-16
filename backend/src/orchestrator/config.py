@@ -35,6 +35,12 @@ class OrchestratorConfig:
     min_word_count: int = 800
     max_word_count: int = 2500
     
+    # Deep Research Settings
+    enable_deep_research: bool = True
+    max_research_articles: int = 5
+    max_scrape_chars_per_article: int = 5000
+    max_research_chars_total: int = 15000
+    
     # API Keys (from environment)
     gemini_api_key: Optional[str] = None
     openai_api_key: Optional[str] = None
@@ -46,7 +52,7 @@ class OrchestratorConfig:
     provider: str = "auto"  # "auto", "huggingface", "openai", "modal"
     
     # Timeouts
-    agent_timeout: int = 60  # seconds per agent
+    agent_timeout: int = 300  # seconds per agent (Scrapling: 30s × 5 articles + synthesis)
     
     # Additional settings
     extra: Dict[str, Any] = field(default_factory=dict)

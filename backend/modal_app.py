@@ -17,8 +17,9 @@ Then call the webhook:
 
 import modal
 import os
+import re
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 # Create Modal app
 app = modal.App("blogger-agent-tfg")
@@ -34,11 +35,14 @@ image = (
     .add_local_dir(os.path.join(backend_dir, "src"), remote_path="/root/src")
     .add_local_dir(os.path.join(backend_dir, "tools"), remote_path="/root/tools")
     .add_local_dir(os.path.join(backend_dir, "aphra_blogger"), remote_path="/root/aphra_blogger")
+    .add_local_file(os.path.join(backend_dir, "cleanup_supabase.py"), remote_path="/root/cleanup_supabase.py")
 )
 
 # Define secrets (will need to be configured in Modal dashboard)
 # modal secret create openai-secret OPENAI_API_KEY=sk-...
 # modal secret create hf-secret HF_TOKEN=hf_...
+# modal secret create brave-secret BRAVE_API_KEY=BSACc5UYx490dRN2WCRaIimxw59Ao7A
+# modal secret create supabase-secret SUPABASE_URL=... SUPABASE_SERVICE_KEY=... SUPABASE_ANON_KEY=...
 
 @app.function(
     image=image,
@@ -46,6 +50,8 @@ image = (
         modal.Secret.from_name("openai-secret"),
         modal.Secret.from_name("huggingface-secret"),
         modal.Secret.from_name("gemini-secret"),
+        modal.Secret.from_name("brave-secret"),
+        modal.Secret.from_name("unsplash-secret"),
     ],
     timeout=600,  # 10 minutes max
     memory=2048,  # 2GB RAM
@@ -114,6 +120,162 @@ def generate_blog_post(
     return result
 
 
+def _parse_moderation_response(text: str) -> Dict[str, Any]:
+    """Parse JSON moderation response from LLM output."""
+    import json
+    import re
+    json_match = re.search(r'\{[^}]+\}', text.strip())
+    if json_match:
+        try:
+            result = json.loads(json_match.group())
+            return {
+                "approved": result.get("approved", True),
+                "reason": result.get("reason"),
+            }
+        except json.JSONDecodeError:
+            pass
+    return {"approved": True, "reason": None}
+
+
+_MODERATION_SYSTEM_PROMPT = """Eres un moderador de contenido. Debes determinar si el siguiente TEMA es apropiado para generar un artículo de blog profesional.
+
+Un tema INAPROPIADO incluye:
+- Contenido explícitamente sexual o pornográfico
+- Violencia extrema, gore o crueldad gratuita
+- Discurso de odio, discriminación, racismo, xenofobia, homofobia
+- Denigración o humillación de personas o grupos por su origen, género, religión, orientación sexual, discapacidad
+- Contenido ilegal o que promueva actividades ilegales (drogas, armas, terrorismo)
+- Acoso, bullying o intimidación
+- Autolesiones, trastornos alimenticios, suicidio
+- Spam, desinformación maliciosa o teorías conspirativas dañinas
+- Contenido que promueva la violencia de género o normalice el abuso
+
+Un tema APROPIADO incluye (incluso si es polémico, siempre que el enfoque sea serio e informativo):
+- Tecnología, ciencia, cultura, educación, historia
+- Noticias y actualidad tratadas con respeto y rigor
+- Opinión y análisis profesional
+- Política, economía, sociedad (con enfoque analítico, no incitador)
+- Salud, bienestar, deportes
+- Entretenimiento y cultura pop
+- Cualquier tema tratado desde una perspectiva INFORMATIVA y RESPETUOSA
+
+IMPORTANTE: No rechaces un tema solo porque sea controvertido. Recházalo SOLO si su contenido intrínseco es denigrante, explícito, ilegal o promueve el odio."""
+
+
+def _moderate_with_modal(topic: str) -> Optional[Dict[str, Any]]:
+    """Try moderation using the Modal-hosted model. Returns None if unavailable."""
+    user_prompt = f"""TEMA A EVALUAR: "{topic}"
+
+Responde ÚNICAMENTE con un JSON válido, sin texto adicional:
+- Si es APROPIADO: {{"approved": true, "reason": null}}
+- Si es INAPROPIADO: {{"approved": false, "reason": "explicación clara y específica de por qué es inapropiado"}}"""
+
+    try:
+        # Call Modal-hosted model directly — works inside Modal's runtime
+        # without needing explicit tokens (Modal handles auth internally)
+        RemoteCls = modal.Cls.from_name("blogger-agent-models", "LlamaModel")
+        instance = RemoteCls()
+
+        response = instance.generate.remote(
+            messages=[
+                {"role": "system", "content": _MODERATION_SYSTEM_PROMPT},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=0.1,
+            max_tokens=200,
+        )
+
+        text = ""
+        if isinstance(response, dict):
+            text = response.get("content", "")
+        else:
+            text = str(response)
+
+        result = _parse_moderation_response(text)
+        print(f"[Moderation] Modal verdict: approved={result.get('approved')}")
+        return result
+
+    except Exception as e:
+        print(f"[Moderation] Modal model unavailable: {e}")
+        return None
+
+
+def _moderate_with_gemini(topic: str) -> Optional[Dict[str, Any]]:
+    """Fallback moderation using Gemini. Returns None if unavailable."""
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return None
+
+    try:
+        from google import genai
+        from google.genai import types as genai_types
+
+        client = genai.Client(api_key=api_key)
+
+        user_prompt = f"""TEMA A EVALUAR: "{topic}"
+
+Responde ÚNICAMENTE con un JSON válido, sin texto adicional:
+- Si es APROPIADO: {{"approved": true, "reason": null}}
+- Si es INAPROPIADO: {{"approved": false, "reason": "explicación clara y específica de por qué es inapropiado"}}"""
+
+        config = genai_types.GenerateContentConfig(
+            temperature=0.1,
+            max_output_tokens=200,
+            system_instruction=_MODERATION_SYSTEM_PROMPT,
+            thinking_config=genai_types.ThinkingConfig(thinking_budget=0),
+        )
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=user_prompt,
+            config=config,
+        )
+
+        text = response.text or ""
+        result = _parse_moderation_response(text)
+        print(f"[Moderation] Gemini verdict: approved={result.get('approved')}")
+        return result
+
+    except ImportError:
+        print("[Moderation] google-genai not available")
+        return None
+    except Exception as e:
+        print(f"[Moderation] Gemini error: {e}")
+        return None
+
+
+def moderate_topic(topic: str) -> Dict[str, Any]:
+    """
+    Check if a topic is appropriate for content generation.
+
+    Uses the Modal-hosted LLM as the primary moderation engine.
+    Falls back to Gemini if the Modal model is unavailable.
+    Topics containing explicit, violent, hateful, or degrading content are rejected.
+
+    Args:
+        topic: The topic string to moderate.
+
+    Returns:
+        Dict with:
+            - approved (bool): True if topic is safe
+            - reason (str | None): Explanation if rejected, None if approved
+    """
+    # Strategy 1: Modal-hosted model (primary, runs inside Modal infra)
+    print(f"[Moderation] Checking topic: '{topic[:60]}{'...' if len(topic) > 60 else ''}'")
+    result = _moderate_with_modal(topic)
+    if result is not None:
+        return result
+
+    # Strategy 2: Gemini API (fallback)
+    result = _moderate_with_gemini(topic)
+    if result is not None:
+        return result
+
+    # Both unavailable → fail open, allow through
+    print("[Moderation] No moderation provider available, allowing through")
+    return {"approved": True, "reason": None}
+
+
 def _map_to_supabase(result: Dict[str, Any]) -> Dict[str, Any]:
     """Map the orchestrator result dict to the Supabase posts schema."""
     metadata = result.get("html_structure", {}).get("metadata", {})
@@ -123,19 +285,26 @@ def _map_to_supabase(result: Dict[str, Any]) -> Dict[str, Any]:
     # Añadimos un sufijo para evitar errores de restricción UNIQUE en supabase
     unique_slug = f"{base_slug}-{short_id}"
     
+    # Obtener primera imagen del contenido para cover_image_url
+    content_html = result.get("html_structure", {}).get("html", "")
+    cover_img = None
+    img_match = re.search(r'<img[^>]+src="([^"]+)"', content_html)
+    if img_match:
+        cover_img = img_match.group(1)
+    
     return {
         "id": workflow_id,
         "slug": unique_slug,
         "title": metadata.get("title") or result.get("title", "Sin título"),
         "description": metadata.get("description", ""),
-        "content": result.get("html_structure", {}).get("html", ""),
+        "content": content_html,
         "author": "Blogger Agent",
         "date": datetime.now().strftime("%Y-%m-%d"),
         "word_count": metadata.get("word_count"),
         "reading_time": metadata.get("reading_time"),
         "keywords": result.get("keywords", []),
         "tags": metadata.get("keywords", []),
-        "cover_image_url": None,
+        "cover_image_url": cover_img,
     }
 
 
@@ -218,6 +387,19 @@ def webhook(data: Dict[str, Any]) -> Dict[str, Any]:
                 "data": None,
                 "error": "topic must be a string"
             }
+        
+        # ── Content Moderation ────────────────────────────────────────────
+        moderation = moderate_topic(topic)
+        if not moderation.get("approved", True):
+            reason = moderation.get("reason", "Tema no apto para generación de contenido")
+            print(f"[Webhook] Topic REJECTED by moderator: {reason}")
+            return {
+                "success": False,
+                "data": None,
+                "error": f"⛔ Tema rechazado por protección de contenido: {reason}"
+            }
+        print(f"[Webhook] Topic approved by moderator ✓")
+        # ──────────────────────────────────────────────────────────────────
         
         # Call the generator
         result = generate_blog_post.remote(
@@ -310,6 +492,30 @@ def scrape_blogger_corpus(
             "max_requested": max_posts,
         }
     }
+
+
+@app.function(
+    image=image,
+    secrets=[modal.Secret.from_name("supabase-secret")],
+    schedule=modal.Cron("0 0 * * *"),  # Runs every day at midnight
+)
+def daily_cleanup():
+    """
+    Scheduled task to clean up old posts.
+    By default, it keeps the 100 most recent posts and deletes the rest.
+    """
+    import sys
+    if "/root" not in sys.path:
+        sys.path.insert(0, "/root")
+    
+    from cleanup_supabase import cleanup_posts
+    
+    print("Starting daily cleanup...")
+    # Keep 100 posts, delete the rest (including images)
+    # Also perform quality check to remove short or poorly structured posts
+    # Set dry_run=False to actually perform the deletion
+    cleanup_posts(keep_limit=100, quality_check=True, dry_run=False)
+    print("Daily cleanup completed.")
 
 
 # Local testing

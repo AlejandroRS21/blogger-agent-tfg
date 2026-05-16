@@ -80,13 +80,7 @@ class KeywordExtractor:
         
         prompt = f"""Extract keywords and characteristic expressions from the blog context: {url_text}
 
-This is Javi Pas's tech blog "Incognitosis". Known recurring topics and expressions:
-
-TOPICS: AI, OpenClaw, Claude, ChatGPT, Apple, Anthropic, technology, family life, 
-nostalgia, retro tech, personal experiments
-
-EXPRESSIONS: "me alucina", "brutal", "flipar", "miniresort burgués", 
-"mis maravillosos niños", "dicho y hecho", "total, que", "el caso es que"
+Identify the most relevant keywords, recurrent expressions, technical terms, and main themes from the provided text to capture the author's specific focus and style.
 
 Extract and return JSON:
 {{
@@ -115,50 +109,39 @@ Return ONLY valid JSON, no other text."""
             return self._fallback_extraction()
     
     def _fallback_extraction(self) -> Dict[str, Any]:
-        """Fallback keyword extraction based on known patterns."""
+        """Fallback keyword extraction based on generic patterns."""
         return {
             "keywords": [
-                "IA", "inteligencia artificial", "OpenClaw", "Claude", "ChatGPT",
-                "tecnología", "Apple", "Anthropic", "innovación", "desarrollo",
-                "software", "hardware", "futuro", "educación", "familia",
-                "experimento", "prueba", "análisis", "opinión", "crítica",
-                "nostalgia", "retro", "gaming", "ordenadores", "Internet"
+                "tecnología", "innovación", "desarrollo", "software", "hardware", 
+                "futuro", "análisis", "tendencias", "mercado", "digital",
+                "datos", "internet", "productividad", "herramientas", "sistema"
             ],
             "expressions": [
-                "me alucina",
-                "dicho y hecho",
-                "total, que",
-                "el caso es que",
-                "ciertamente",
-                "como digo",
-                "insisto",
-                "miniresort burgués",
-                "mis maravillosos niños",
-                "brutal",
-                "flipar",
-                "chulo",
-                "mazo",
-                "yuyu"
+                "es importante destacar",
+                "en resumen",
+                "por otro lado",
+                "sin embargo",
+                "en conclusión",
+                "cabe mencionar",
+                "desde esta perspectiva",
+                "la realidad es que",
+                "en definitiva"
             ],
             "technical_terms": [
                 "API",
-                "modelo de lenguaje",
-                "LLM",
-                "prompt",
-                "machine learning",
-                "neural network",
-                "deployment",
-                "cloud",
-                "open source"
+                "algoritmo",
+                "backend",
+                "frontend",
+                "framework",
+                "cloud computing",
+                "despliegue",
+                "arquitectura"
             ],
             "themes": [
-                "Inteligencia Artificial",
-                "Tecnología personal",
-                "Vida familiar",
-                "Experimentos tech",
-                "Industria tecnológica",
-                "Nostalgia computacional",
-                "Opinión crítica",
-                "Educación tech"
+                "Desarrollo de Software",
+                "Tendencias Tecnológicas",
+                "Productividad Digital",
+                "Análisis de Industria",
+                "Innovación"
             ]
         }

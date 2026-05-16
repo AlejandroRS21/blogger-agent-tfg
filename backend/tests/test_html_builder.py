@@ -39,10 +39,14 @@ This is a paragraph with **bold** and *italic* text.
         )
         
         assert isinstance(output, HTMLOutput)
-        # The output contains both <h1> and <h2> tags
-        assert '<h1' in output.html
+        # The <h1> is stripped from body to avoid duplicate with page template
+        assert '<h1' not in output.html, "<h1> should be stripped from body html"
+        assert 'Test Title' not in output.html, "Title should be stripped from body html"
+        # The <h1> lives in full_page template
+        assert '<h1' in output.full_page
+        assert 'Test Title' in output.full_page or 'Test Title' == output.meta_title
+        # <h2> sections remain in body html
         assert '<h2' in output.html
-        assert 'Test Title' in output.html
         assert 'Section 1' in output.html
         assert '<article' in output.html
     

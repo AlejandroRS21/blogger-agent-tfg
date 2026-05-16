@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchPost, getAllPosts } from "@/lib/api";
+import { getTitleLinks, applyCrossLinks } from "@/lib/crossLinks";
 import PostContent from "@/components/PostContent";
 
 interface PostPageProps {
@@ -16,6 +17,10 @@ export default async function PostPage({ params }: PostPageProps) {
   if (!post) {
     notFound();
   }
+
+  // Cross-link: link phrases matching other post titles
+  const titleLinks = await getTitleLinks();
+  const crossLinkedContent = applyCrossLinks(post.content, slug, titleLinks);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
@@ -39,8 +44,8 @@ export default async function PostPage({ params }: PostPageProps) {
         </Link>
       </div>
 
-      {/* Post content */}
-      <PostContent post={post} />
+      {/* Post content with cross-links */}
+      <PostContent post={post} crossLinkedContent={crossLinkedContent} />
 
       {/* Bottom navigation */}
       <div className="mt-12 flex items-center justify-between border-t border-gray-200 pt-8">

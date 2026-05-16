@@ -1,10 +1,14 @@
+"use client";
+
+import Link from "next/link";
 import type { BlogPost } from "@/types/post";
 
 interface PostContentProps {
   post: BlogPost;
+  crossLinkedContent?: string;
 }
 
-export default function PostContent({ post }: PostContentProps) {
+export default function PostContent({ post, crossLinkedContent }: PostContentProps) {
   const hasHeadings =
     post.html_structure?.headings &&
     post.html_structure.headings.length > 0;
@@ -30,12 +34,13 @@ export default function PostContent({ post }: PostContentProps) {
         {post.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {post.tags.map((tag) => (
-              <span
+              <Link
                 key={tag}
-                className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
+                href={`/tags/${encodeURIComponent(tag.toLowerCase())}`}
+                className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
               >
                 {tag}
-              </span>
+              </Link>
             ))}
           </div>
         )}
@@ -66,8 +71,8 @@ export default function PostContent({ post }: PostContentProps) {
 
       {/* Blog content with prose styles */}
       <div
-        className="prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        className="prose prose-lg max-w-none prose-img:rounded-2xl prose-img:shadow-md prose-img:mx-auto prose-figure:my-8 prose-figcaption:text-center prose-figcaption:text-sm prose-figcaption:text-gray-500"
+        dangerouslySetInnerHTML={{ __html: crossLinkedContent ?? post.content }}
       />
 
       {/* Meta keywords */}

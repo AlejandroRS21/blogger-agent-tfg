@@ -1,10 +1,10 @@
 schema: spec-driven
 
 context: |
-  Stack: Python 3.11, Hatchling, Modal, Daggr.
-  Architecture: Multi-agent blogger system.
-  Testing: Pytest, pytest-cov.
-  Style: Ruff, Black.
+  Python 3.11, Hatchling build, Daggr visual workflows, Modal serverless.
+  Multi-agent blogger with orchestrator (~/src/orchestrator), 7-phase pipeline.
+  Frontend: Next.js 16 App Router, React 19, Tailwind CSS 4, TypeScript 5.9.
+  Style: Ruff (E/W/F/I/B/C4/UP selects, line-length 100), Black (line-length 100, py311).
 
 strict_tdd: true
 
@@ -14,11 +14,41 @@ testing:
   layers:
     unit: true
     integration: true
+    e2e: false
   quality:
     linter: ruff
     command_linter: ruff check .
     formatter: black
     command_formatter: black .
+    type_checker: none
   coverage:
     available: true
     command: pytest --cov
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Identify affected modules/packages (aphra_blogger.agents, src.orchestrator, frontend)
+  specs:
+    - Use Given/When/Then format for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group tasks by phase (infrastructure, implementation, testing)
+    - Use hierarchical numbering (1.1, 1.2, etc.)
+    - Keep tasks small enough to complete in one session
+  apply:
+    - Follow existing code patterns and conventions
+    - Load relevant coding skills for the project stack
+    tdd: true
+    test_command: pytest
+  verify:
+    - Run tests if test infrastructure exists
+    - Compare implementation against every spec scenario
+    test_command: pytest
+    build_command: ruff check .
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas (large removals)

@@ -80,8 +80,40 @@ export default function NewPostPage() {
     return () => clearTimeout(timer);
   }, [state.isGenerating, state.currentPhase]);
 
+  /** Client-side content moderation — quick pattern check before hitting the API */
+  const isTopicAppropriate = (topic: string): string | null => {
+    const trimmed = topic.trim().toLowerCase();
+    if (trimmed.length < 2) return "El tema es demasiado corto.";
+
+    // Patrones de contenido explícito/denigrante (primera línea de defensa)
+    // La protección real está en el backend con Gemini
+    const blockedPatterns = [
+      /\b(sexo|sexual|pornograf[íi]a|xxx|porno|desnud[oa]s?|er[óo]tico)\b/i,
+      /\b(violaci[óo]n|maltrato|tortura|gore|sangriento)\b/i,
+      /\b(odio|discriminaci[óo]n|racista|xen[óo]fobo|nazi)\b/i,
+      /\b(armas?|explosivos?|drogas?|narcotr[áa]fico)\b/i,
+      /\b(autolesi[óo]n|suicidio|bullying|acoso)\b/i,
+    ];
+
+    for (const pattern of blockedPatterns) {
+      if (pattern.test(trimmed)) {
+        return `⛔ El tema contiene lenguaje que podría ser inapropiado. Elegí un tema profesional para el blog.`;
+      }
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Client-side moderation first
+    const moderationError = isTopicAppropriate(state.topic);
+    if (moderationError) {
+      dispatch({ type: 'SET_ERROR', payload: moderationError });
+      return;
+    }
+
     dispatch({ type: 'START_GENERATION' });
 
     try {
@@ -138,7 +170,7 @@ export default function NewPostPage() {
               placeholder="Ej: El futuro de la IA en el desarrollo web"
               className="w-full px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             />
-            <p className="text-xs text-secondary italic">El Agente Guardián validará que el tema sea profesional.</p>
+            <p className="text-xs text-secondary italic">El moderador con IA validará que el tema sea profesional.</p>
           </div>
 
           <div className="space-y-2">

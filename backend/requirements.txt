@@ -33,3 +33,5 @@ daggr>=0.7.0
 
 fastapi[standard]
 supabase>=2.0.0
+# Deep web research - stealth HTTP scraping (bypass anti-bot, full article content)
+scrapling[fetchers]>=0.4.0

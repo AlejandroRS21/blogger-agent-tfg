@@ -49,8 +49,8 @@ class ContentGenerator:
                     provider=provider,
                     api_key=api_key,
                     model=model,
-                    temperature=0.8,
-                    max_tokens=3000,
+                    temperature=0.9,
+                    max_tokens=4096,
                 )
             except Exception as e:
                 print(f"Warning: Failed to initialize LLM provider: {e}")
@@ -70,21 +70,62 @@ class ContentGenerator:
         """Set style profile directly."""
         self.style_profile = profile
 
+    def _fit_context_to_token_limit(
+        self, sample_text: str, research_context: str, overhead_chars: int = 2000
+    ) -> tuple:
+        """Truncate sample_text and research_context to fit within token budget.
+
+        Modal LLM has 4096 total tokens. We reserve ~1024 for output + overhead,
+        leaving ~3072 tokens for input context. At ~4 chars/token in Spanish,
+        that's ~8000 chars total input.
+
+        Returns:
+            Tuple of (truncated_sample, truncated_research)
+        """
+        budget = 8000  # chars (~2000 tokens, leaving ~2000 for output + overhead)
+        sample_trimmed = (sample_text or "")[:8000]
+        research_trimmed = (research_context or "")[:8000]
+
+        # Rough estimate of total input chars (including template overhead)
+        total = len(sample_trimmed) + len(research_trimmed) + overhead_chars
+
+        if total <= budget:
+            return sample_trimmed, research_trimmed
+
+        # Need to cut: prioritize research (factual) over sample (style reference)
+        # Cut research first, then sample if still over
+        research_trimmed = research_trimmed[:4000]
+        total = len(sample_trimmed) + len(research_trimmed) + overhead_chars
+
+        if total <= budget:
+            return sample_trimmed, research_trimmed
+
+        # Still over: cut both proportionally
+        excess = total - budget
+        sample_trimmed = sample_trimmed[: max(500, len(sample_trimmed) - excess // 2)]
+        research_trimmed = research_trimmed[: max(500, len(research_trimmed) - excess // 2)]
+
+        return sample_trimmed, research_trimmed
+
     def generate_draft(
         self,
         topic: str,
         style_profile: Dict[str, Any] = None,
         keywords: list = None,
+        sample_text: str = None,
+        research_context: str = None,
         min_words: int = 1500,
         max_words: int = 2500,
     ) -> str:
         """
-        Generate initial draft content using few-shot learning.
+        Generate initial draft content using in-context learning from real blog examples.
 
         Args:
             topic: Topic to write about
-            style_profile: Style profile (from StyleExtractor or StyleAnalyzer)
+            style_profile: Style profile (from StyleAnalyzer)
             keywords: Keywords from KeywordExtractor
+            sample_text: Actual blog text scraped from the blogger, used for style reference
+            research_context: Real search results and data about the topic for factual grounding
             min_words: Minimum word count
             max_words: Maximum word count
 
@@ -96,71 +137,137 @@ class ContentGenerator:
         if not self.llm or not self.llm.is_available():
             return self._fallback_draft(topic, keywords, profile)
 
-        # Extraer elementos del perfil
-        expressions = profile.get("expressions", [])[:10]
-        vocabulary = profile.get("vocabulary", [])[:20]
-        topics = profile.get("topics", [])
-        tone = profile.get("tone", "coloquial y cercano")
-        voice = profile.get("voice", "primera persona")
-        sentence_pattern = profile.get("sentence_pattern", "oraciones de longitud media")
-        paragraph_pattern = profile.get("paragraph_pattern", "párrafos de longitud media")
-        use_of_humor = profile.get("use_of_humor", "humor irónico")
-        technical_level = profile.get("technical_level", "técnico-intermedio")
-        common_opens = profile.get("common_opens", [])[:2]
-        common_closes = profile.get("common_closes", [])[:2]
+        keywords_str = ", ".join(keywords[:10]) if keywords else ""
 
-        keywords_str = ", ".join(keywords[:15]) if keywords else ""
+        # Extract style hints as a compact reference line
+        tone = profile.get("tone", "")
+        voice = profile.get("voice", "")
+        style_hint = f"Tono: {tone}. Voz: {voice}." if (tone or voice) else ""
 
-        # Few-shot examples
-        few_shot_examples = ""
-        if common_opens:
-            few_shot_examples += f'\nEJEMPLO DE INTRODUCCIÓN (similar a cómo escribe el blogger):\n"{common_opens[0]}"\n'
-        if common_closes:
-            few_shot_examples += f'\nEJEMPLO DE CIERRE (similar a cómo termina los artículos):\n"{common_closes[0]}"\n'
+        # Fit context to Modal's 4096 token limit
+        sample_text, research_context = self._fit_context_to_token_limit(
+            sample_text, research_context
+        )
 
-        prompt = f"""Eres un blogger de tecnología español que escribe artículos en un estilo muy característico. Tu tarea es escribir un artículo completo sobre el tema indicado, imitando fielmente el estilo del blogger original.
+        # Research context block (información factual real)
+        research_block = ""
+        if research_context and len(research_context.strip()) > 100:
+            research_block = f"""
+━━━━━━ INFORMACIÓN REAL SOBRE EL TEMA ━━━━━━━━
+Usá esta información como base factual para el post. No inventes datos, basate en esto.
+{research_context}
+━━━━━━ FIN DE INFORMACIÓN ━━━━━━━━━━━━━━━━━━━━━
+"""
 
-TEMA DEL ARTÍCULO: {topic}
+        if sample_text and len(sample_text.strip()) > 200:
+            # ---- PROMPT CON EJEMPLOS REALES (modo principal) ----
+            prompt = f"""Abajo tenés posts REALES escritos por el blogger cuyo estilo tenés que imitar, e información factual sobre el tema del post.
 
-PERFIL DE ESTILO DEL BLOGGER:
-- Tono: {tone}
-- Voz: {voice}
-- Patrón de oraciones: {sentence_pattern}
-- Patrón de párrafos: {paragraph_pattern}
-- Uso del humor: {use_of_humor}
-- Nivel técnico: {technical_level}
+━━━━━━ EJEMPLOS DEL BLOGGER ORIGINAL ────────
+{sample_text[:20000]}
+━━━━━━ FIN DE LOS EJEMPLOS ──────────────────
+{research_block}
+Ahora escribí un NUEVO post sobre: {topic}
 
-VOCABULARIO CARACTERÍSTICO (usa estas palabras de forma natural):
-{", ".join(vocabulary)}
+{style_hint}
 
-EXPRESIONES TÍPICAS (incorpóralas naturalmente en el texto):
-{", ".join(expressions)}
+REGLAS:
 
-TEMS QUE SUELE TRATAR EL BLOGGER:
-{", ".join(topics)}
+- ### IDIOMA — español REAL, nada de Spanglish
+  - Escribí TODO el post en ESPAÑOL. Título, cuerpo, secciones, TODO.
+  - Traducí cualquier término técnico: "Machine Learning" → "Aprendizaje Automático", "Deep Learning" → "Aprendizaje Profundo", "Neural Networks" → "Redes Neuronales", "Data Science" → "Ciencia de Datos", "Data Preprocessing" → "Preprocesamiento de Datos", "Model Training" → "Entrenamiento de Modelos".
+  - NO dejes NINGUNA palabra en inglés suelta. Nada de "on-line", "performance", "disappointing resultado". TODO traducido.
+  - Usá vocabulario español real, no inventes palabras ("alcanceado" → "alcanzado", "percaté" → "me di cuenta").
 
-{few_shot_examples}
+- ### GRAMÁTICA y ortografía
+  - Usá tildes correctamente (empecé, percaté, está, cómo, así).
+  - Respetá la concordancia de género y número ("estos temas", no "estas temas").
+  - No inventes palabras. Si no estás segura de una palabra, usá un sinónimo conocido.
 
-REQUISITOS DEL ARTÍCULO:
-- Longitud: entre {min_words} y {max_words} palabras
-- Escribe en primera persona, como si lo estuvieras contando a un amigo
-- Usa un tono {tone}, con cercanía y algo de humor
-- Incluye alguna referencia personal o anéctdota si es natural
-- Estructura el artículo con secciones (##)
-- Termina con alguna pregunta o llamada a la acción para el lector
-- Keywords a incluir naturalmente: {keywords_str}
-- NO copies texto del blogger original, solo imita su ESTILO
-- Usa markdown para estructurar (# títulos, ## secciones, negritas, etc.)
+- ### REGISTRO — voz consistente
+  - Elegí UN registro y mantenelo todo el post. Recomendado: voseo informal ("vos", "tenés", "pensá") o "tuteo" informal ("tú", "tienes", "piensa").
+  - NO mezcles "usted" (Recuerde, se dedique) con "vos" en el mismo post.
+  - Evitá el registro formal. Esto es un blog personal, no un paper académico.
 
-Escribe el artículo completo:"""
+- ### TÍTULO PRINCIPAL — formato correcto
+  - La PRIMERA LÍNEA del post debe ser EXACTAMENTE: `# <título gancho>`
+  - Usá el formato markdown `# ` al inicio. NO uses `━━━ title: ... ━━━` ni `Title: ...` ni mayúsculas decorativas.
+  - El título debe ser UN GANCHO: datos concretos, afirmaciones audaces, o contrastes impactantes.
+  - Ejemplos BUENOS: `# Los 634 segundos que casi vacían la cartera de un programador`, `# El truco sucio de las academias que prometen programadores en 3 meses`.
+  - Ejemplos MALOS (NUNCA uses estos): títulos en inglés, preguntas tipo "¿Es X realmente Y?", títulos genéricos como "Análisis de X".
+
+- ### CONTENIDO y estructura
+  - BASATE EN LA INFORMACIÓN REAL proporcionada arriba. No inventes datos.
+  - Incluí AL MENOS 2 datos concretos o citas específicas de la investigación. No te quedes en generalidades.
+  - NO uses estructuras de plantilla como "Contexto", "Introducción", "Lo que he aprendido", "Reflexión final" o "Conclusión" como títulos de sección. Dejá que la estructura fluya naturalmente.
+  - Cada título de sección debe ser ESPECÍFICO al contenido concreto, no genérico. Si ese título pudiera aparecer en cualquier otro post, está mal.
+  - Pensá: "¿Qué es lo más interesante de esta información?" y empezá por ahí.
+  - Variá la longitud de las secciones. Algunas ideas merecen un párrafo, otras merecen varios.
+  - Si el blogger usa primera persona, anécdotas personales, humor, etc., hace lo mismo.
+  - Mencioná estos temas si aplican naturalmente: {keywords_str}
+
+- ### ESTILO — que no parezca IA
+  - NO aclares que esto es contenido generado por IA.
+  - NO generes URLs de imágenes falsas (src="https://..." inventadas).
+  - Variá los conectores. No uses "Sin embargo" más de una vez. Alterná con "Pero", "No obstante", "Ahora bien", "Eso sí", "El problema", "Lo cierto es que", etc.
+  - Escribí como un ser humano, no como un asistente. Sin estructuras repetitivas.
+
+Escribí el post completo ahora:"""
+        else:
+            # ---- PROMPT SIMPLIFICADO (sin ejemplos del blogger) ----
+            prompt = f"""{research_block}
+Escribí un post de blog sobre: {topic}
+
+{style_hint}
+
+REGLAS:
+
+- ### IDIOMA — español REAL, nada de Spanglish
+  - Escribí TODO el post en ESPAÑOL. Título, cuerpo, secciones, TODO.
+  - Traducí cualquier término técnico: "Machine Learning" → "Aprendizaje Automático", "Deep Learning" → "Aprendizaje Profundo", "Neural Networks" → "Redes Neuronales", "Data Science" → "Ciencia de Datos", etc.
+  - NO dejes NINGUNA palabra en inglés suelta. TODO traducido.
+  - Usá vocabulario español real, no inventes palabras.
+
+- ### GRAMÁTICA y ortografía
+  - Usá tildes correctamente (empecé, percaté, está, cómo, así).
+  - Respetá la concordancia de género y número.
+  - No inventes palabras. Usá sinónimos conocidos.
+
+- ### REGISTRO — voz consistente
+  - Elegí UN registro y mantenelo: voseo informal ("vos", "tenés") o tuteo ("tú", "tienes").
+  - NO mezcles "usted" con "vos" en el mismo post.
+  - Evitá el registro formal. Es un blog personal.
+
+- ### TÍTULO PRINCIPAL — formato correcto
+  - La PRIMERA LÍNEA debe ser EXACTAMENTE: `# <título gancho>`
+  - Usá formato markdown `# `. NO uses `━━━ title:` ni `Title:` ni mayúsculas decorativas.
+  - El título debe ser UN GANCHO: datos concretos, afirmaciones audaces.
+  - NUNCA uses títulos en inglés ni preguntas tipo "¿Es X realmente Y?".
+
+- ### CONTENIDO y calidad
+  - BASATE EN LA INFORMACIÓN REAL. No inventes datos.
+  - Incluí AL MENOS 2 datos concretos de la investigación.
+  - NO uses títulos genéricos como "Introducción" o "Conclusión".
+  - Cada título de sección debe ser ESPECÍFICO al contenido concreto.
+  - Variá la longitud de las secciones.
+  - Mencioná estos temas si aplican: {keywords_str}
+  - Longitud: entre {min_words} y {max_words} palabras.
+
+- ### ESTILO — que no parezca IA
+  - NO aclares que es contenido generado por IA.
+  - NO generes URLs de imágenes falsas.
+  - Variá los conectores. No uses "Sin embargo" más de una vez. Alterná con "Pero", "Eso sí", "El problema", "Lo cierto es que", etc.
+  - Escribí como un ser humano, no como un asistente.
+
+Escribí el post ahora:"""
 
         try:
             messages = self.llm.create_messages(
-                system_prompt="Eres un experto escribiendo artículos de tecnología en español, con un estilo cercano, humorístico y personal. Escribes como Javi Pas (javipas.com), un blogger conocido por su tono coloquial, sus expresiones características y su forma narrar experiencias personales.",
+                system_prompt="Eres un escritor de blogs. Escribís posts como lo haría un blogger real: con voz propia, estructura orgánica, y sin clichés de IA. Tu estilo es natural, conversacional, y evitás cualquier estructura que parezca plantilla.",
                 user_prompt=prompt,
             )
 
-            response = self.llm.chat_completion(messages, temperature=0.8, max_tokens=3500)
+            response = self.llm.chat_completion(messages, temperature=0.9, max_tokens=4000)
 
             return response.content
 
@@ -231,33 +338,26 @@ Provide the refined version in markdown format."""
 
         return f"""# {topic}
 
-Sé que estoy un poco pesado con el tema, pero {topic} me tiene fascinado últimamente.
+Explorando a fondo las implicaciones de {topic} y su impacto actual.
 
-## Contexto
+## Introducción al Tema
 
-El caso es que hace unos días decidí investigar más sobre esto. Total, que me puse manos a la obra y lo que descubrí me dejó bastante sorprendido. Llevo años siguiendo este tipo de cosas, pero cada vez que profundizo encuentro algo nuevo que me alucina.
+El panorama actual nos obliga a mirar de cerca cómo evoluciona todo. Cuando analizamos esto, nos damos cuenta de que hay mucho más bajo la superficie. La conexión con {keywords_str} resulta evidente cuando lo observamos en detalle.
 
-## Lo que he aprendido
+## Desarrollo y Puntos Claves
 
-Primero, hay que entender el contexto. {topic} no es algo que haya surgido de la noche a la mañana. Lleva años desarrollándose, pero ahora es cuando realmente empieza a tener sentido. La conexión con {keywords_str} es fundamental para entender su importancia.
+En primer lugar, hay que entender el contexto fundamental. No es algo que haya surgido sin precedentes, sino que representa la maduración de ciertas ideas previas. A medida que profundizamos, los patrones se vuelven más claros.
 
-Dicho y hecho, me lancé a probarlo por mi cuenta. Y ciertamente, los resultados son bastante chulos. No es perfecto, obviamente, pero tiene un potencial brutal.
+Es importante destacar algunos elementos esenciales:
+- La rápida evolución de las herramientas.
+- La necesidad de adaptación constante.
+- Los desafíos inherentes a la implementación.
 
-## Mi experiencia personal
+## Análisis y Perspectiva
 
-En mi miniresort burgués, mis maravillosos niños me preguntaron sobre esto. Y ahí me di cuenta de lo importante que es explicar estas cosas de manera sencilla. La tecnología avanza a un ritmo brutal, y {topic} es un ejemplo perfecto de ello.
-
-He estado experimentando con diferentes enfoques, y cada uno tiene su punto. Algunos funcionan mejor que otros, pero todos aportan algo interesante al conjunto.
-
-## Reflexión final
-
-Insisto: vale la pena prestarle atención a {topic}. No es solo hype, hay sustancia detrás. Como digo siempre, el tiempo lo dirá. Pero por ahora, yo estoy bastante optimista.
-
-La clave está en entender no solo cómo funciona, sino por qué es importante. Y eso es algo que solo se consigue probando, equivocándose, y aprendiendo del proceso.
+Al evaluar las alternativas, queda claro que no hay una única solución correcta. Depende en gran medida del escenario de uso y de los objetivos específicos que se persigan.
 
 ## Conclusión
 
-Total, que aquí estamos. {topic} sigue evolucionando, y yo seguiré experimentando con ello. Si tenéis comentarios y sugerencias, invitados estáis a compartirlos.
-
-Como siempre, esto es solo el principio. Lo interesante está por llegar.
+En definitiva, {topic} representa un paso más en esta dirección. Seguiremos atentos a cómo se desarrolla todo este panorama en los próximos meses. El debate, desde luego, está servido.
 """

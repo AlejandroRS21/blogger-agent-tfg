@@ -64,7 +64,7 @@ class ResearchAgent:
 
     def search(self, query: str, limit: int = 5) -> Dict[str, Any]:
         """
-        Performs a web search using Brave Search API.
+        Performs a web search using DuckDuckGo (primary) or Brave Search API.
         
         Args:
             query: Search query
@@ -73,6 +73,36 @@ class ResearchAgent:
         Returns:
             Dictionary with results and status
         """
+        # Try DuckDuckGo first (no API key needed)
+        try:
+            from duckduckgo_search import DDGS
+            results = []
+            with DDGS() as ddgs:
+                ddg_results = ddgs.text(
+                    query,
+                    max_results=limit,
+                    region="es-es",
+                    safesearch="moderate",
+                )
+                for item in ddg_results:
+                    results.append({
+                        "title": item.get("title", ""),
+                        "description": item.get("body", ""),
+                        "url": item.get("href", ""),
+                    })
+            
+            if results:
+                return {
+                    "status": "OK",
+                    "results": results,
+                    "summary": self._summarize(query, results) if results else "No se encontraron resultados relevantes."
+                }
+        except ImportError:
+            pass
+        except Exception as e:
+            print(f"DuckDuckGo search error: {e}")
+        
+        # Fallback: Brave Search API
         if not self.brave_api_key:
             return {
                 "status": "No API Key",
